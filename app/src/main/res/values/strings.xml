@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ClueRush</string>
-    <string name="tagline">Read the clue. Rush across campus. Win the hunt.</string>
+    <string name="tagline">Read the clue. Rush across campus.\nWin the hunt.</string>
 
     <string name="login_title">Welcome back</string>
     <string name="register_title">Create account</string>
@@ -38,4 +38,6 @@
 
     <string name="welcome_user">Welcome, %1$s</string>
     <string name="guest_name">Guest</string>
+    <string name="brand_clue">Clue</string>
+    <string name="brand_rush">Rush</string>
 </resources>

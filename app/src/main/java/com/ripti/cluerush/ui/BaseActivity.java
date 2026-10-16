@@ -5,7 +5,9 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.FrameLayout;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -16,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.ripti.cluerush.R;
+import com.ripti.cluerush.ui.view.NeonMapBackgroundView;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -25,6 +28,22 @@ public abstract class BaseActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         installBackground();
         installSystemBarAppearance();
+    }
+
+    /** Every screen gets the animated map background behind its content. */
+    @Override
+    public void setContentView(@LayoutRes int layoutResId) {
+        setContentView(getLayoutInflater().inflate(layoutResId, null, false));
+    }
+
+    @Override
+    public void setContentView(View content) {
+        FrameLayout frame = new FrameLayout(this);
+        frame.addView(new NeonMapBackgroundView(this), new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        frame.addView(content, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        super.setContentView(frame);
     }
 
     private void installBackground() {
@@ -45,11 +64,17 @@ public abstract class BaseActivity extends AppCompatActivity {
         controller.setAppearanceLightNavigationBars(!isNight);
     }
 
+
     protected void applyInsets(View root) {
+        final int baseLeft = root.getPaddingLeft();
+        final int baseTop = root.getPaddingTop();
+        final int baseRight = root.getPaddingRight();
+        final int baseBottom = root.getPaddingBottom();
         ViewCompat.setOnApplyWindowInsetsListener(root, (view, insets) -> {
             Insets bars = insets.getInsets(
                     WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
-            view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            view.setPadding(baseLeft + bars.left, baseTop + bars.top,
+                    baseRight + bars.right, baseBottom + bars.bottom);
             return WindowInsetsCompat.CONSUMED;
         });
     }

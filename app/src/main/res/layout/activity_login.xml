@@ -6,26 +6,20 @@
     android:fillViewport="true">
 
     <LinearLayout
+        android:id="@+id/contentColumn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="@dimen/space_lg">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textAppearance="@style/TextAppearance.ClueRush.Display" />
-
-        <TextView
+        <!-- Brand logo, title and tagline -->
+        <include
+            layout="@layout/view_brand_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_sm"
-            android:gravity="center"
-            android:text="@string/tagline"
-            android:textAppearance="@style/TextAppearance.ClueRush.BodySecondary" />
+            android:layout_height="wrap_content" />
 
+        <!-- Login card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,6 +34,7 @@
                 android:text="@string/login_title"
                 android:textAppearance="@style/TextAppearance.ClueRush.Headline" />
 
+            <!-- Email -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/emailLayout"
                 style="@style/Widget.ClueRush.TextInput"
@@ -56,8 +51,10 @@
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:textAppearance="@style/TextAppearance.ClueRush.Body" />
+
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Password -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/passwordLayout"
                 style="@style/Widget.ClueRush.TextInput"
@@ -75,8 +72,10 @@
                     android:inputType="textPassword"
                     android:maxLines="1"
                     android:textAppearance="@style/TextAppearance.ClueRush.Body" />
+
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Forgot password -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/forgotButton"
                 style="@style/Widget.Material3.Button.TextButton"
@@ -85,6 +84,7 @@
                 android:layout_gravity="end"
                 android:text="@string/action_forgot" />
 
+            <!-- Login button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/loginButton"
                 style="@style/Widget.ClueRush.Button"
@@ -92,8 +92,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_sm"
                 android:text="@string/action_login" />
+
         </LinearLayout>
 
+        <!-- Guest login -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/guestButton"
             style="@style/Widget.ClueRush.Button.Outlined"
@@ -102,6 +104,7 @@
             android:layout_marginTop="@dimen/space_lg"
             android:text="@string/action_guest" />
 
+        <!-- Registration link -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -121,6 +124,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/action_register" />
+
         </LinearLayout>
+
     </LinearLayout>
+
 </ScrollView>
