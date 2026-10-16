@@ -1,6 +1,6 @@
 package com.ripti.cluerush.data;
 
-import com.google.firebase.database.FirebaseDatabase;
+import com.ripti.cluerush.FirebaseManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,7 @@ public class UserRepository {
             profile.put("totalWins", 0);
             profile.put("matchesPlayed", 0);
 
-            FirebaseDatabase.getInstance()
+            FirebaseManager.getDatabase()
                     .getReference("users")
                     .child(uid)
                     .setValue(profile)
