@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="TextAppearance.ClueRush.Display" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/text_display</item>
+        <item name="android:textColor">@color/cr_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.ClueRush.Headline" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/text_headline</item>
+        <item name="android:textColor">@color/cr_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.ClueRush.Title" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/text_title</item>
+        <item name="android:textColor">@color/cr_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.ClueRush.Body" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textSize">@dimen/text_body</item>
+        <item name="android:textColor">@color/cr_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.ClueRush.BodySecondary" parent="TextAppearance.ClueRush.Body">
+        <item name="android:textColor">@color/cr_text_secondary</item>
+    </style>
+
+    <style name="TextAppearance.ClueRush.Caption" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textSize">@dimen/text_caption</item>
+        <item name="android:textColor">@color/cr_text_secondary</item>
+    </style>
+
+    <style name="TextAppearance.ClueRush.Mono" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">@font/jetbrains_mono</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/text_headline</item>
+        <item name="android:textColor">@color/cr_accent_text</item>
+        <item name="android:letterSpacing">0.15</item>
+    </style>
+
+    <style name="TextAppearance.ClueRush.Button" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">@dimen/text_body</item>
+    </style>
+
+    <style name="Widget.ClueRush.Button" parent="Widget.Material3.Button">
+        <item name="android:minHeight">@dimen/touch_min</item>
+        <item name="android:paddingStart">@dimen/space_lg</item>
+        <item name="android:paddingEnd">@dimen/space_lg</item>
+        <item name="android:textAppearance">@style/TextAppearance.ClueRush.Button</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="backgroundTint">@color/rush_blue</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
+    </style>
+
+    <style name="Widget.ClueRush.Button.Gold">
+        <item name="android:textColor">@color/navy_950</item>
+        <item name="backgroundTint">@color/treasure_gold</item>
+    </style>
+
+    <style name="Widget.ClueRush.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">@dimen/touch_min</item>
+        <item name="android:paddingStart">@dimen/space_lg</item>
+        <item name="android:paddingEnd">@dimen/space_lg</item>
+        <item name="android:textAppearance">@style/TextAppearance.ClueRush.Button</item>
+        <item name="android:textColor">@color/cr_text_primary</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
+        <item name="strokeColor">@color/rush_blue</item>
+        <item name="strokeWidth">@dimen/stroke_medium</item>
+    </style>
+
+    <style name="Widget.ClueRush.TextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">@dimen/radius_button</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/radius_button</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/radius_button</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/radius_button</item>
+        <item name="boxStrokeColor">@color/rush_blue</item>
+        <item name="hintTextColor">@color/cr_text_secondary</item>
+        <item name="android:textColorHint">@color/cr_text_secondary</item>
+    </style>
+
+</resources>

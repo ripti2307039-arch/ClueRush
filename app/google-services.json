@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "720847733860",
+    "firebase_url": "https://cluerush-4eca7-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "cluerush-4eca7",
+    "storage_bucket": "cluerush-4eca7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:720847733860:android:eec664506918c42b038b71",
+        "android_client_info": {
+          "package_name": "com.ripti.cluerush"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCh60vZSHUkQx68myxFdKQca_HYlZxKB54"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

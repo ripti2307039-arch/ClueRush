@@ -27,5 +27,10 @@
     <color name="cr_accent_text">#8A5A00</color>
     <color name="cr_success_text">#0F7B70</color>
     <color name="cr_error_text">#C1272D</color>
+    <color name="cr_bg_start">#E6EEFF</color>
+    <color name="cr_bg_end">#F6F8FB</color>
+    <color name="cr_glow_start">#332F6BFF</color>
+    <color name="cr_glow_end">#002F6BFF</color>
+    <color name="cr_grid_line">#140B1220</color>
 
 </resources>

@@ -1,3 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ClueRush</string>
+    <string name="tagline">Read the clue. Rush across campus. Win the hunt.</string>
+
+    <string name="login_title">Welcome back</string>
+    <string name="register_title">Create account</string>
+
+    <string name="hint_name">Name</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_confirm_password">Confirm password</string>
+
+    <string name="action_login">Log in</string>
+    <string name="action_register">Sign up</string>
+    <string name="action_guest">Continue as guest</string>
+    <string name="action_forgot">Forgot password?</string>
+    <string name="action_logout">Log out</string>
+    <string name="no_account">New here?</string>
+    <string name="have_account">Already have an account?</string>
+    <string name="loading">Please wait</string>
+
+    <string name="error_name_required">Please enter your name</string>
+    <string name="error_email_required">Please enter your email</string>
+    <string name="error_email_invalid">That email address does not look right</string>
+    <string name="error_password_required">Please enter your password</string>
+    <string name="error_password_short">Use at least 6 characters</string>
+    <string name="error_password_mismatch">Passwords do not match</string>
+    <string name="error_no_internet">No internet connection. Please check your network and try again</string>
+    <string name="error_weak_password">That password is too weak. Try a longer one</string>
+    <string name="error_email_in_use">An account with this email already exists</string>
+    <string name="error_wrong_credentials">Email or password is incorrect</string>
+    <string name="error_too_many">Too many attempts. Please try again later</string>
+    <string name="error_generic">Something went wrong. Please try again</string>
+
+    <string name="reset_email_required">Enter your email above first</string>
+    <string name="reset_sent">Password reset link sent. Check your inbox</string>
+
+    <string name="welcome_user">Welcome, %1$s</string>
+    <string name="guest_name">Guest</string>
 </resources>

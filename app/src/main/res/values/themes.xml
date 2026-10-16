@@ -16,9 +16,12 @@
         <item name="colorOnBackground">@color/cr_text_primary</item>
         <item name="colorOnSurfaceVariant">@color/cr_text_secondary</item>
         <item name="colorOutline">@color/cr_stroke</item>
+        <item name="android:windowBackground">@drawable/bg_main</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="materialButtonStyle">@style/Widget.ClueRush.Button</item>
     </style>
 
 </resources>
