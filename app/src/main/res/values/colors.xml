@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+
+    <color name="rush_blue">#2F6BFF</color>
+    <color name="rush_blue_pressed">#1F4FD1</color>
+    <color name="treasure_gold">#FFB703</color>
+    <color name="mint">#2EC4B6</color>
+    <color name="alert_red">#E63946</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="navy_950">#0B1220</color>
+    <color name="navy_900">#131C2E</color>
+    <color name="navy_800">#1B2740</color>
+
+    <color name="player_me">#2F6BFF</color>
+    <color name="player_opponent">#FFB703</color>
+
+    <color name="cr_background">#F6F8FB</color>
+    <color name="cr_surface">#FFFFFF</color>
+    <color name="cr_elevated">#EEF2F9</color>
+    <color name="cr_text_primary">#0B1220</color>
+    <color name="cr_text_secondary">#4A5870</color>
+    <color name="cr_stroke">#1F0B1220</color>
+    <color name="cr_glass_fill">#CCFFFFFF</color>
+    <color name="cr_primary_container">#DCE6FF</color>
+    <color name="cr_on_primary_container">#0B1F5C</color>
+    <color name="cr_accent_text">#8A5A00</color>
+    <color name="cr_success_text">#0F7B70</color>
+    <color name="cr_error_text">#C1272D</color>
+
 </resources>
