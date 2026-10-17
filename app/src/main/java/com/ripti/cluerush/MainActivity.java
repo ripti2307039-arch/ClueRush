@@ -18,7 +18,7 @@ import com.ripti.cluerush.data.MatchRepository;
 import com.ripti.cluerush.databinding.ActivityMainBinding;
 import com.ripti.cluerush.databinding.DialogJoinCodeBinding;
 import com.ripti.cluerush.model.Arena;
-import com.ripti.cluerush.model.Match;
+import com.ripti.cluerush.model.Difficulty;
 import com.ripti.cluerush.ui.BaseActivity;
 import com.ripti.cluerush.ui.auth.LoginActivity;
 import com.ripti.cluerush.ui.game.GameActivity;
@@ -112,17 +112,17 @@ public class MainActivity extends BaseActivity {
                                       DifficultyListener listener) {
         String[] options = {
                 getString(R.string.difficulty_easy),
+                getString(R.string.difficulty_medium),
                 getString(R.string.difficulty_hard)
         };
+        Difficulty[] values = Difficulty.values();
         int[] choice = {0};
         new MaterialAlertDialogBuilder(this)
                 .setTitle(title)
                 .setSingleChoiceItems(options, 0, (dialog, which) -> choice[0] = which)
                 .setNegativeButton(R.string.action_cancel, null)
                 .setPositiveButton(positiveLabel, (dialog, which) ->
-                        listener.onChosen(choice[0] == 0
-                                ? Match.DIFFICULTY_EASY
-                                : Match.DIFFICULTY_HARD))
+                        listener.onChosen(values[choice[0]].getKey()))
                 .show();
     }
 

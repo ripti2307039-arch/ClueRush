@@ -6,16 +6,7 @@ public enum HeatLevel {
     WARM,
     HOT;
 
-    public static HeatLevel forDistance(double meters, boolean hard) {
-        if (hard) {
-            if (meters <= 150.0) {
-                return HOT;
-            }
-            if (meters <= 450.0) {
-                return WARM;
-            }
-            return COLD;
-        }
+    public static HeatLevel forDistance(double meters) {
         if (meters <= 100.0) {
             return HOT;
         }

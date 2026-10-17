@@ -12,10 +12,10 @@ public class CampusLocation {
     private final double latitude;
     private final double longitude;
     private final double radiusMeters;
-    private final List<String> clues;
+    private final List<Clue> clues;
 
     public CampusLocation(String id, String name, double latitude, double longitude,
-                          double radiusMeters, List<String> clues) {
+                          double radiusMeters, List<Clue> clues) {
         this.id = id;
         this.name = name;
         this.latitude = latitude;
@@ -44,7 +44,17 @@ public class CampusLocation {
         return radiusMeters;
     }
 
-    public String pickClue(Random random) {
-        return clues.get(random.nextInt(clues.size()));
+    public String pickClue(Random random, Difficulty difficulty) {
+        List<Clue> exact = new ArrayList<>();
+        List<Clue> general = new ArrayList<>();
+        for (Clue clue : clues) {
+            if (clue.getLevel() == null) {
+                general.add(clue);
+            } else if (clue.getLevel() == difficulty) {
+                exact.add(clue);
+            }
+        }
+        List<Clue> pool = !exact.isEmpty() ? exact : (!general.isEmpty() ? general : clues);
+        return pool.get(random.nextInt(pool.size())).getText();
     }
 }

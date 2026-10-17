@@ -6,6 +6,8 @@ import android.util.Xml;
 
 import com.ripti.cluerush.model.Arena;
 import com.ripti.cluerush.model.CampusLocation;
+import com.ripti.cluerush.model.Clue;
+import com.ripti.cluerush.model.Difficulty;
 import com.ripti.cluerush.model.GeoBounds;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -135,7 +137,7 @@ public final class ArenaXmlParser {
                 : "location '" + id + "'";
 
         List<String> issues = new ArrayList<>();
-        List<String> clues = new ArrayList<>();
+        List<Clue> clues = new ArrayList<>();
         int event;
         while ((event = parser.next()) != XmlPullParser.END_TAG) {
             if (event == XmlPullParser.END_DOCUMENT) {
@@ -145,11 +147,19 @@ public final class ArenaXmlParser {
                 continue;
             }
             if ("clue".equals(parser.getName())) {
+                String levelText = attribute(parser, "level");
                 String text = parser.nextText().trim();
+                Difficulty level = null;
+                if (!levelText.isEmpty()) {
+                    level = Difficulty.fromName(levelText);
+                    if (level == null) {
+                        issues.add("has a clue with an unknown level '" + levelText + "'");
+                    }
+                }
                 if (text.isEmpty()) {
                     issues.add("has an empty <clue>");
                 } else {
-                    clues.add(text);
+                    clues.add(new Clue(text, level));
                 }
             } else {
                 skip(parser);

@@ -16,7 +16,10 @@ public interface GameMap {
 
     void setMarkers(List<MapMarker> markers);
 
-    void setLabelsVisible(boolean visible);
+    void setPlayerPosition(double latitude, double longitude);
+
+    /** Meters. Zero or less means no fog and every pin and name visible (debug). */
+    void setVisionRadius(double meters);
 
     void showZone(double latitude, double longitude, double radiusMeters);
 

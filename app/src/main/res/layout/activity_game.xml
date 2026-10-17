@@ -20,12 +20,6 @@
         android:layout_gravity="center"
         android:contentDescription="@string/cd_player_avatar" />
 
-    <com.ripti.cluerush.ui.view.CompassView
-        android:id="@+id/compassView"
-        android:layout_width="@dimen/compass_size"
-        android:layout_height="@dimen/compass_size"
-        android:layout_gravity="center"
-        android:contentDescription="@string/cd_compass" />
 
     <FrameLayout
         android:id="@+id/hudLayer"

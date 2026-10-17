@@ -12,6 +12,7 @@ public class Match {
     public static final String STATUS_FINISHED = "finished";
 
     public static final String DIFFICULTY_EASY = "easy";
+    public static final String DIFFICULTY_MEDIUM = "medium";
     public static final String DIFFICULTY_HARD = "hard";
 
     public static final int DEFAULT_MAX_PLAYERS = 2;

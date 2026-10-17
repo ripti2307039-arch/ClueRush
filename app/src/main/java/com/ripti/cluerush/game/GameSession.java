@@ -9,8 +9,12 @@ import java.util.Set;
 
 public class GameSession {
 
+    public static final int WRONG_PLACE_PENALTY = 10;
+
     private final List<Round> rounds;
+    private final Set<String> discovered = new HashSet<>();
     private int index;
+    private int wrongAttempts;
 
     public GameSession(List<Round> rounds) {
         this.rounds = new ArrayList<>(rounds);
@@ -44,5 +48,25 @@ public class GameSession {
             ids.add(rounds.get(i).getLocation().getId());
         }
         return ids;
+    }
+
+    public boolean discover(String locationId) {
+        return discovered.add(locationId);
+    }
+
+    public Set<String> getDiscoveredIds() {
+        return new HashSet<>(discovered);
+    }
+
+    public void registerWrongAttempt() {
+        wrongAttempts++;
+    }
+
+    public int getWrongAttempts() {
+        return wrongAttempts;
+    }
+
+    public int getPenaltyPoints() {
+        return wrongAttempts * WRONG_PLACE_PENALTY;
     }
 }

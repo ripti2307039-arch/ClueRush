@@ -126,7 +126,7 @@
     <string name="location_reached_body">The task for this spot arrives in the next step. For now, continue to the next clue.</string>
     <string name="action_continue">Continue</string>
     <string name="game_finished_title">Hunt complete!</string>
-    <string name="game_finished_body">You found all %1$d locations.</string>
+    <string name="game_finished_body">You found all %1$d locations. Wrong guesses: %2$d.</string>
     <string name="action_back_home">Back to home</string>
     <string name="error_arena_load">Arena data could not be loaded. Please check the arena files.</string>
     <string name="error_no_arenas">No valid arenas were found. Please check the arena files.</string>
@@ -144,4 +144,9 @@
         <item>west</item>
         <item>north-west</item>
     </string-array>
+    <string name="difficulty_medium">Medium</string>
+    <string name="hint_no_place">Nothing here. Read the clue and keep exploring.</string>
+    <string name="hint_no_place_easy">Nothing here yet. Watch the Hot/Cold chip.</string>
+    <string name="hint_wrong_place">This is %1$s, not the place the clue describes. −%2$d points.</string>
+    <string name="hint_discovered">Discovered: %1$s</string>
 </resources>

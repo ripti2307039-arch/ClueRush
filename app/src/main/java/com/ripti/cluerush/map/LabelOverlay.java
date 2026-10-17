@@ -10,6 +10,7 @@ import android.graphics.RectF;
 import androidx.core.content.ContextCompat;
 
 import com.ripti.cluerush.R;
+import com.ripti.cluerush.util.GeoMath;
 
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.Projection;
@@ -43,8 +44,12 @@ class LabelOverlay extends Overlay {
     private GeoPoint[] geoPoints = new GeoPoint[0];
     private int[] xs = new int[0];
     private int[] ys = new int[0];
+    private boolean[] visible = new boolean[0];
+    private boolean[] named = new boolean[0];
     private RectF[] placed = new RectF[0];
-    private boolean labelsVisible = true;
+    private double playerLat = Double.NaN;
+    private double playerLng = Double.NaN;
+    private double visionMeters;
 
     LabelOverlay(Context context) {
         density = context.getResources().getDisplayMetrics().density;
@@ -75,6 +80,8 @@ class LabelOverlay extends Overlay {
         geoPoints = new GeoPoint[count];
         xs = new int[count];
         ys = new int[count];
+        visible = new boolean[count];
+        named = new boolean[count];
         placed = new RectF[count];
         for (int i = 0; i < count; i++) {
             MapMarker marker = markers.get(i);
@@ -83,8 +90,13 @@ class LabelOverlay extends Overlay {
         }
     }
 
-    void setLabelsVisible(boolean visible) {
-        labelsVisible = visible;
+    void setPlayer(double lat, double lng) {
+        playerLat = lat;
+        playerLng = lng;
+    }
+
+    void setVisionMeters(double meters) {
+        visionMeters = meters;
     }
 
     @Override
@@ -97,11 +109,12 @@ class LabelOverlay extends Overlay {
         Rect clip = canvas.getClipBounds();
         float margin = 120f * density;
         float scale = scaleFor(projection.getZoomLevel());
-        float dotRadius = (labelsVisible ? 6f : 8f) * density * scale;
+        float dotRadius = 7f * density * scale;
         float padH = 8f * density * scale;
         float padV = 3f * density * scale;
         float gap = 5f * density * scale;
         float corner = 8f * density * scale;
+        boolean unlimited = visionMeters <= 0.0;
 
         dotStrokePaint.setStrokeWidth(2f * density * scale);
         textPaint.setTextSize(13f * density * scale);
@@ -109,13 +122,21 @@ class LabelOverlay extends Overlay {
         float textHeight = metrics.descent - metrics.ascent;
 
         for (int i = 0; i < count; i++) {
-            projection.toPixels(geoPoints[i], point);
-            xs[i] = point.x;
-            ys[i] = point.y;
+            MapMarker marker = markers.get(i);
+            double distance = GeoMath.distanceMeters(playerLat, playerLng,
+                    marker.getLatitude(), marker.getLongitude());
+            visible[i] = unlimited || distance <= visionMeters;
+            named[i] = visible[i] && (unlimited || marker.isDiscovered()
+                    || distance <= marker.getRevealRadiusMeters());
+            if (visible[i]) {
+                projection.toPixels(geoPoints[i], point);
+                xs[i] = point.x;
+                ys[i] = point.y;
+            }
         }
 
         for (int i = 0; i < count; i++) {
-            if (!onScreen(xs[i], ys[i], clip, margin)) {
+            if (!visible[i] || !onScreen(xs[i], ys[i], clip, margin)) {
                 continue;
             }
             dotPaint.setColor(markers.get(i).isCompleted() ? completedColor : pendingColor);
@@ -123,13 +144,9 @@ class LabelOverlay extends Overlay {
             canvas.drawCircle(xs[i], ys[i], dotRadius, dotStrokePaint);
         }
 
-        if (!labelsVisible) {
-            return;
-        }
-
         int placedCount = 0;
         for (int i = 0; i < count; i++) {
-            if (!onScreen(xs[i], ys[i], clip, margin)) {
+            if (!named[i] || !onScreen(xs[i], ys[i], clip, margin)) {
                 continue;
             }
             MapMarker marker = markers.get(i);

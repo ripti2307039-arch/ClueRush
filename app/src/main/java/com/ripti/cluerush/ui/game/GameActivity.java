@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.WindowManager;
@@ -29,16 +30,15 @@ import com.ripti.cluerush.databinding.ActivityGameBinding;
 import com.ripti.cluerush.game.GameLoop;
 import com.ripti.cluerush.game.GameSession;
 import com.ripti.cluerush.game.HeatLevel;
+import com.ripti.cluerush.game.LocationScanner;
 import com.ripti.cluerush.game.PlayerController;
 import com.ripti.cluerush.game.RoundGenerator;
-import com.ripti.cluerush.game.TargetInfo;
-import com.ripti.cluerush.game.TargetTracker;
 import com.ripti.cluerush.map.GameMap;
 import com.ripti.cluerush.map.MapMarker;
 import com.ripti.cluerush.map.OsmGameMap;
 import com.ripti.cluerush.model.Arena;
 import com.ripti.cluerush.model.CampusLocation;
-import com.ripti.cluerush.model.Match;
+import com.ripti.cluerush.model.Difficulty;
 import com.ripti.cluerush.model.Round;
 import com.ripti.cluerush.ui.BaseActivity;
 import com.ripti.cluerush.util.GeoMath;
@@ -55,6 +55,7 @@ public class GameActivity extends BaseActivity {
     public static final String EXTRA_DIFFICULTY = "extra_difficulty";
 
     private static final int ROUND_COUNT = 5;
+    private static final double VISION_RADIUS_METERS = 80.0;
     private static final float MAX_ZOOM_OUT = 0.35f;
     private static final float ZOOM_RESPONSE = 3f;
     private static final float ZOOM_APPLY_THRESHOLD = 0.004f;
@@ -62,6 +63,7 @@ public class GameActivity extends BaseActivity {
     private static final double TRAIL_SPACING_METERS = 7.0;
     private static final long HINT_VISIBLE_MS = 2600L;
     private static final long PANEL_ANIMATION_MS = 220L;
+    private static final long WRONG_COOLDOWN_MS = 900L;
 
     private final Random random = new Random();
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -73,7 +75,7 @@ public class GameActivity extends BaseActivity {
     private GameLoop gameLoop;
     private GameSession session;
     private Arena arena;
-    private boolean hard;
+    private Difficulty difficulty;
     private double baseZoom;
     private float zoomOffset;
     private float appliedZoomOffset;
@@ -81,11 +83,12 @@ public class GameActivity extends BaseActivity {
     private double lastTrailLongitude = Double.NaN;
     private boolean inputLocked;
     private boolean finishedState;
-    private boolean inside;
-    private boolean zoneShown;
     private boolean panelExpanded = true;
+    private boolean debugReveal;
+    private long lastWrongAt;
     private HeatLevel currentHeat;
-    private TargetInfo lastInfo;
+    private CampusLocation insideLocation;
+    private CampusLocation zoneLocation;
     private ObjectAnimator pulseAnimator;
 
     @Override
@@ -99,8 +102,9 @@ public class GameActivity extends BaseActivity {
             return;
         }
 
-        hard = Match.DIFFICULTY_HARD.equals(getIntent().getStringExtra(EXTRA_DIFFICULTY));
-        session = new GameSession(RoundGenerator.generate(arena, ROUND_COUNT, random));
+        difficulty = Difficulty.fromKey(getIntent().getStringExtra(EXTRA_DIFFICULTY));
+        session = new GameSession(
+                RoundGenerator.generate(arena, ROUND_COUNT, difficulty, random));
 
         configureWindow();
         MapConfig.init(this);
@@ -118,7 +122,11 @@ public class GameActivity extends BaseActivity {
         gameMap.setNightStyle(isNightMode());
         gameMap.setZoom(baseZoom);
         gameMap.moveCamera(player.getLatitude(), player.getLongitude());
-        gameMap.setLabelsVisible(!hard);
+        gameMap.setPlayerPosition(player.getLatitude(), player.getLongitude());
+        gameMap.setVisionRadius(VISION_RADIUS_METERS);
+
+        binding.heatChip.setVisibility(difficulty.showsHeat() ? View.VISIBLE : View.GONE);
+        binding.actionButton.setAlpha(INACTIVE_BUTTON_ALPHA);
 
         binding.joystick.setListener((x, y) -> {
             if (!inputLocked) {
@@ -129,6 +137,15 @@ public class GameActivity extends BaseActivity {
         binding.exitButton.setOnClickListener(v -> confirmExit());
         binding.panelToggle.setOnClickListener(v -> setPanelExpanded(!panelExpanded));
         binding.resultButton.setOnClickListener(v -> onResultContinue());
+
+        // DEBUG (12B-te minimap ashle muche debo): long-press korle fog off, shob pin dekha jay.
+        binding.attributionText.setOnLongClickListener(v -> {
+            debugReveal = !debugReveal;
+            gameMap.setVisionRadius(debugReveal ? 0.0 : VISION_RADIUS_METERS);
+            Toast.makeText(this, debugReveal ? "Debug: fog off" : "Debug: fog on",
+                    Toast.LENGTH_SHORT).show();
+            return true;
+        });
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -150,7 +167,7 @@ public class GameActivity extends BaseActivity {
         hideSystemBars();
         gameMap.onResume();
         gameLoop.start();
-        if (inside && !inputLocked) {
+        if (insideLocation != null && !inputLocked) {
             startPulse();
         }
     }
@@ -189,12 +206,13 @@ public class GameActivity extends BaseActivity {
         boolean moved = player.update(deltaSeconds);
         if (moved) {
             gameMap.moveCamera(player.getLatitude(), player.getLongitude());
+            gameMap.setPlayerPosition(player.getLatitude(), player.getLongitude());
             addTrailIfNeeded();
         }
         binding.avatarView.setMoving(player.isMoving());
         binding.avatarView.setFacingRight(player.isFacingRight());
         updateZoom(deltaSeconds);
-        updateTarget();
+        updateProximity();
     }
 
     private void updateZoom(float deltaSeconds) {
@@ -223,76 +241,91 @@ public class GameActivity extends BaseActivity {
         if (round == null) {
             return;
         }
-        inside = false;
-        zoneShown = false;
         currentHeat = null;
-        lastInfo = null;
-        gameMap.hideZone();
-        stopPulse();
-        binding.actionButton.setAlpha(INACTIVE_BUTTON_ALPHA);
         binding.clueIndexText.setText(getString(R.string.clue_index,
                 session.getIndex() + 1, session.getTotal()));
         binding.clueText.setText(round.getClue());
         publishMarkers();
-        updateTarget();
+        updateProximity();
     }
 
     private void publishMarkers() {
         Set<String> done = session.getCompletedLocationIds();
+        Set<String> seen = session.getDiscoveredIds();
         List<MapMarker> markers = new ArrayList<>();
         for (CampusLocation location : arena.getLocations()) {
             markers.add(new MapMarker(location.getId(), location.getName(),
                     location.getLatitude(), location.getLongitude(),
-                    done.contains(location.getId())));
+                    location.getRadiusMeters(),
+                    done.contains(location.getId()),
+                    seen.contains(location.getId())));
         }
         gameMap.setMarkers(markers);
     }
 
-    private void updateTarget() {
+    private void updateProximity() {
         Round round = session.getCurrent();
         if (round == null || inputLocked) {
             return;
         }
-        CampusLocation target = round.getLocation();
-        TargetInfo info = TargetTracker.compute(player.getLatitude(), player.getLongitude(),
-                target, hard);
-        lastInfo = info;
+        double lat = player.getLatitude();
+        double lng = player.getLongitude();
 
-        binding.compassView.setBearing((float) info.getBearingDegrees());
-
-        if (info.getHeat() != currentHeat) {
-            currentHeat = info.getHeat();
-            applyHeat(currentHeat);
+        if (difficulty.showsHeat()) {
+            double distance = LocationScanner.distanceTo(round.getLocation(), lat, lng);
+            HeatLevel heat = HeatLevel.forDistance(distance);
+            if (heat != currentHeat) {
+                currentHeat = heat;
+                applyHeat(heat);
+            }
         }
 
-        if (info.isNearZone() != zoneShown) {
-            zoneShown = info.isNearZone();
-            if (zoneShown) {
-                gameMap.showZone(target.getLatitude(), target.getLongitude(),
-                        target.getRadiusMeters());
+        LocationScanner.Hit hit = LocationScanner.nearest(arena, lat, lng);
+        if (hit == null) {
+            return;
+        }
+
+        CampusLocation zoneNow = hit.isNearZone() ? hit.getLocation() : null;
+        if (!sameLocation(zoneNow, zoneLocation)) {
+            zoneLocation = zoneNow;
+            if (zoneNow != null) {
+                gameMap.showZone(zoneNow.getLatitude(), zoneNow.getLongitude(),
+                        zoneNow.getRadiusMeters());
             } else {
                 gameMap.hideZone();
             }
         }
 
-        if (info.isInside() != inside) {
-            inside = info.isInside();
-            if (inside) {
-                onZoneEntered();
+        CampusLocation insideNow = hit.isInside() ? hit.getLocation() : null;
+        if (!sameLocation(insideNow, insideLocation)) {
+            insideLocation = insideNow;
+            if (insideNow != null) {
+                onAreaEntered(insideNow);
             } else {
-                onZoneLeft();
+                onAreaLeft();
             }
         }
     }
 
-    private void onZoneEntered() {
+    private static boolean sameLocation(CampusLocation a, CampusLocation b) {
+        if (a == null || b == null) {
+            return a == b;
+        }
+        return a.getId().equals(b.getId());
+    }
+
+    private void onAreaEntered(CampusLocation location) {
         gameMap.playZoneRipple();
         binding.getRoot().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
         binding.actionButton.setAlpha(1f);
         startPulse();
+        if (session.discover(location.getId())) {
+            publishMarkers();
+            showHint(getString(R.string.hint_discovered, location.getName()));
+        }
     }
 
-    private void onZoneLeft() {
+    private void onAreaLeft() {
         stopPulse();
         binding.actionButton.setAlpha(INACTIVE_BUTTON_ALPHA);
     }
@@ -330,22 +363,37 @@ public class GameActivity extends BaseActivity {
     }
 
     private void onActionPressed() {
-        if (inputLocked || lastInfo == null) {
+        Round round = session.getCurrent();
+        if (inputLocked || round == null) {
             return;
         }
-        if (lastInfo.isInside()) {
-            openLocationResult();
-        } else {
-            showFarHint(lastInfo);
+        if (insideLocation == null) {
+            showHint(getString(difficulty.showsHeat()
+                    ? R.string.hint_no_place_easy : R.string.hint_no_place));
+            return;
         }
+        if (insideLocation.getId().equals(round.getLocation().getId())) {
+            openLocationResult();
+            return;
+        }
+
+        long now = SystemClock.uptimeMillis();
+        if (now - lastWrongAt < WRONG_COOLDOWN_MS) {
+            return;
+        }
+        lastWrongAt = now;
+        session.registerWrongAttempt();
+        shakeActionButton();
+        showHint(getString(R.string.hint_wrong_place, insideLocation.getName(),
+                GameSession.WRONG_PLACE_PENALTY));
     }
 
-    private void showFarHint(TargetInfo info) {
-        int step = hard ? 50 : 10;
-        int rounded = Math.max(step, (int) (Math.round(info.getDistanceMeters() / step) * step));
-        String direction = getResources().getStringArray(R.array.directions)[
-                TargetTracker.directionIndex(info.getBearingDegrees())];
-        showHint(getString(R.string.hint_far, rounded, direction));
+    private void shakeActionButton() {
+        float shift = 10f * getResources().getDisplayMetrics().density;
+        ObjectAnimator.ofFloat(binding.actionButton, View.TRANSLATION_X,
+                        0f, -shift, shift, -shift * 0.6f, shift * 0.6f, 0f)
+                .setDuration(280L)
+                .start();
     }
 
     private void showHint(String message) {
@@ -373,7 +421,6 @@ public class GameActivity extends BaseActivity {
         }
         lockInput();
         stopPulse();
-        gameMap.hideZone();
         showResult(getString(R.string.location_reached_title),
                 round.getLocation().getName(),
                 getString(R.string.location_reached_body),
@@ -399,6 +446,9 @@ public class GameActivity extends BaseActivity {
         binding.resultOverlay.setVisibility(View.GONE);
         inputLocked = false;
         showRound();
+        if (insideLocation != null) {
+            startPulse();
+        }
     }
 
     private void showFinished() {
@@ -406,7 +456,8 @@ public class GameActivity extends BaseActivity {
         gameMap.hideZone();
         publishMarkers();
         showResult(getString(R.string.game_finished_title), "",
-                getString(R.string.game_finished_body, session.getTotal()),
+                getString(R.string.game_finished_body, session.getTotal(),
+                        session.getWrongAttempts()),
                 R.string.action_back_home);
     }
 

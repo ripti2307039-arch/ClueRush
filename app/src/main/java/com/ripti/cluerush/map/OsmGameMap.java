@@ -32,6 +32,7 @@ public class OsmGameMap implements GameMap {
     private final TrailOverlay trailOverlay;
     private final ZoneOverlay zoneOverlay;
     private final LabelOverlay labelOverlay;
+    private final FogOverlay fogOverlay;
 
     @SuppressLint("ClickableViewAccessibility")
     public OsmGameMap(MapView mapView) {
@@ -49,9 +50,11 @@ public class OsmGameMap implements GameMap {
         trailOverlay = new TrailOverlay(mapView.getContext(), mapView);
         zoneOverlay = new ZoneOverlay(mapView.getContext(), mapView);
         labelOverlay = new LabelOverlay(mapView.getContext());
+        fogOverlay = new FogOverlay();
         mapView.getOverlays().add(trailOverlay);
         mapView.getOverlays().add(zoneOverlay);
         mapView.getOverlays().add(labelOverlay);
+        mapView.getOverlays().add(fogOverlay);
     }
 
     @Override
@@ -88,8 +91,15 @@ public class OsmGameMap implements GameMap {
     }
 
     @Override
-    public void setLabelsVisible(boolean visible) {
-        labelOverlay.setLabelsVisible(visible);
+    public void setPlayerPosition(double latitude, double longitude) {
+        labelOverlay.setPlayer(latitude, longitude);
+        fogOverlay.setPlayer(latitude, longitude);
+    }
+
+    @Override
+    public void setVisionRadius(double meters) {
+        labelOverlay.setVisionMeters(meters);
+        fogOverlay.setRadiusMeters(meters);
         mapView.invalidate();
     }
 
