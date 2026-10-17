@@ -2,6 +2,7 @@ package com.ripti.cluerush;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -20,6 +21,7 @@ import com.ripti.cluerush.model.Arena;
 import com.ripti.cluerush.model.Match;
 import com.ripti.cluerush.ui.BaseActivity;
 import com.ripti.cluerush.ui.auth.LoginActivity;
+import com.ripti.cluerush.ui.game.GameActivity;
 import com.ripti.cluerush.ui.home.ArenaAdapter;
 import com.ripti.cluerush.ui.lobby.LobbyActivity;
 import com.ripti.cluerush.ui.profile.ProfileActivity;
@@ -32,6 +34,10 @@ import java.util.List;
 public class MainActivity extends BaseActivity {
 
     private static final String CODE_PATTERN = "[A-Z0-9]{6}";
+
+    private interface DifficultyListener {
+        void onChosen(String difficulty);
+    }
 
     private final MatchRepository matchRepository = new MatchRepository();
 
@@ -59,17 +65,35 @@ public class MainActivity extends BaseActivity {
                 startActivity(new Intent(this, ProfileActivity.class)));
 
         List<Arena> arenas = ArenaCatalog.getAll(this);
-        selectedArena = arenas.get(0);
-        ArenaAdapter adapter = new ArenaAdapter(arenas, arena -> selectedArena = arena);
-        binding.arenaList.setLayoutManager(
-                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        binding.arenaList.setItemAnimator(null);
-        binding.arenaList.setAdapter(adapter);
+        if (arenas.isEmpty()) {
+            binding.arenaList.setVisibility(View.GONE);
+            binding.createMatchButton.setEnabled(false);
+            binding.practiceButton.setEnabled(false);
+            showMessage(getString(R.string.error_no_arenas));
+        } else {
+            selectedArena = arenas.get(0);
+            ArenaAdapter adapter = new ArenaAdapter(arenas, arena -> selectedArena = arena);
+            binding.arenaList.setLayoutManager(
+                    new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+            binding.arenaList.setItemAnimator(null);
+            binding.arenaList.setAdapter(adapter);
+        }
 
-        binding.createMatchButton.setOnClickListener(v -> showCreateDialog());
+        binding.createMatchButton.setOnClickListener(v -> {
+            if (selectedArena != null) {
+                showDifficultyDialog(
+                        getString(R.string.create_dialog_title, selectedArena.getName()),
+                        R.string.action_create, this::createMatch);
+            }
+        });
         binding.joinButton.setOnClickListener(v -> showJoinDialog());
-        binding.practiceButton.setOnClickListener(v ->
-                showMessage(getString(R.string.coming_practice)));
+        binding.practiceButton.setOnClickListener(v -> {
+            if (selectedArena != null) {
+                showDifficultyDialog(
+                        getString(R.string.practice_dialog_title, selectedArena.getName()),
+                        R.string.action_start, this::openGame);
+            }
+        });
 
         if (savedInstanceState == null) {
             EntranceAnimator.play(binding.contentColumn);
@@ -84,18 +108,19 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private void showCreateDialog() {
+    private void showDifficultyDialog(String title, @StringRes int positiveLabel,
+                                      DifficultyListener listener) {
         String[] options = {
                 getString(R.string.difficulty_easy),
                 getString(R.string.difficulty_hard)
         };
         int[] choice = {0};
         new MaterialAlertDialogBuilder(this)
-                .setTitle(getString(R.string.create_dialog_title, selectedArena.getName()))
+                .setTitle(title)
                 .setSingleChoiceItems(options, 0, (dialog, which) -> choice[0] = which)
                 .setNegativeButton(R.string.action_cancel, null)
-                .setPositiveButton(R.string.action_create, (dialog, which) ->
-                        createMatch(choice[0] == 0
+                .setPositiveButton(positiveLabel, (dialog, which) ->
+                        listener.onChosen(choice[0] == 0
                                 ? Match.DIFFICULTY_EASY
                                 : Match.DIFFICULTY_HARD))
                 .show();
@@ -206,6 +231,13 @@ public class MainActivity extends BaseActivity {
     private void openLobby(String code) {
         Intent intent = new Intent(this, LobbyActivity.class);
         intent.putExtra(LobbyActivity.EXTRA_CODE, code);
+        startActivity(intent);
+    }
+
+    private void openGame(String difficulty) {
+        Intent intent = new Intent(this, GameActivity.class);
+        intent.putExtra(GameActivity.EXTRA_ARENA_ID, selectedArena.getId());
+        intent.putExtra(GameActivity.EXTRA_DIFFICULTY, difficulty);
         startActivity(intent);
     }
 

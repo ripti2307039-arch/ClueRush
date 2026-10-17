@@ -27,5 +27,21 @@
     <dimen name="avatar_large">96dp</dimen>
     <dimen name="arena_card_width">260dp</dimen>
     <dimen name="arena_card_height">190dp</dimen>
+    <dimen name="joystick_size">168dp</dimen>
+    <dimen name="avatar_game_size">120dp</dimen>
+    <dimen name="hud_margin">40dp</dimen>
+    <dimen name="hud_margin_small">16dp</dimen>
+    <dimen name="hud_icon_padding">12dp</dimen>
+    <dimen name="radius_small">8dp</dimen>
+    <dimen name="text_micro">10sp</dimen>
+    <dimen name="action_button_height">64dp</dimen>
+    <dimen name="action_button_min_width">200dp</dimen>
+    <dimen name="compass_size">160dp</dimen>
+    <dimen name="clue_panel_width">232dp</dimen>
+    <dimen name="panel_toggle_width">40dp</dimen>
+    <dimen name="panel_toggle_height">64dp</dimen>
+    <dimen name="hint_max_width">240dp</dimen>
+    <dimen name="result_card_min_width">320dp</dimen>
+    <dimen name="result_body_max_width">380dp</dimen>
 
 </resources>

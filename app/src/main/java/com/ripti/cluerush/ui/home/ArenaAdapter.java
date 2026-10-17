@@ -75,10 +75,7 @@ public class ArenaAdapter extends RecyclerView.Adapter<ArenaAdapter.ArenaViewHol
 
             GradientDrawable background = new GradientDrawable(
                     GradientDrawable.Orientation.TL_BR,
-                    new int[]{
-                            ContextCompat.getColor(context, arena.getColorStartRes()),
-                            ContextCompat.getColor(context, arena.getColorEndRes())
-                    });
+                    new int[]{arena.getColorStart(), arena.getColorEnd()});
             background.setCornerRadius(context.getResources().getDimension(R.dimen.radius_sheet));
             if (selected) {
                 background.setStroke(

@@ -107,4 +107,41 @@
     <string name="leave_message_player">You can rejoin with the same code until the match starts.</string>
     <string name="host_left">The host closed the room</string>
     <string name="cd_copy_code">Copy match code</string>
+    <string name="action_is_this_the_place">Is this the place?</string>
+    <string name="osm_attribution">© OpenStreetMap contributors</string>
+    <string name="cd_joystick">Movement joystick</string>
+    <string name="cd_exit_match">Leave match</string>
+    <string name="cd_player_avatar">Your avatar</string>
+    <string name="exit_match_title">Leave the match?</string>
+    <string name="exit_match_message">Your progress in this match will be lost.</string>
+    <string name="action_leave_match">Leave match</string>
+    <string name="zone_check_soon">Location check arrives in the next step</string>
+    <string name="clue_index">CLUE %1$d OF %2$d</string>
+    <string name="heat_cold">Cold</string>
+    <string name="heat_cool">Cool</string>
+    <string name="heat_warm">Warm</string>
+    <string name="heat_hot">Hot</string>
+    <string name="hint_far">Not here yet. About %1$d m away, head %2$s.</string>
+    <string name="location_reached_title">Location reached!</string>
+    <string name="location_reached_body">The task for this spot arrives in the next step. For now, continue to the next clue.</string>
+    <string name="action_continue">Continue</string>
+    <string name="game_finished_title">Hunt complete!</string>
+    <string name="game_finished_body">You found all %1$d locations.</string>
+    <string name="action_back_home">Back to home</string>
+    <string name="error_arena_load">Arena data could not be loaded. Please check the arena files.</string>
+    <string name="error_no_arenas">No valid arenas were found. Please check the arena files.</string>
+    <string name="practice_dialog_title">Practice on %1$s</string>
+    <string name="action_start">Start</string>
+    <string name="cd_toggle_clue_panel">Show or hide the clue panel</string>
+    <string name="cd_compass">Direction to the current target</string>
+    <string-array name="directions">
+        <item>north</item>
+        <item>north-east</item>
+        <item>east</item>
+        <item>south-east</item>
+        <item>south</item>
+        <item>south-west</item>
+        <item>west</item>
+        <item>north-west</item>
+    </string-array>
 </resources>

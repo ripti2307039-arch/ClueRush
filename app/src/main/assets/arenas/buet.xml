@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<arena
+    id="buet"
+    order="3"
+    name="BUET campus"
+    subtitle="Bangladesh University of Engineering and Technology"
+    colorStart="#7C3AED"
+    colorEnd="#BE185D"
+    centerLat="23.7265"
+    centerLng="90.3925"
+    zoom="18"
+    north="23.7330"
+    south="23.7200"
+    east="90.3995"
+    west="90.3855">
+
+    <location id="library" name="Central Library" lat="23.7283" lng="90.3907" radius="40">
+        <clue>Where books outnumber students.</clue>
+        <clue>Silence is the rule here, and so is borrowing.</clue>
+    </location>
+    <location id="admin" name="Administrative Building" lat="23.7272" lng="90.3944" radius="40">
+        <clue>Every important form ends up on a desk here.</clue>
+        <clue>The place where official letters and signatures live.</clue>
+    </location>
+    <location id="mosque" name="Central Mosque" lat="23.7248" lng="90.3908" radius="40">
+        <clue>A calm place where the day is measured in prayers.</clue>
+        <clue>The call to prayer starts here, five times a day.</clue>
+    </location>
+    <location id="shaheed_minar" name="Shaheed Minar" lat="23.7295" lng="90.3930" radius="40">
+        <clue>Flowers are laid here every February.</clue>
+        <clue>A monument that remembers the language movement.</clue>
+    </location>
+    <location id="cafeteria" name="Central Cafeteria" lat="23.7246" lng="90.3946" radius="40">
+        <clue>Tea, snacks and the loudest conversations on campus.</clue>
+        <clue>Hungry students always end up here.</clue>
+    </location>
+    <location id="main_gate" name="Main Gate" lat="23.7218" lng="90.3925" radius="40">
+        <clue>Everyone enters through here, nobody ignores it.</clue>
+        <clue>The first thing a visitor sees on campus.</clue>
+    </location>
+    <location id="ground" name="Sports Ground" lat="23.7279" lng="90.3880" radius="40">
+        <clue>Wide open grass where matches begin at sunset.</clue>
+        <clue>Goalposts, a running track and lots of cheering.</clue>
+    </location>
+    <location id="auditorium" name="Auditorium" lat="23.7233" lng="90.3968" radius="40">
+        <clue>Seminars, cultural nights and convocations happen here.</clue>
+        <clue>A big hall with rows of seats and a stage.</clue>
+    </location>
+</arena>

@@ -39,5 +39,13 @@
     <color name="arena_buet_start">#7C3AED</color>
     <color name="arena_buet_end">#BE185D</color>
     <color name="gold_deep">#FF8A00</color>
+    <color name="hud_scrim">#8C0B1220</color>
+    <color name="hud_stroke">#99FFFFFF</color>
+    <color name="vignette_edge">#8C000000</color>
+    <color name="avatar_shadow">#66000000</color>
+    <color name="hud_text_secondary">#B8C4DD</color>
+    <color name="overlay_scrim">#B30B1220</color>
+    <color name="heat_cold">#2A5FE0</color>
+    <color name="heat_hot">#C1272D</color>
 
 </resources>

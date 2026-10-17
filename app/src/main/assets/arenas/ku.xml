@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<arena
+    id="ku"
+    order="2"
+    name="KU campus"
+    subtitle="Khulna University"
+    colorStart="#15803D"
+    colorEnd="#0F766E"
+    centerLat="22.8993"
+    centerLng="89.5339"
+    zoom="18"
+    north="22.9080"
+    south="22.8906"
+    east="89.5431"
+    west="89.5247">
+
+    <location id="library" name="Central Library" lat="22.9016" lng="89.5318" radius="40">
+        <clue>Where books outnumber students.</clue>
+        <clue>Silence is the rule here, and so is borrowing.</clue>
+    </location>
+    <location id="admin" name="Administrative Building" lat="22.9004" lng="89.5362" radius="40">
+        <clue>Every important form ends up on a desk here.</clue>
+        <clue>The place where official letters and signatures live.</clue>
+    </location>
+    <location id="mosque" name="Central Mosque" lat="22.8978" lng="89.5316" radius="40">
+        <clue>A calm place where the day is measured in prayers.</clue>
+        <clue>The call to prayer starts here, five times a day.</clue>
+    </location>
+    <location id="shaheed_minar" name="Shaheed Minar" lat="22.9027" lng="89.5343" radius="40">
+        <clue>Flowers are laid here every February.</clue>
+        <clue>A monument that remembers the language movement.</clue>
+    </location>
+    <location id="cafeteria" name="Central Cafeteria" lat="22.8975" lng="89.5364" radius="40">
+        <clue>Tea, snacks and the loudest conversations on campus.</clue>
+        <clue>Hungry students always end up here.</clue>
+    </location>
+    <location id="main_gate" name="Main Gate" lat="22.8939" lng="89.5339" radius="40">
+        <clue>Everyone enters through here, nobody ignores it.</clue>
+        <clue>The first thing a visitor sees on campus.</clue>
+    </location>
+    <location id="ground" name="Sports Ground" lat="22.9010" lng="89.5285" radius="40">
+        <clue>Wide open grass where matches begin at sunset.</clue>
+        <clue>Goalposts, a running track and lots of cheering.</clue>
+    </location>
+    <location id="auditorium" name="Auditorium" lat="22.8960" lng="89.5390" radius="40">
+        <clue>Seminars, cultural nights and convocations happen here.</clue>
+        <clue>A big hall with rows of seats and a stage.</clue>
+    </location>
+</arena>

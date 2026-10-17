@@ -42,10 +42,17 @@
             android:name=".ui.profile.ProfileActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.lobby.LobbyActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".ui.game.GameActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|density"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape" />
 
     </application>
 
