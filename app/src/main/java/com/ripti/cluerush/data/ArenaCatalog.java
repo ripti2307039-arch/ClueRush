@@ -29,4 +29,13 @@ public final class ArenaCatalog {
                 R.color.arena_buet_start, R.color.arena_buet_end));
         return arenas;
     }
+
+    public static Arena findById(Context context, String id) {
+        for (Arena arena : getAll(context)) {
+            if (arena.getId().equals(id)) {
+                return arena;
+            }
+        }
+        return null;
+    }
 }

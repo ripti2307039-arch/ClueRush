@@ -38,5 +38,6 @@
     <color name="arena_ku_end">#0F766E</color>
     <color name="arena_buet_start">#7C3AED</color>
     <color name="arena_buet_end">#BE185D</color>
+    <color name="gold_deep">#FF8A00</color>
 
 </resources>

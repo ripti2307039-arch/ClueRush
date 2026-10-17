@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -12,14 +13,18 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.ripti.cluerush.data.ArenaCatalog;
+import com.ripti.cluerush.data.MatchRepository;
 import com.ripti.cluerush.databinding.ActivityMainBinding;
 import com.ripti.cluerush.databinding.DialogJoinCodeBinding;
 import com.ripti.cluerush.model.Arena;
+import com.ripti.cluerush.model.Match;
 import com.ripti.cluerush.ui.BaseActivity;
 import com.ripti.cluerush.ui.auth.LoginActivity;
 import com.ripti.cluerush.ui.home.ArenaAdapter;
+import com.ripti.cluerush.ui.lobby.LobbyActivity;
 import com.ripti.cluerush.ui.profile.ProfileActivity;
 import com.ripti.cluerush.util.EntranceAnimator;
+import com.ripti.cluerush.util.NetworkUtils;
 import com.ripti.cluerush.util.UserDisplay;
 
 import java.util.List;
@@ -27,6 +32,8 @@ import java.util.List;
 public class MainActivity extends BaseActivity {
 
     private static final String CODE_PATTERN = "[A-Z0-9]{6}";
+
+    private final MatchRepository matchRepository = new MatchRepository();
 
     private ActivityMainBinding binding;
     private Arena selectedArena;
@@ -59,8 +66,7 @@ public class MainActivity extends BaseActivity {
         binding.arenaList.setItemAnimator(null);
         binding.arenaList.setAdapter(adapter);
 
-        binding.createMatchButton.setOnClickListener(v ->
-                showMessage(getString(R.string.coming_create, selectedArena.getName())));
+        binding.createMatchButton.setOnClickListener(v -> showCreateDialog());
         binding.joinButton.setOnClickListener(v -> showJoinDialog());
         binding.practiceButton.setOnClickListener(v ->
                 showMessage(getString(R.string.coming_practice)));
@@ -76,6 +82,57 @@ public class MainActivity extends BaseActivity {
         if (FirebaseAuth.getInstance().getCurrentUser() == null && binding != null) {
             openLogin();
         }
+    }
+
+    private void showCreateDialog() {
+        String[] options = {
+                getString(R.string.difficulty_easy),
+                getString(R.string.difficulty_hard)
+        };
+        int[] choice = {0};
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(getString(R.string.create_dialog_title, selectedArena.getName()))
+                .setSingleChoiceItems(options, 0, (dialog, which) -> choice[0] = which)
+                .setNegativeButton(R.string.action_cancel, null)
+                .setPositiveButton(R.string.action_create, (dialog, which) ->
+                        createMatch(choice[0] == 0
+                                ? Match.DIFFICULTY_EASY
+                                : Match.DIFFICULTY_HARD))
+                .show();
+    }
+
+    private void createMatch(String difficulty) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            openLogin();
+            return;
+        }
+        if (!NetworkUtils.isOnline(this)) {
+            showMessage(getString(R.string.error_no_internet));
+            return;
+        }
+
+        setBusy(true, true);
+        matchRepository.createMatch(user.getUid(), UserDisplay.displayName(this, user),
+                selectedArena.getId(), difficulty, new MatchRepository.CreateCallback() {
+                    @Override
+                    public void onCreated(String code) {
+                        if (isFinishing() || isDestroyed()) {
+                            return;
+                        }
+                        setBusy(false, true);
+                        openLobby(code);
+                    }
+
+                    @Override
+                    public void onError(@StringRes int messageRes) {
+                        if (isFinishing() || isDestroyed()) {
+                            return;
+                        }
+                        setBusy(false, true);
+                        showMessage(getString(messageRes));
+                    }
+                });
     }
 
     private void showJoinDialog() {
@@ -96,9 +153,60 @@ public class MainActivity extends BaseActivity {
                         return;
                     }
                     dialog.dismiss();
-                    showMessage(getString(R.string.coming_join, code));
+                    joinMatch(code);
                 }));
         dialog.show();
+    }
+
+    private void joinMatch(String code) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            openLogin();
+            return;
+        }
+        if (!NetworkUtils.isOnline(this)) {
+            showMessage(getString(R.string.error_no_internet));
+            return;
+        }
+
+        setBusy(true, false);
+        matchRepository.joinMatch(user.getUid(), UserDisplay.displayName(this, user), code,
+                new MatchRepository.JoinCallback() {
+                    @Override
+                    public void onJoined() {
+                        if (isFinishing() || isDestroyed()) {
+                            return;
+                        }
+                        setBusy(false, false);
+                        openLobby(code);
+                    }
+
+                    @Override
+                    public void onError(@StringRes int messageRes) {
+                        if (isFinishing() || isDestroyed()) {
+                            return;
+                        }
+                        setBusy(false, false);
+                        showMessage(getString(messageRes));
+                    }
+                });
+    }
+
+    private void setBusy(boolean busy, boolean fromCreate) {
+        binding.createMatchButton.setEnabled(!busy);
+        binding.joinButton.setEnabled(!busy);
+        binding.practiceButton.setEnabled(!busy);
+        if (fromCreate) {
+            binding.createMatchButton.setText(busy ? R.string.loading : R.string.create_match);
+        } else {
+            binding.joinButton.setText(busy ? R.string.loading : R.string.join_with_code);
+        }
+    }
+
+    private void openLobby(String code) {
+        Intent intent = new Intent(this, LobbyActivity.class);
+        intent.putExtra(LobbyActivity.EXTRA_CODE, code);
+        startActivity(intent);
     }
 
     private void showMessage(String message) {
