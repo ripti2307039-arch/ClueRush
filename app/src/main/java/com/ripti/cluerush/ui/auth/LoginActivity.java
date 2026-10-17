@@ -1,4 +1,3 @@
-
 package com.ripti.cluerush.ui.auth;
 
 import android.content.Intent;
@@ -25,22 +24,22 @@ public class LoginActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityLoginBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        applyInsets(binding.getRoot());
-
         auth = FirebaseAuth.getInstance();
 
-        binding.loginButton.setOnClickListener(v -> attemptLogin());
+        if (auth.getCurrentUser() != null) {
+            openHome();
+            return;
+        }
 
-        binding.registerLink.setOnClickListener(v -> {
-            Intent intent = new Intent(
-                    LoginActivity.this,
-                    RegisterActivity.class
-            );
-            startActivity(intent);
-        });
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        applyInsets(binding.getRoot());
+
+        binding.loginButton.setOnClickListener(v -> attemptLogin());
+        binding.guestButton.setOnClickListener(v -> signInAsGuest());
+        binding.forgotButton.setOnClickListener(v -> sendPasswordReset());
+        binding.registerLink.setOnClickListener(v ->
+                startActivity(new Intent(this, RegisterActivity.class)));
 
         if (savedInstanceState == null) {
             EntranceAnimator.play(binding.contentColumn);
@@ -53,25 +52,18 @@ public class LoginActivity extends BaseActivity {
 
         String email = readText(binding.emailInput.getText());
         String password = readText(binding.passwordInput.getText());
-
         boolean valid = true;
 
         if (email.isEmpty()) {
-            binding.emailLayout.setError(
-                    getString(R.string.error_email_required)
-            );
+            binding.emailLayout.setError(getString(R.string.error_email_required));
             valid = false;
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.emailLayout.setError(
-                    getString(R.string.error_email_invalid)
-            );
+            binding.emailLayout.setError(getString(R.string.error_email_invalid));
             valid = false;
         }
 
         if (password.isEmpty()) {
-            binding.passwordLayout.setError(
-                    getString(R.string.error_password_required)
-            );
+            binding.passwordLayout.setError(getString(R.string.error_password_required));
             valid = false;
         }
 
@@ -80,39 +72,62 @@ public class LoginActivity extends BaseActivity {
         }
 
         setLoading(true);
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
+            if (task.isSuccessful()) {
+                openHome();
+            } else {
+                setLoading(false);
+                showError(AuthErrorMapper.toMessage(this, task.getException()));
+            }
+        });
+    }
 
-        auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    setLoading(false);
+    private void signInAsGuest() {
+        setLoading(true);
+        auth.signInAnonymously().addOnCompleteListener(this, task -> {
+            if (task.isSuccessful()) {
+                openHome();
+            } else {
+                setLoading(false);
+                showError(AuthErrorMapper.toMessage(this, task.getException()));
+            }
+        });
+    }
 
-                    if (task.isSuccessful()) {
-                        openHome();
-                    } else {
-                        showError(
-                                AuthErrorMapper.toMessage(
-                                        this,
-                                        task.getException()
-                                )
-                        );
-                    }
-                });
+    private void sendPasswordReset() {
+        binding.emailLayout.setError(null);
+        String email = readText(binding.emailInput.getText());
+
+        if (email.isEmpty()) {
+            binding.emailLayout.setError(getString(R.string.reset_email_required));
+            return;
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.emailLayout.setError(getString(R.string.error_email_invalid));
+            return;
+        }
+
+        setLoading(true);
+        auth.sendPasswordResetEmail(email).addOnCompleteListener(this, task -> {
+            setLoading(false);
+            if (task.isSuccessful()) {
+                showError(getString(R.string.reset_sent));
+            } else {
+                showError(AuthErrorMapper.toMessage(this, task.getException()));
+            }
+        });
     }
 
     private void setLoading(boolean loading) {
         binding.loginButton.setEnabled(!loading);
+        binding.guestButton.setEnabled(!loading);
+        binding.forgotButton.setEnabled(!loading);
         binding.registerLink.setEnabled(!loading);
-
-        binding.loginButton.setText(
-                loading ? R.string.loading : R.string.action_login
-        );
+        binding.loginButton.setText(loading ? R.string.loading : R.string.action_login);
     }
 
     private void showError(String message) {
-        Snackbar.make(
-                binding.getRoot(),
-                message,
-                Snackbar.LENGTH_LONG
-        ).show();
+        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
     }
 
     private String readText(CharSequence text) {
@@ -121,12 +136,7 @@ public class LoginActivity extends BaseActivity {
 
     private void openHome() {
         Intent intent = new Intent(this, MainActivity.class);
-
-        intent.addFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK
-                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
-        );
-
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 }

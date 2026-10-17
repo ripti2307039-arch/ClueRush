@@ -1,29 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="@dimen/space_lg">
+    android:fillViewport="true">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textAppearance="@style/TextAppearance.ClueRush.Display" />
-
-    <TextView
-        android:id="@+id/welcomeText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_md"
-        android:textAppearance="@style/TextAppearance.ClueRush.Title" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/logoutButton"
-        style="@style/Widget.ClueRush.Button.Outlined"
+    <LinearLayout
+        android:id="@+id/contentColumn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_xl"
-        android:text="@string/action_logout" />
-</LinearLayout>
+        android:orientation="vertical"
+        android:padding="@dimen/space_lg">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/greetingText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.ClueRush.Headline" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/home_subtitle"
+                    android:textAppearance="@style/TextAppearance.ClueRush.BodySecondary" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/avatarButton"
+                android:layout_width="@dimen/avatar_small"
+                android:layout_height="@dimen/avatar_small"
+                android:background="@drawable/bg_avatar"
+                android:clickable="true"
+                android:contentDescription="@string/cd_open_profile"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.ClueRush.Title"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xl"
+            android:text="@string/section_arenas"
+            android:textAppearance="@style/TextAppearance.ClueRush.Title" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/arenaList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_md"
+            android:clipToPadding="false"
+            android:nestedScrollingEnabled="false" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:minHeight="@dimen/space_lg" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/createMatchButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_lg"
+            android:text="@string/create_match" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/joinButton"
+            style="@style/Widget.ClueRush.Button.Gold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_md"
+            android:text="@string/join_with_code" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/practiceButton"
+            style="@style/Widget.ClueRush.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_md"
+            android:text="@string/practice_mode" />
+    </LinearLayout>
+</ScrollView>

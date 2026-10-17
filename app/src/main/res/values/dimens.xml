@@ -23,5 +23,9 @@
     <dimen name="glow_radius">420dp</dimen>
     <dimen name="stroke_medium">2dp</dimen>
     <dimen name="grid_cell">32dp</dimen>
+    <dimen name="avatar_small">48dp</dimen>
+    <dimen name="avatar_large">96dp</dimen>
+    <dimen name="arena_card_width">260dp</dimen>
+    <dimen name="arena_card_height">190dp</dimen>
 
 </resources>

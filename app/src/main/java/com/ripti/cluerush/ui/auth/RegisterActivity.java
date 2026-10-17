@@ -135,14 +135,13 @@ public class RegisterActivity extends BaseActivity {
                                     .setDisplayName(name)
                                     .build();
 
-                    user.updateProfile(request);
-
-                    userRepository.createProfile(
-                            user.getUid(),
-                            name,
-                            email,
-                            this::openHome
-                    );
+                    user.updateProfile(request).addOnCompleteListener(profileTask ->
+                            userRepository.createProfile(
+                                    user.getUid(),
+                                    name,
+                                    email,
+                                    this::openHome
+                            ));
                 });
     }
 

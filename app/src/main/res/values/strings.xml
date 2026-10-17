@@ -40,4 +40,36 @@
     <string name="guest_name">Guest</string>
     <string name="brand_clue">Clue</string>
     <string name="brand_rush">Rush</string>
+    <string name="greeting_user">Hello, %1$s</string>
+    <string name="home_subtitle">Pick an arena and rush</string>
+    <string name="section_arenas">Arenas</string>
+    <string name="arena_tag">ARENA</string>
+    <string name="arena_kuet_name">KUET campus</string>
+    <string name="arena_kuet_subtitle">Khulna University of Engineering and Technology</string>
+    <string name="arena_ku_name">KU campus</string>
+    <string name="arena_ku_subtitle">Khulna University</string>
+    <string name="arena_buet_name">BUET campus</string>
+    <string name="arena_buet_subtitle">Bangladesh University of Engineering and Technology</string>
+
+    <string name="action_cancel">Cancel</string>
+    <string name="action_join">Join</string>
+    <string name="join_dialog_hint">Match code</string>
+    <string name="join_error">Enter the 6-character match code</string>
+    <string name="coming_create">Create match on %1$s arrives in the next step</string>
+    <string name="coming_join">Code %1$s accepted. The lobby arrives in the next step</string>
+    <string name="coming_practice">Practice mode arrives in a later step</string>
+
+    <string name="cd_open_profile">Open profile</string>
+    <string name="cd_back">Back</string>
+    <string name="stat_wins">Wins</string>
+    <string name="stat_matches">Matches</string>
+    <string name="level_label">Level %1$d</string>
+    <string name="xp_progress">%1$d / %2$d XP</string>
+    <string name="guest_hint">Guest account. Sign up to keep your XP and level.</string>
+    <string name="logout_title">Log out of ClueRush?</string>
+    <string name="logout_message">You can log back in anytime.</string>
+    <string name="logout_guest_message">Guest progress is not saved after logging out.</string>
+    <string name="create_match">Create match</string>
+    <string name="join_with_code">Join with code</string>
+    <string name="practice_mode">Practice mode</string>
 </resources>
