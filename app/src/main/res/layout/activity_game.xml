@@ -20,7 +20,6 @@
         android:layout_gravity="center"
         android:contentDescription="@string/cd_player_avatar" />
 
-
     <FrameLayout
         android:id="@+id/hudLayer"
         android:layout_width="match_parent"
@@ -36,6 +35,15 @@
             android:contentDescription="@string/cd_exit_match"
             android:padding="@dimen/hud_icon_padding"
             android:src="@drawable/ic_close" />
+
+        <com.ripti.cluerush.ui.view.MinimapView
+            android:id="@+id/minimapView"
+            android:layout_width="@dimen/minimap_size"
+            android:layout_height="@dimen/minimap_size"
+            android:layout_gravity="top|start"
+            android:layout_marginStart="@dimen/minimap_offset_start"
+            android:layout_marginTop="@dimen/hud_margin_small"
+            android:contentDescription="@string/cd_minimap" />
 
         <TextView
             android:id="@+id/hintBanner"
@@ -147,6 +155,126 @@
             android:text="@string/osm_attribution"
             android:textColor="@color/white"
             android:textSize="@dimen/text_micro" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/mapOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/navy_950"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <org.osmdroid.views.MapView
+            android:id="@+id/overviewMapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <FrameLayout
+            android:id="@+id/mapUiLayer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/mapTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|start"
+                android:layout_margin="@dimen/hud_margin_small"
+                android:background="@drawable/bg_hud_pill"
+                android:paddingStart="@dimen/space_md"
+                android:paddingTop="@dimen/space_sm"
+                android:paddingEnd="@dimen/space_md"
+                android:paddingBottom="@dimen/space_sm"
+                android:textAppearance="@style/TextAppearance.ClueRush.Body"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/mapCloseButton"
+                android:layout_width="@dimen/touch_min"
+                android:layout_height="@dimen/touch_min"
+                android:layout_gravity="top|end"
+                android:layout_margin="@dimen/hud_margin_small"
+                android:background="@drawable/bg_hud_circle"
+                android:contentDescription="@string/cd_close_map"
+                android:padding="@dimen/hud_icon_padding"
+                android:src="@drawable/ic_close" />
+
+            <TextView
+                android:id="@+id/debugToggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|start"
+                android:layout_margin="@dimen/hud_margin_small"
+                android:background="@drawable/bg_hud_pill"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="@dimen/space_md"
+                android:paddingTop="@dimen/space_sm"
+                android:paddingEnd="@dimen/space_md"
+                android:paddingBottom="@dimen/space_sm"
+                android:text="@string/debug_off"
+                android:textColor="@color/treasure_gold"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/debugPanel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="@dimen/hud_margin_small"
+                android:background="@drawable/bg_hud_pill"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="@dimen/space_md"
+                android:paddingEnd="@dimen/space_sm"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/debugCoordText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxWidth="@dimen/result_body_max_width"
+                    android:text="@string/debug_pick_hint"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/debugCopyButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/touch_min"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingStart="@dimen/space_md"
+                    android:paddingEnd="@dimen/space_md"
+                    android:text="@string/debug_copy"
+                    android:textColor="@color/treasure_gold"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/mapAttribution"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="@dimen/hud_margin_small"
+                android:background="@drawable/bg_hud_pill"
+                android:paddingStart="@dimen/space_sm"
+                android:paddingTop="@dimen/space_xs"
+                android:paddingEnd="@dimen/space_sm"
+                android:paddingBottom="@dimen/space_xs"
+                android:text="@string/osm_attribution"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_micro" />
+        </FrameLayout>
     </FrameLayout>
 
     <FrameLayout

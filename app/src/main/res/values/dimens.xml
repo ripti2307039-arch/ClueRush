@@ -43,5 +43,7 @@
     <dimen name="hint_max_width">240dp</dimen>
     <dimen name="result_card_min_width">320dp</dimen>
     <dimen name="result_body_max_width">380dp</dimen>
+    <dimen name="minimap_size">112dp</dimen>
+    <dimen name="minimap_offset_start">72dp</dimen>
 
 </resources>

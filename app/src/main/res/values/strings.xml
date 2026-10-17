@@ -149,4 +149,12 @@
     <string name="hint_no_place_easy">Nothing here yet. Watch the Hot/Cold chip.</string>
     <string name="hint_wrong_place">This is %1$s, not the place the clue describes. −%2$d points.</string>
     <string name="hint_discovered">Discovered: %1$s</string>
+    <string name="cd_minimap">Open the full campus map</string>
+    <string name="cd_close_map">Close the map</string>
+    <string name="debug_on">DEBUG ON</string>
+    <string name="debug_off">DEBUG OFF</string>
+    <string name="debug_pick_hint">Tap the map to pick a point</string>
+    <string name="debug_pick_result">%1$s · nearest: %2$s (%3$d m)</string>
+    <string name="debug_copy">Copy</string>
+    <string name="debug_copied">Copied. Paste it into the XML.</string>
 </resources>

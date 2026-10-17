@@ -3,6 +3,10 @@ package com.ripti.cluerush.ui.game;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -10,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.WindowManager;
@@ -36,6 +41,7 @@ import com.ripti.cluerush.game.RoundGenerator;
 import com.ripti.cluerush.map.GameMap;
 import com.ripti.cluerush.map.MapMarker;
 import com.ripti.cluerush.map.OsmGameMap;
+import com.ripti.cluerush.map.OverviewMap;
 import com.ripti.cluerush.model.Arena;
 import com.ripti.cluerush.model.CampusLocation;
 import com.ripti.cluerush.model.Difficulty;
@@ -46,6 +52,7 @@ import com.ripti.cluerush.util.MapConfig;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 
@@ -54,6 +61,7 @@ public class GameActivity extends BaseActivity {
     public static final String EXTRA_ARENA_ID = "extra_arena_id";
     public static final String EXTRA_DIFFICULTY = "extra_difficulty";
 
+    private static final String PICK_TAG = "MapPick";
     private static final int ROUND_COUNT = 5;
     private static final double VISION_RADIUS_METERS = 80.0;
     private static final float MAX_ZOOM_OUT = 0.35f;
@@ -64,6 +72,7 @@ public class GameActivity extends BaseActivity {
     private static final long HINT_VISIBLE_MS = 2600L;
     private static final long PANEL_ANIMATION_MS = 220L;
     private static final long WRONG_COOLDOWN_MS = 900L;
+    private static final long MAP_FADE_MS = 180L;
 
     private final Random random = new Random();
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -71,6 +80,7 @@ public class GameActivity extends BaseActivity {
 
     private ActivityGameBinding binding;
     private GameMap gameMap;
+    private OverviewMap overviewMap;
     private PlayerController player;
     private GameLoop gameLoop;
     private GameSession session;
@@ -84,7 +94,9 @@ public class GameActivity extends BaseActivity {
     private boolean inputLocked;
     private boolean finishedState;
     private boolean panelExpanded = true;
-    private boolean debugReveal;
+    private boolean mapOpen;
+    private boolean debugTools;
+    private String lastPickText;
     private long lastWrongAt;
     private HeatLevel currentHeat;
     private CampusLocation insideLocation;
@@ -112,6 +124,7 @@ public class GameActivity extends BaseActivity {
         binding = ActivityGameBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         applyInsets(binding.hudLayer);
+        applyInsets(binding.mapUiLayer);
 
         baseZoom = arena.getZoom();
         player = new PlayerController(arena.getCenterLatitude(), arena.getCenterLongitude(),
@@ -125,11 +138,26 @@ public class GameActivity extends BaseActivity {
         gameMap.setPlayerPosition(player.getLatitude(), player.getLongitude());
         gameMap.setVisionRadius(VISION_RADIUS_METERS);
 
+        binding.minimapView.setBounds(arena.getBounds());
+        binding.minimapView.setVisionMeters(VISION_RADIUS_METERS);
+        binding.minimapView.setPlayer(player.getLatitude(), player.getLongitude());
+        binding.minimapView.setOnClickListener(v -> openMap());
+
+        overviewMap = new OverviewMap(binding.overviewMapView);
+        overviewMap.setBounds(arena.getBounds());
+        overviewMap.setPickListener(this::onMapPicked);
+        binding.mapTitle.setText(arena.getName());
+        binding.mapCloseButton.setOnClickListener(v -> closeMap());
+        binding.debugToggle.setVisibility(isDebuggable() ? View.VISIBLE : View.GONE);
+        binding.debugToggle.setOnClickListener(v -> setDebugTools(!debugTools));
+        binding.debugCopyButton.setOnClickListener(v -> copyPick());
+        setDebugTools(false);
+
         binding.heatChip.setVisibility(difficulty.showsHeat() ? View.VISIBLE : View.GONE);
         binding.actionButton.setAlpha(INACTIVE_BUTTON_ALPHA);
 
         binding.joystick.setListener((x, y) -> {
-            if (!inputLocked) {
+            if (!inputLocked && !mapOpen) {
                 player.setInput(x, y);
             }
         });
@@ -138,19 +166,14 @@ public class GameActivity extends BaseActivity {
         binding.panelToggle.setOnClickListener(v -> setPanelExpanded(!panelExpanded));
         binding.resultButton.setOnClickListener(v -> onResultContinue());
 
-        // DEBUG (12B-te minimap ashle muche debo): long-press korle fog off, shob pin dekha jay.
-        binding.attributionText.setOnLongClickListener(v -> {
-            debugReveal = !debugReveal;
-            gameMap.setVisionRadius(debugReveal ? 0.0 : VISION_RADIUS_METERS);
-            Toast.makeText(this, debugReveal ? "Debug: fog off" : "Debug: fog on",
-                    Toast.LENGTH_SHORT).show();
-            return true;
-        });
-
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                confirmExit();
+                if (mapOpen) {
+                    closeMap();
+                } else {
+                    confirmExit();
+                }
             }
         });
 
@@ -166,6 +189,9 @@ public class GameActivity extends BaseActivity {
         }
         hideSystemBars();
         gameMap.onResume();
+        if (mapOpen) {
+            overviewMap.onResume();
+        }
         gameLoop.start();
         if (insideLocation != null && !inputLocked) {
             startPulse();
@@ -181,6 +207,9 @@ public class GameActivity extends BaseActivity {
             stopPulse();
             handler.removeCallbacks(hideHint);
             gameMap.onPause();
+            if (mapOpen) {
+                overviewMap.onPause();
+            }
         }
         super.onPause();
     }
@@ -190,6 +219,9 @@ public class GameActivity extends BaseActivity {
         handler.removeCallbacksAndMessages(null);
         if (gameMap != null) {
             gameMap.onDestroy();
+        }
+        if (overviewMap != null) {
+            overviewMap.onDestroy();
         }
         super.onDestroy();
     }
@@ -207,6 +239,7 @@ public class GameActivity extends BaseActivity {
         if (moved) {
             gameMap.moveCamera(player.getLatitude(), player.getLongitude());
             gameMap.setPlayerPosition(player.getLatitude(), player.getLongitude());
+            binding.minimapView.setPlayer(player.getLatitude(), player.getLongitude());
             addTrailIfNeeded();
         }
         binding.avatarView.setMoving(player.isMoving());
@@ -261,6 +294,8 @@ public class GameActivity extends BaseActivity {
                     seen.contains(location.getId())));
         }
         gameMap.setMarkers(markers);
+        binding.minimapView.setMarkers(markers);
+        overviewMap.setMarkers(markers);
     }
 
     private void updateProximity() {
@@ -364,7 +399,7 @@ public class GameActivity extends BaseActivity {
 
     private void onActionPressed() {
         Round round = session.getCurrent();
-        if (inputLocked || round == null) {
+        if (inputLocked || mapOpen || round == null) {
             return;
         }
         if (insideLocation == null) {
@@ -413,6 +448,98 @@ public class GameActivity extends BaseActivity {
                 .withEndAction(() -> binding.hintBanner.setVisibility(View.GONE))
                 .start();
     }
+
+    // ---- Full-screen map + debug tools ----
+
+    private void openMap() {
+        if (mapOpen || inputLocked) {
+            return;
+        }
+        mapOpen = true;
+        binding.joystick.reset();
+        player.setInput(0f, 0f);
+        overviewMap.setPlayer(player.getLatitude(), player.getLongitude());
+        overviewMap.onResume();
+        binding.mapOverlay.animate().cancel();
+        binding.mapOverlay.setAlpha(0f);
+        binding.mapOverlay.setVisibility(View.VISIBLE);
+        binding.mapOverlay.animate().alpha(1f).setDuration(MAP_FADE_MS).start();
+        overviewMap.fit();
+    }
+
+    private void closeMap() {
+        if (!mapOpen) {
+            return;
+        }
+        mapOpen = false;
+        binding.mapOverlay.animate().cancel();
+        binding.mapOverlay.animate()
+                .alpha(0f)
+                .setDuration(MAP_FADE_MS)
+                .withEndAction(() -> {
+                    if (!mapOpen) {
+                        binding.mapOverlay.setVisibility(View.GONE);
+                        overviewMap.onPause();
+                    }
+                })
+                .start();
+    }
+
+    private void setDebugTools(boolean on) {
+        debugTools = on;
+        overviewMap.setRevealAll(on);
+        overviewMap.setPickEnabled(on);
+        binding.debugPanel.setVisibility(on ? View.VISIBLE : View.GONE);
+        binding.debugToggle.setText(on ? R.string.debug_on : R.string.debug_off);
+        lastPickText = null;
+        overviewMap.clearPicked();
+        if (on) {
+            binding.debugCoordText.setText(R.string.debug_pick_hint);
+        }
+    }
+
+    private void onMapPicked(double lat, double lng) {
+        if (!debugTools) {
+            return;
+        }
+        overviewMap.setPicked(lat, lng);
+
+        CampusLocation nearest = null;
+        double best = Double.MAX_VALUE;
+        for (CampusLocation location : arena.getLocations()) {
+            double distance = LocationScanner.distanceTo(location, lat, lng);
+            if (distance < best) {
+                best = distance;
+                nearest = location;
+            }
+        }
+
+        String coords = String.format(Locale.US, "%.6f, %.6f", lat, lng);
+        lastPickText = String.format(Locale.US, "lat=\"%.6f\" lng=\"%.6f\"", lat, lng);
+        String nearestId = nearest == null ? "-" : nearest.getId();
+        Log.i(PICK_TAG, lastPickText + "  nearest=" + nearestId
+                + " (" + Math.round(best) + " m)");
+        binding.debugCoordText.setText(getString(R.string.debug_pick_result,
+                coords, nearestId, (int) Math.round(best)));
+    }
+
+    private void copyPick() {
+        if (lastPickText == null) {
+            return;
+        }
+        ClipboardManager clipboard =
+                (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboard != null) {
+            clipboard.setPrimaryClip(ClipData.newPlainText("coordinates", lastPickText));
+            Toast.makeText(this, R.string.debug_copied, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean isDebuggable() {
+        return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+    }
+
+    // ---- Result overlay ----
 
     private void openLocationResult() {
         Round round = session.getCurrent();
