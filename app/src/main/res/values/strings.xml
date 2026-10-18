@@ -172,6 +172,23 @@
     <string name="task_solved_title">Task solved!</string>
     <string name="task_failed_title">Task failed</string>
     <string name="task_solved_body">Time left: %1$d s · Mistakes: %2$d</string>
-    <string name="task_failed_body">Time ran out. Mistakes: %1$d. The hunt goes on.</string>
+    <string name="task_failed_body">Not solved. Mistakes: %1$d. The hunt goes on.</string>
     <string name="task_summary">Tasks solved: %1$d of %2$d.</string>
+    <string name="score_hud">Score %1$d</string>
+    <string name="score_gain">+%1$d</string>
+    <string name="score_loss">−%1$d</string>
+    <string name="score_base">Task points +%1$d</string>
+    <string name="score_time">Time bonus +%1$d</string>
+    <string name="score_mistakes">Mistakes −%1$d</string>
+    <string name="score_streak">Streak ×%1$s  +%2$d</string>
+    <string name="score_find">Find bonus +%1$d</string>
+    <string name="score_round_total">Round total +%1$d</string>
+    <string name="score_round_line">%1$d. %2$s  +%3$d</string>
+    <string name="score_earned">Points earned: %1$d</string>
+    <string name="score_wrong_places">Wrong places: −%1$d</string>
+    <string name="score_perfect">Perfect hunt bonus: +%1$d</string>
+    <string name="score_final">Final score: %1$d</string>
+    <string name="score_new_best">New best score!</string>
+    <string name="score_best">Best: %1$d</string>
+    <string name="rank_line">Rank %1$s %2$s</string>
 </resources>

@@ -1,4 +1,3 @@
-# level|WORD|hint
 easy|CHAIR|You sit on it
 easy|TABLE|Four legs and a flat top
 easy|PAPER|You write on it
@@ -7,6 +6,22 @@ easy|WATER|You drink it
 easy|BRAIN|Used for thinking
 easy|CLOCK|Shows the time
 easy|EXAM|Students dread it
+easy|BOOK|You read it
+easy|DESK|Students work at it
+easy|LAMP|Gives light at night
+easy|DOOR|You open it to enter
+easy|BOARD|Teachers write on it
+easy|CLASS|Students sit together in it
+easy|SCORE|Points in a game
+easy|GRADE|Result of an exam
+easy|NOTES|Written during lectures
+easy|PLANT|Grows in soil
+easy|LIGHT|Opposite of dark
+easy|MOUSE|You click with it
+easy|RADIO|Plays songs and news
+easy|MUSIC|Songs and melodies
+easy|TRAIN|Runs on rails
+easy|RIVER|Flows to the sea
 
 medium|STUDENT|Learns at a university
 medium|LIBRARY|Full of books
@@ -16,6 +31,22 @@ medium|CAMPUS|University grounds
 medium|MACHINE|Engineers build it
 medium|CIRCUIT|A path for current
 medium|PROJECT|Final year work
+medium|SCIENCE|Physics and chemistry
+medium|HISTORY|Study of the past
+medium|PENCIL|Write and erase
+medium|BUTTON|Press it
+medium|CAMERA|Takes photos
+medium|MONITOR|A computer screen
+medium|NETWORK|Connected computers
+medium|PRINTER|Puts text on paper
+medium|FACULTY|Teaching staff of a department
+medium|LECTURE|A talk in the classroom
+medium|CONTEST|A competition
+medium|COMPASS|Shows direction
+medium|PICTURE|A photo or painting
+medium|GARDEN|Flowers grow here
+medium|BRIDGE|Crosses a river
+medium|ENGINE|Powers a car
 
 hard|ENGINEER|Designs and builds things
 hard|DATABASE|Stores organized data
@@ -25,3 +56,19 @@ hard|UNIVERSITY|Where degrees are earned
 hard|LABORATORY|Where experiments happen
 hard|TRANSISTOR|Tiny electronic switch
 hard|RESISTANCE|Opposes electric current
+hard|COMPUTER|You may be using one now
+hard|KEYBOARD|You type on it
+hard|SEMESTER|Half of an academic year
+hard|CHEMISTRY|Atoms and reactions
+hard|PROGRAMMER|Writes code
+hard|CALCULATOR|Does sums for you
+hard|GRADUATION|Degree ceremony
+hard|MICROPHONE|Picks up your voice
+hard|DICTIONARY|Explains word meanings
+hard|TELEPHONE|An older way to call
+hard|FRAMEWORK|Ready-made code structure
+hard|INTERNET|Connects the whole world
+hard|SOFTWARE|Programs, not hardware
+hard|HARDWARE|Physical computer parts
+hard|ELECTRON|Negative particle
+hard|MAGNETISM|Why a compass works

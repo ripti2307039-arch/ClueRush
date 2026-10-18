@@ -34,12 +34,16 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.ripti.cluerush.R;
 import com.ripti.cluerush.data.ArenaCatalog;
 import com.ripti.cluerush.databinding.ActivityGameBinding;
+import com.ripti.cluerush.game.BestScoreStore;
 import com.ripti.cluerush.game.GameLoop;
 import com.ripti.cluerush.game.GameSession;
 import com.ripti.cluerush.game.HeatLevel;
 import com.ripti.cluerush.game.LocationScanner;
 import com.ripti.cluerush.game.PlayerController;
+import com.ripti.cluerush.game.Rank;
 import com.ripti.cluerush.game.RoundGenerator;
+import com.ripti.cluerush.game.RoundScore;
+import com.ripti.cluerush.game.ScoreRules;
 import com.ripti.cluerush.map.GameMap;
 import com.ripti.cluerush.map.MapMarker;
 import com.ripti.cluerush.map.OsmGameMap;
@@ -81,6 +85,8 @@ public class GameActivity extends BaseActivity {
     private static final long PANEL_ANIMATION_MS = 220L;
     private static final long WRONG_COOLDOWN_MS = 900L;
     private static final long MAP_FADE_MS = 180L;
+    private static final long SCORE_COUNT_MS = 600L;
+    private static final int LOSS_COLOR = 0xFFFF6B6B;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable hideHint = this::dismissHint;
@@ -100,6 +106,8 @@ public class GameActivity extends BaseActivity {
     private float appliedZoomOffset;
     private double lastTrailLatitude = Double.NaN;
     private double lastTrailLongitude = Double.NaN;
+    private double roundSeconds;
+    private int displayedScore;
     private boolean inputLocked;
     private boolean finishedState;
     private boolean panelExpanded = true;
@@ -111,6 +119,7 @@ public class GameActivity extends BaseActivity {
     private CampusLocation insideLocation;
     private CampusLocation zoneLocation;
     private ObjectAnimator pulseAnimator;
+    private ValueAnimator scoreAnimator;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -127,7 +136,8 @@ public class GameActivity extends BaseActivity {
         long seed = getIntent().getLongExtra(EXTRA_SEED, System.nanoTime());
         random = new Random(seed);
         int rounds = Math.min(MAX_ROUNDS, TaskType.values().length);
-        session = new GameSession(RoundGenerator.generate(arena, rounds, difficulty, random));
+        session = new GameSession(
+                RoundGenerator.generate(arena, rounds, difficulty, random), difficulty);
 
         configureWindow();
         MapConfig.init(this);
@@ -143,6 +153,8 @@ public class GameActivity extends BaseActivity {
                 new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT));
         applyInsets(taskOverlay);
+
+        binding.scoreText.setText(getString(R.string.score_hud, 0));
 
         baseZoom = arena.getZoom();
         player = new PlayerController(arena.getCenterLatitude(), arena.getCenterLongitude(),
@@ -239,6 +251,9 @@ public class GameActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         handler.removeCallbacksAndMessages(null);
+        if (scoreAnimator != null) {
+            scoreAnimator.cancel();
+        }
         if (gameMap != null) {
             gameMap.onDestroy();
         }
@@ -257,6 +272,9 @@ public class GameActivity extends BaseActivity {
     }
 
     private void onFrame(float deltaSeconds) {
+        if (!inputLocked) {
+            roundSeconds += deltaSeconds;
+        }
         boolean moved = player.update(deltaSeconds);
         if (moved) {
             gameMap.moveCamera(player.getLatitude(), player.getLongitude());
@@ -297,6 +315,7 @@ public class GameActivity extends BaseActivity {
             return;
         }
         currentHeat = null;
+        roundSeconds = 0.0;
         binding.clueIndexText.setText(getString(R.string.clue_index,
                 session.getIndex() + 1, session.getTotal()));
         binding.clueText.setText(round.getClue());
@@ -441,6 +460,8 @@ public class GameActivity extends BaseActivity {
         lastWrongAt = now;
         session.registerWrongAttempt();
         shakeActionButton();
+        animateScoreTo(session.getTotalScore());
+        showScoreDelta(-ScoreRules.WRONG_PLACE_PENALTY);
         showHint(getString(R.string.hint_wrong_place, insideLocation.getName(),
                 GameSession.WRONG_PLACE_PENALTY));
     }
@@ -471,7 +492,41 @@ public class GameActivity extends BaseActivity {
                 .start();
     }
 
-    // ---- Task ----
+    private void animateScoreTo(int target) {
+        if (scoreAnimator != null) {
+            scoreAnimator.cancel();
+        }
+        if (target == displayedScore) {
+            return;
+        }
+        scoreAnimator = ValueAnimator.ofInt(displayedScore, target);
+        scoreAnimator.setDuration(SCORE_COUNT_MS);
+        scoreAnimator.addUpdateListener(animator -> {
+            displayedScore = (int) animator.getAnimatedValue();
+            binding.scoreText.setText(getString(R.string.score_hud, displayedScore));
+        });
+        scoreAnimator.start();
+    }
+
+    private void showScoreDelta(int delta) {
+        if (delta == 0) {
+            return;
+        }
+        float rise = 16f * getResources().getDisplayMetrics().density;
+        binding.scoreDeltaText.animate().cancel();
+        binding.scoreDeltaText.setText(getString(
+                delta > 0 ? R.string.score_gain : R.string.score_loss, Math.abs(delta)));
+        binding.scoreDeltaText.setTextColor(delta > 0
+                ? ContextCompat.getColor(this, R.color.mint) : LOSS_COLOR);
+        binding.scoreDeltaText.setAlpha(1f);
+        binding.scoreDeltaText.setTranslationY(0f);
+        binding.scoreDeltaText.animate()
+                .translationY(-rise)
+                .alpha(0f)
+                .setStartDelay(500L)
+                .setDuration(900L)
+                .start();
+    }
 
     private void startTask() {
         Round round = session.getCurrent();
@@ -497,18 +552,88 @@ public class GameActivity extends BaseActivity {
         if (round == null) {
             return;
         }
-        session.recordTask(solved, mistakes, secondsLeft);
+        int limit = round.getTask().getType().timeLimitSeconds(difficulty);
+        RoundScore score = session.recordTask(solved, mistakes, secondsLeft, limit, roundSeconds);
+        animateScoreTo(session.getTotalScore());
+        showScoreDelta(score.getTotal());
         if (solved) {
             binding.getRoot().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
         }
         String title = getString(solved ? R.string.task_solved_title : R.string.task_failed_title);
-        String body = solved
-                ? getString(R.string.task_solved_body, secondsLeft, mistakes)
-                : getString(R.string.task_failed_body, mistakes);
-        showResult(title, round.getLocation().getName(), body, R.string.action_continue);
+        showResult(title, round.getLocation().getName(),
+                buildTaskResult(solved, mistakes, secondsLeft, score), R.string.action_continue);
     }
 
-    // ---- Full-screen map + debug tools ----
+    private String buildTaskResult(boolean solved, int mistakes, int secondsLeft,
+                                   RoundScore score) {
+        StringBuilder text = new StringBuilder();
+        text.append(solved
+                ? getString(R.string.task_solved_body, secondsLeft, mistakes)
+                : getString(R.string.task_failed_body, mistakes));
+        if (solved) {
+            appendLine(text, getString(R.string.score_base, score.getBase()));
+            if (score.getTimeBonus() > 0) {
+                appendLine(text, getString(R.string.score_time, score.getTimeBonus()));
+            }
+            if (score.getMistakePenalty() > 0) {
+                appendLine(text, getString(R.string.score_mistakes, score.getMistakePenalty()));
+            }
+            if (score.getStreakBonus() > 0) {
+                appendLine(text, getString(R.string.score_streak,
+                        String.format(Locale.US, "%.1f", score.getStreakMultiplier()),
+                        score.getStreakBonus()));
+            }
+        }
+        if (score.getFindBonus() > 0) {
+            appendLine(text, getString(R.string.score_find, score.getFindBonus()));
+        }
+        appendLine(text, getString(R.string.score_round_total, score.getTotal()));
+        return text.toString();
+    }
+
+    private String buildFinalSummary(String bestLine) {
+        StringBuilder text = new StringBuilder();
+        text.append(getString(R.string.game_finished_body,
+                session.getTotal(), session.getWrongAttempts()));
+        appendLine(text, getString(R.string.task_summary,
+                session.getTasksSolved(), session.getTotal()));
+
+        List<RoundScore> scores = session.getRoundScores();
+        for (int i = 0; i < scores.size() && i < session.getTotal(); i++) {
+            Round round = session.getRound(i);
+            text.append("\n");
+            if (i == 0) {
+                text.append("\n");
+            }
+            text.append(getString(R.string.score_round_line, i + 1,
+                    getString(round.getTask().getType().getTitleRes()),
+                    scores.get(i).getTotal()));
+        }
+
+        text.append("\n");
+        appendLine(text, getString(R.string.score_earned, session.getEarnedPoints()));
+        if (session.getPenaltyPoints() > 0) {
+            appendLine(text, getString(R.string.score_wrong_places, session.getPenaltyPoints()));
+        }
+        if (session.getPerfectBonus() > 0) {
+            appendLine(text, getString(R.string.score_perfect, session.getPerfectBonus()));
+        }
+        appendLine(text, getString(R.string.score_final, session.getTotalScore()));
+        appendLine(text, bestLine);
+        return text.toString();
+    }
+
+    private String rankLine(Rank rank) {
+        StringBuilder stars = new StringBuilder();
+        for (int i = 0; i < rank.getStars(); i++) {
+            stars.append('\u2605');
+        }
+        return getString(R.string.rank_line, rank.getLabel(), stars.toString()).trim();
+    }
+
+    private static void appendLine(StringBuilder builder, String line) {
+        builder.append("\n").append(line);
+    }
 
     private void openMap() {
         if (mapOpen || inputLocked) {
@@ -598,8 +723,6 @@ public class GameActivity extends BaseActivity {
         return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
     }
 
-    // ---- Result overlay ----
-
     private void lockInput() {
         inputLocked = true;
         binding.joystick.reset();
@@ -628,11 +751,17 @@ public class GameActivity extends BaseActivity {
         finishedState = true;
         gameMap.hideZone();
         publishMarkers();
-        String body = getString(R.string.game_finished_body,
-                session.getTotal(), session.getWrongAttempts())
-                + "\n"
-                + getString(R.string.task_summary, session.getTasksSolved(), session.getTotal());
-        showResult(getString(R.string.game_finished_title), "", body, R.string.action_back_home);
+        animateScoreTo(session.getTotalScore());
+
+        int score = session.getTotalScore();
+        int previousBest = BestScoreStore.get(this, arena.getId(), difficulty);
+        boolean newBest = BestScoreStore.submit(this, arena.getId(), difficulty, score);
+        String bestLine = newBest
+                ? getString(R.string.score_new_best)
+                : getString(R.string.score_best, previousBest);
+
+        showResult(getString(R.string.game_finished_title), rankLine(session.getRank()),
+                buildFinalSummary(bestLine), R.string.action_back_home);
     }
 
     private void showResult(String title, String subtitle, String body,

@@ -1,5 +1,6 @@
 package com.ripti.cluerush.game;
 
+import com.ripti.cluerush.model.Difficulty;
 import com.ripti.cluerush.model.Round;
 
 import java.util.ArrayList;
@@ -10,44 +11,27 @@ import java.util.Set;
 
 public class GameSession {
 
-    public static final int WRONG_PLACE_PENALTY = 10;
-
-    public static final class TaskOutcome {
-        private final boolean solved;
-        private final int mistakes;
-        private final int secondsLeft;
-
-        TaskOutcome(boolean solved, int mistakes, int secondsLeft) {
-            this.solved = solved;
-            this.mistakes = mistakes;
-            this.secondsLeft = secondsLeft;
-        }
-
-        public boolean isSolved() {
-            return solved;
-        }
-
-        public int getMistakes() {
-            return mistakes;
-        }
-
-        public int getSecondsLeft() {
-            return secondsLeft;
-        }
-    }
+    public static final int WRONG_PLACE_PENALTY = ScoreRules.WRONG_PLACE_PENALTY;
 
     private final List<Round> rounds;
+    private final Difficulty difficulty;
     private final Set<String> discovered = new HashSet<>();
-    private final List<TaskOutcome> outcomes = new ArrayList<>();
+    private final List<RoundScore> roundScores = new ArrayList<>();
     private int index;
     private int wrongAttempts;
+    private int streak;
 
-    public GameSession(List<Round> rounds) {
+    public GameSession(List<Round> rounds, Difficulty difficulty) {
         this.rounds = new ArrayList<>(rounds);
+        this.difficulty = difficulty;
     }
 
     public Round getCurrent() {
         return index < rounds.size() ? rounds.get(index) : null;
+    }
+
+    public Round getRound(int position) {
+        return rounds.get(position);
     }
 
     public int getIndex() {
@@ -93,21 +77,26 @@ public class GameSession {
     }
 
     public int getPenaltyPoints() {
-        return wrongAttempts * WRONG_PLACE_PENALTY;
+        return wrongAttempts * ScoreRules.WRONG_PLACE_PENALTY;
     }
 
-    public void recordTask(boolean solved, int mistakes, int secondsLeft) {
-        outcomes.add(new TaskOutcome(solved, mistakes, secondsLeft));
+    public RoundScore recordTask(boolean solved, int mistakes, int secondsLeft,
+                                 int limitSeconds, double findSeconds) {
+        RoundScore score = ScoreRules.score(difficulty, solved, mistakes, secondsLeft,
+                limitSeconds, findSeconds, streak);
+        roundScores.add(score);
+        streak = solved && mistakes == 0 ? streak + 1 : 0;
+        return score;
     }
 
-    public List<TaskOutcome> getTaskOutcomes() {
-        return Collections.unmodifiableList(outcomes);
+    public List<RoundScore> getRoundScores() {
+        return Collections.unmodifiableList(roundScores);
     }
 
     public int getTasksSolved() {
         int solved = 0;
-        for (TaskOutcome outcome : outcomes) {
-            if (outcome.isSolved()) {
+        for (RoundScore score : roundScores) {
+            if (score.isSolved()) {
                 solved++;
             }
         }
@@ -116,9 +105,35 @@ public class GameSession {
 
     public int getTaskMistakes() {
         int total = 0;
-        for (TaskOutcome outcome : outcomes) {
-            total += outcome.getMistakes();
+        for (RoundScore score : roundScores) {
+            total += score.getMistakes();
         }
         return total;
+    }
+
+    public int getEarnedPoints() {
+        int sum = 0;
+        for (RoundScore score : roundScores) {
+            sum += score.getTotal();
+        }
+        return sum;
+    }
+
+    public boolean isPerfect() {
+        return isFinished() && !rounds.isEmpty()
+                && getTasksSolved() == rounds.size() && wrongAttempts == 0;
+    }
+
+    public int getPerfectBonus() {
+        return isPerfect() ? ScoreRules.perfectBonus(difficulty) : 0;
+    }
+
+    public int getTotalScore() {
+        return Math.max(0, getEarnedPoints() - getPenaltyPoints()) + getPerfectBonus();
+    }
+
+    public Rank getRank() {
+        return Rank.forScore(getTotalScore(),
+                ScoreRules.maxPoints(difficulty, rounds.size()));
     }
 }

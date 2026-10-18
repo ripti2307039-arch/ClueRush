@@ -25,7 +25,6 @@ public enum TaskType {
         return hintRes;
     }
 
-    /** Easy / Medium / Hard-e koto second shomoy pabe. */
     public int timeLimitSeconds(Difficulty difficulty) {
         switch (this) {
             case QUIZ:
@@ -33,7 +32,7 @@ public enum TaskType {
             case SUDOKU:
                 return byLevel(difficulty, 150, 120, 100);
             case WORD_SCRAMBLE:
-                return byLevel(difficulty, 45, 60, 90);
+                return byLevel(difficulty, 75, 100, 130);
             default:
                 return byLevel(difficulty, 60, 90, 120);
         }

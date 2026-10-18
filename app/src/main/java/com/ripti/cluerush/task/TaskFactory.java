@@ -21,7 +21,6 @@ public final class TaskFactory {
     private TaskFactory() {
     }
 
-    /** Content na pele null ferot dey. Caller task skip kore. */
     public static BaseTaskView create(Context context, TaskSpec spec) {
         Random random = new Random(spec.getSeed());
         Difficulty difficulty = spec.getDifficulty();
@@ -66,7 +65,7 @@ public final class TaskFactory {
     }
 
     private static BaseTaskView createWords(Context context, Difficulty difficulty, Random random) {
-        int count = byLevel(difficulty, 1, 2, 3);
+        int count = byLevel(difficulty, 3, 4, 5);
         List<TaskAssets.LevelRow> rows = TaskAssets.pick(
                 TaskAssets.load(context, WORDS_FILE, 2), difficulty, count, random);
         List<WordScrambleView.Entry> entries = new ArrayList<>();
