@@ -91,7 +91,6 @@ public class LogoView extends View {
         buildPin();
     }
 
-    /** Builds the map pin: a round head with a hole, and a triangular tail. */
     private void buildPin() {
         float headR = radius * 0.22f;
         float headY = cy - radius * 0.07f;

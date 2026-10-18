@@ -10,6 +10,34 @@ easy|Car|Banana|Apple|Orange
 easy|Moon|Rose|Lily|Jasmine
 easy|Rainbow|Bus|Train|Truck
 easy|Spoon|Tea|Water|Milk
+easy|Cow|Apple|Orange|Grapes
+easy|Shoe|Red|Blue|Green
+easy|Sun|Fork|Knife|Plate
+easy|Bus|Fish|Duck|Frog
+easy|Table|Blue|Yellow|Pink
+easy|Sugar|Chair|Sofa|Stool
+easy|Eagle|Rose|Tulip|Daisy
+easy|Hand|Cat|Dog|Rabbit
+easy|Tuesday|Red|Blue|Green
+easy|Saturn|Dhaka|Rajshahi|Chattogram
+easy|Ball|Shirt|Pants|Socks
+easy|Milk|Pen|Book|Eraser
+easy|Ant|Bus|Car|Bike
+easy|Ship|Tea|Coffee|Juice
+easy|Cricket|Mango|Guava|Lychee
+easy|Sofa|Cat|Horse|Goat
+easy|Triangle|One|Seven|Nine
+easy|Frog|Ten|Twenty|Thirty
+easy|Rose|Teacher|Doctor|Farmer
+easy|Pilot|Pen|Pencil|Ruler
+easy|Cloud|Hot|Cold|Warm
+easy|Lion|Fan|Light|Switch
+easy|Bread|Summer|Winter|Spring
+easy|Tea|Eye|Ear|Nose
+easy|Saw|Chicken|Duck|Pigeon
+easy|Fire|Rain|Snow|Hail
+easy|Piano|Football|Cricket|Tennis
+easy|Kite|Mother|Father|Sister
 
 medium|Whale|Shark|Tuna|Salmon
 medium|Bat|Eagle|Sparrow|Pigeon
@@ -23,6 +51,34 @@ medium|Nile|Dhaka|Tokyo|Paris
 medium|Hexagon|Square|Rectangle|Rhombus
 medium|February|April|June|September
 medium|Moon|Mars|Venus|Earth
+medium|Mercury|Python|Java|Swift
+medium|Frog|Dog|Cat|Horse
+medium|Dolphin|Eagle|Crow|Sparrow
+medium|Oxygen|Gold|Silver|Copper
+medium|Mouse|Windows|Linux|Android
+medium|Iron|Oxygen|Nitrogen|Hydrogen
+medium|Sun|Mars|Venus|Jupiter
+medium|Square|Sphere|Cube|Cylinder
+medium|Dhaka|Jamuna|Meghna|Karnaphuli
+medium|Keyboard|Chrome|Firefox|Safari
+medium|Eid|April|June|August
+medium|Chess|Football|Cricket|Hockey
+medium|Banana|Carrot|Potato|Onion
+medium|Energy|Solid|Liquid|Gas
+medium|Hospital|Doctor|Nurse|Surgeon
+medium|Kilogram|Meter|Kilometer|Centimeter
+medium|Celsius|Hour|Minute|Second
+medium|Volt|Liter|Milliliter|Gallon
+medium|Teak|Rose|Lily|Jasmine
+medium|Rickshaw|Lion|Tiger|Leopard
+medium|Snake|Dog|Cat|Cow
+medium|Taka|Bangla|Hindi|Urdu
+medium|Paris|Dollar|Yen|Euro
+medium|Sunday|Summer|Winter|Monsoon
+medium|Calcium|Vitamin A|Vitamin C|Vitamin D
+medium|Femur|Liver|Kidney|Lung
+medium|Rice|Sitar|Tabla|Flute
+medium|Printer|Email|Chat|Video call
 
 hard|Python|HTML|CSS|XML
 hard|RAM|Hard disk|SSD|Flash drive
@@ -36,3 +92,31 @@ hard|Logarithm|Sine|Cosine|Tangent
 hard|Evaporation|Photosynthesis|Digestion|Respiration
 hard|Ethernet|Wi-Fi|Bluetooth|NFC
 hard|Binary search|Bubble sort|Merge sort|Quick sort
+hard|Linux|Python|Java|C++
+hard|Router|HTML|CSS|JavaScript
+hard|Voltmeter|Resistor|Capacitor|Inductor
+hard|Variance|Mean|Median|Mode
+hard|Dijkstra|Prim|Kruskal|Boruvka
+hard|Uracil|Adenine|Guanine|Thymine
+hard|Helium|Sodium|Potassium|Lithium
+hard|Methane|Oxygen|Nitrogen|Hydrogen
+hard|Velocity|Mass|Time|Length
+hard|Kelvin|Joule|Watt|Newton
+hard|Sound|Radio|Microwave|X-ray
+hard|Phishing|Firewall|Antivirus|Encryption
+hard|HTML|HTTP|FTP|SMTP
+hard|Excel|MySQL|PostgreSQL|SQLite
+hard|Monitor|Keyboard|Mouse|Scanner
+hard|Titan|Europa|Ganymede|Io
+hard|Rhombus|Isosceles|Scalene|Equilateral
+hard|Albert Einstein|Rabindranath Tagore|Kazi Nazrul Islam|Michael Madhusudan Dutt
+hard|Java|HTML|CSS|XML
+hard|Merge sort|Binary search|Linear search|Interpolation search
+hard|Interpreter|Tree|Graph|Heap
+hard|Docker|Windows|macOS|Ubuntu
+hard|Moon|Mercury|Venus|Mars
+hard|Heart|Artery|Vein|Capillary
+hard|Rubber|Copper|Silver|Aluminium
+hard|O2|NaCl|H2O|CO2
+hard|Aspirin|Penicillin|Amoxicillin|Ciprofloxacin
+hard|Hertz|Gigabyte|Megabyte|Kilobyte

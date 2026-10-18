@@ -203,5 +203,9 @@
     <string name="task_odd_question">Which one does not belong?</string>
     <string name="task_puzzle_progress">Puzzle %1$d of %2$d</string>
     <string name="task_ok">OK</string>
+    <string name="task_ready_label">GET READY</string>
+    <string name="task_ready_time">Time limit: %1$s</string>
+    <string name="task_ready_start">Start (%1$d)</string>
+    <string name="task_ready_note">The timer starts when you press Start.</string>
 
 </resources>

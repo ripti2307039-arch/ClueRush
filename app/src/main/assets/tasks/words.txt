@@ -22,6 +22,22 @@ easy|RADIO|Plays songs and news
 easy|MUSIC|Songs and melodies
 easy|TRAIN|Runs on rails
 easy|RIVER|Flows to the sea
+easy|HOUSE|Where a family lives
+easy|BREAD|Made from flour
+easy|SUGAR|Makes tea sweet
+easy|CLOUD|Floats in the sky
+easy|TIGER|Striped big cat
+easy|APPLE|A red or green fruit
+easy|BEACH|Sand and waves
+easy|EARTH|Our planet
+easy|FIELD|Open grass land
+easy|GLASS|You drink from it
+easy|HEART|Pumps blood
+easy|MONEY|You spend it
+easy|OCEAN|Very large body of water
+easy|PIANO|A keyboard instrument
+easy|SMILE|Happy face
+easy|STORM|Heavy rain and wind
 
 medium|STUDENT|Learns at a university
 medium|LIBRARY|Full of books
@@ -47,6 +63,22 @@ medium|PICTURE|A photo or painting
 medium|GARDEN|Flowers grow here
 medium|BRIDGE|Crosses a river
 medium|ENGINE|Powers a car
+medium|ROCKET|Flies to space
+medium|WINDOW|Glass you look through
+medium|FREEDOM|Being free
+medium|MORNING|Early part of the day
+medium|HOLIDAY|A day off work
+medium|KITCHEN|Where food is cooked
+medium|TRAFFIC|Cars on a busy road
+medium|VOLTAGE|Electric pressure
+medium|CURRENT|Flow of charge
+medium|PHYSICS|Study of matter and energy
+medium|SIGNAL|A message sent by waves or lights
+medium|SCREEN|Shows pictures on a device
+medium|SENSOR|Detects heat or motion
+medium|DESIGN|Plan of how something looks
+medium|MARKET|Where goods are sold
+medium|ANTENNA|Catches radio waves
 
 hard|ENGINEER|Designs and builds things
 hard|DATABASE|Stores organized data
@@ -72,3 +104,19 @@ hard|SOFTWARE|Programs, not hardware
 hard|HARDWARE|Physical computer parts
 hard|ELECTRON|Negative particle
 hard|MAGNETISM|Why a compass works
+hard|MATHEMATICS|Numbers and equations
+hard|ELECTRICITY|Powers our lights
+hard|TECHNOLOGY|Modern tools and machines
+hard|BANGLADESH|Our country
+hard|ARCHITECT|Designs buildings
+hard|PROFESSOR|Senior university teacher
+hard|SCHOLARSHIP|Money to support study
+hard|TELESCOPE|Used to see stars
+hard|ELEVATOR|Carries people between floors
+hard|GENERATOR|Makes electric power
+hard|CAPACITOR|Stores electric charge
+hard|MICROSCOPE|Shows tiny things
+hard|DISCOVERY|Finding something new
+hard|SATELLITE|Orbits the Earth
+hard|TRANSFORMER|Changes voltage levels
+hard|CONDUCTOR|Lets current flow

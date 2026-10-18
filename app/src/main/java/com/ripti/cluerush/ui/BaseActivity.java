@@ -30,7 +30,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         installSystemBarAppearance();
     }
 
-    /** Every screen gets the animated map background behind its content. */
+
     @Override
     public void setContentView(@LayoutRes int layoutResId) {
         setContentView(getLayoutInflater().inflate(layoutResId, null, false));

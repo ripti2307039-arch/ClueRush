@@ -14,6 +14,53 @@ easy|International Mother Language Day is in which month?|February|March|Decembe
 easy|What is 7 x 8?|56|54|48|64
 easy|Which organ pumps blood around the body?|Heart|Lung|Liver|Kidney
 easy|In which city is KUET located?|Khulna|Dhaka|Sylhet|Barishal
+easy|Which animal is known as the king of the jungle?|Lion|Tiger|Elephant|Bear
+easy|How many months are in a year?|12|10|11|13
+easy|What color is the sky on a clear day?|Blue|Green|Red|Yellow
+easy|Which is the national flower of Bangladesh?|Water lily|Rose|Sunflower|Jasmine
+easy|What is the national bird of Bangladesh?|Oriental magpie-robin|Peacock|Crow|Parrot
+easy|Which river flows through Dhaka?|Buriganga|Karnaphuli|Teesta|Surma
+easy|How many continents are there?|7|5|6|8
+easy|Which planet is closest to the Sun?|Mercury|Venus|Earth|Mars
+easy|What is the freezing point of water in Celsius?|0|10|32|100
+easy|Which animal gives us wool?|Sheep|Cow|Dog|Horse
+easy|How many sides does a triangle have?|3|4|5|6
+easy|What is the largest animal on Earth?|Blue whale|Elephant|Giraffe|Shark
+easy|Which sense do we use our ears for?|Hearing|Seeing|Smelling|Tasting
+easy|What is 9 + 6?|15|14|16|13
+easy|What is 100 divided by 4?|25|20|30|40
+easy|Which month comes after March?|April|February|May|June
+easy|What is the national language of Bangladesh?|Bangla|Hindi|Urdu|English
+easy|What colour is the circle on the flag of Bangladesh?|Red|Green|Blue|Yellow
+easy|Which gas do humans breathe in to live?|Oxygen|Helium|Carbon dioxide|Methane
+easy|What do we call a baby cat?|Kitten|Puppy|Cub|Calf
+easy|Which device shows the time?|Clock|Compass|Scale|Ruler
+easy|Which animal is the fastest on land?|Cheetah|Horse|Lion|Deer
+easy|How many legs does a spider have?|8|6|4|10
+easy|Which fruit is yellow and curved?|Banana|Apple|Grapes|Guava
+easy|What is the capital of India?|New Delhi|Mumbai|Kolkata|Chennai
+easy|Which direction does the sun rise from?|East|West|North|South
+easy|How many minutes are in an hour?|60|30|100|120
+easy|Which is the hottest season in Bangladesh?|Summer|Winter|Autumn|Spring
+easy|What is the opposite of hot?|Cold|Warm|Dry|Soft
+easy|Which planet has rings around it?|Saturn|Mars|Earth|Venus
+easy|Which organ do we use to see?|Eye|Ear|Nose|Hand
+easy|What is 12 x 5?|60|50|55|65
+easy|How many players are in a football team on the field?|11|9|10|12
+easy|Which game is played with a bat, a ball and wickets?|Cricket|Football|Hockey|Tennis
+easy|Which animal is known for its long neck?|Giraffe|Elephant|Zebra|Camel
+easy|What is the largest country in the world by area?|Russia|China|India|Canada
+easy|Which metal is liquid at room temperature?|Mercury|Iron|Copper|Gold
+easy|How many letters are in the English alphabet?|26|24|25|28
+easy|Which is the biggest planet in our solar system?|Jupiter|Saturn|Earth|Neptune
+easy|What is the currency of Bangladesh?|Taka|Rupee|Dollar|Rial
+easy|Which tool do we use to cut paper?|Scissors|Hammer|Spoon|Comb
+easy|How many colours are in a rainbow?|7|5|6|8
+easy|What is the main ingredient of bread?|Flour|Sugar|Salt|Butter
+easy|What is the square of 5?|25|10|20|30
+easy|Which part of a plant makes food using sunlight?|Leaf|Root|Stem|Seed
+easy|Which animal lays eggs?|Hen|Cow|Goat|Dog
+easy|Which is the first month of the year?|January|March|December|June
 
 medium|In what year did Bangladesh gain independence?|1971|1947|1952|1975
 medium|What does CPU stand for?|Central Processing Unit|Central Program Unit|Computer Power Unit|Core Processing Utility
@@ -27,6 +74,54 @@ medium|Which planet is known as the Red Planet?|Mars|Mercury|Saturn|Neptune
 medium|What is the value of pi to two decimal places?|3.14|3.41|2.14|3.24
 medium|What does HTTP stand for?|HyperText Transfer Protocol|HighText Transfer Program|HyperText Transmission Process|Home Tool Transfer Protocol
 medium|What is the SI unit of force?|Newton|Joule|Pascal|Watt
+medium|Who wrote the novel Pather Panchali?|Bibhutibhushan Bandyopadhyay|Rabindranath Tagore|Humayun Ahmed|Sarat Chandra Chattopadhyay
+medium|Who is the national poet of Bangladesh?|Kazi Nazrul Islam|Rabindranath Tagore|Jasimuddin|Jibanananda Das
+medium|Which Bangladeshi won the Nobel Peace Prize in 2006?|Muhammad Yunus|Amartya Sen|Abhijit Banerjee|Fazle Hasan Abed
+medium|In which year did the Language Movement take place?|1952|1947|1971|1969
+medium|What is the capital of Japan?|Tokyo|Kyoto|Osaka|Seoul
+medium|What is the capital of Australia?|Canberra|Sydney|Melbourne|Perth
+medium|What is the capital of Germany?|Berlin|Munich|Hamburg|Frankfurt
+medium|What is the capital of Canada?|Ottawa|Toronto|Vancouver|Montreal
+medium|What is the chemical formula of water?|H2O|CO2|O2|NaCl
+medium|What is the chemical symbol for sodium?|Na|So|Sd|S
+medium|How many bones are in the adult human body?|206|180|230|300
+medium|What is the hardest natural substance?|Diamond|Gold|Iron|Quartz
+medium|Which vitamin do we get from sunlight?|Vitamin D|Vitamin A|Vitamin C|Vitamin B12
+medium|Which blood group is the universal donor for red cells?|O negative|AB positive|A positive|B negative
+medium|What does RAM stand for?|Random Access Memory|Read Access Memory|Rapid Action Memory|Run All Memory
+medium|What does USB stand for?|Universal Serial Bus|Unified System Board|Universal Storage Box|United Serial Binder
+medium|Who is considered the father of the computer?|Charles Babbage|Alan Turing|Bill Gates|Steve Jobs
+medium|Which company owns the Android operating system?|Google|Apple|Microsoft|Samsung
+medium|Which language is used to style web pages?|CSS|HTML|SQL|Java
+medium|What does HTML stand for?|HyperText Markup Language|HighText Machine Language|HyperTool Markup Logic|Home Text Markup Language
+medium|What is the largest organ of the human body?|Skin|Liver|Heart|Brain
+medium|Which planet is the hottest in the solar system?|Venus|Mercury|Mars|Jupiter
+medium|What is the smallest prime number?|2|1|3|0
+medium|What is the sum of the angles in a triangle?|180 degrees|90 degrees|270 degrees|360 degrees
+medium|How many sides does a hexagon have?|6|5|7|8
+medium|What is the square root of 144?|12|14|11|13
+medium|What is 15% of 200?|30|15|20|25
+medium|Which is the longest bone in the human body?|Femur|Humerus|Tibia|Radius
+medium|Which is the largest district of Bangladesh by area?|Rangamati|Dhaka|Chattogram|Khulna
+medium|Which Bangladeshi town is famous for its very long natural sea beach?|Cox's Bazar|Kuakata|Saint Martin|Patenga
+medium|What is the largest continent?|Asia|Africa|Europe|North America
+medium|What is the smallest continent?|Australia|Europe|Antarctica|South America
+medium|Who is said to have discovered gravity after watching an apple fall?|Isaac Newton|Albert Einstein|Galileo|Nikola Tesla
+medium|What is the SI unit of resistance?|Ohm|Volt|Watt|Henry
+medium|What is the approximate speed of sound in air?|343 m/s|34 m/s|3,430 m/s|100 m/s
+medium|What does GPS stand for?|Global Positioning System|General Position Signal|Global Path Sensor|Geo Point Service
+medium|What is the full form of LED?|Light Emitting Diode|Light Energy Device|Low Energy Diode|Linear Emission Display
+medium|Which gas is the most abundant in Earth's atmosphere?|Nitrogen|Oxygen|Carbon dioxide|Argon
+medium|What is the process by which plants make food called?|Photosynthesis|Respiration|Digestion|Evaporation
+medium|Which planet is known for its Great Red Spot?|Jupiter|Mars|Saturn|Neptune
+medium|Which programming language is named after a snake?|Python|Java|Swift|Rust
+medium|How many days are in a leap year?|366|365|364|367
+medium|What is the currency of Japan?|Yen|Won|Yuan|Ringgit
+medium|What is the national anthem of Bangladesh called?|Amar Sonar Bangla|Dhono Dhanno Pushpe Bhora|Bangladesh Amar Desh|Chol Chol Chol
+medium|Which instrument is used to measure temperature?|Thermometer|Barometer|Ammeter|Speedometer
+medium|Which instrument measures atmospheric pressure?|Barometer|Thermometer|Hygrometer|Odometer
+medium|How many strings does a standard guitar have?|6|4|5|8
+medium|Which organ produces urine?|Kidney|Liver|Heart|Lung
 
 hard|What is the time complexity of binary search?|O(log n)|O(n)|O(n log n)|O(1)
 hard|Which logic gate outputs 1 only when both inputs are 1?|AND|OR|XOR|NOR
@@ -39,3 +134,52 @@ hard|Who invented the World Wide Web?|Tim Berners-Lee|Bill Gates|Vint Cerf|Linus
 hard|Which element has atomic number 6?|Carbon|Oxygen|Nitrogen|Boron
 hard|Approximately what is the speed of light?|300,000 km/s|150,000 km/s|30,000 km/s|3,000 km/s
 hard|Which law states V = I x R?|Ohm's law|Faraday's law|Kirchhoff's law|Newton's law
+hard|What is the worst-case time complexity of bubble sort?|O(n^2)|O(n)|O(log n)|O(n log n)
+hard|Which data structure follows LIFO order?|Stack|Queue|Array|Graph
+hard|What does SQL stand for?|Structured Query Language|Simple Question Language|Sequential Query Logic|Standard Queue Language
+hard|Which protocol is used to send email?|SMTP|FTP|HTTP|SSH
+hard|What is the default port of HTTP?|80|21|443|25
+hard|What is the default port of HTTPS?|443|80|8080|22
+hard|In traditional computing, how many bytes are in 1 KB?|1024|1000|512|2000
+hard|Which logic gate outputs 1 when its two inputs are different?|XOR|AND|NAND|NOR
+hard|What is two's complement used for?|Representing negative numbers|Compressing data|Encrypting data|Sorting numbers
+hard|What is the integral of 1/x for x greater than 0?|ln(x) + C|x^2/2 + C|-1/x^2 + C|e^x + C
+hard|What is the derivative of e^x?|e^x|x e^(x-1)|1/x|e
+hard|What is the value of sin 90 degrees?|1|0|0.5|-1
+hard|What is the value of log10(1000)?|3|2|10|1000
+hard|Which law says energy can be neither created nor destroyed?|Conservation of energy|Newton's third law|Ohm's law|Boyle's law
+hard|What is the formula of Newton's second law?|F = ma|E = mc^2|V = IR|P = mv^2
+hard|What is the SI unit of frequency?|Hertz|Watt|Tesla|Pascal
+hard|What is the SI unit of magnetic flux density?|Tesla|Weber|Henry|Gauss
+hard|What is the SI unit of power?|Watt|Joule|Newton|Pascal
+hard|What is the formula for kinetic energy?|1/2 mv^2|mgh|mv|ma
+hard|What does ALU stand for in a CPU?|Arithmetic Logic Unit|Applied Logic Unit|Arithmetic Load Unit|Active Logic Utility
+hard|Which part of the cell is called the powerhouse?|Mitochondria|Nucleus|Ribosome|Golgi body
+hard|How many chromosomes does a normal human cell have?|46|23|44|48
+hard|What is the pH of pure water at 25 degrees Celsius?|7|0|14|1
+hard|What is the chemical formula of table salt?|NaCl|KCl|CaCO3|NaOH
+hard|What is Avogadro's number approximately?|6.022 x 10^23|6.022 x 10^32|3.14 x 10^23|9.8 x 10^23
+hard|Which element has the symbol Fe?|Iron|Fluorine|Francium|Lead
+hard|Which particle has a negative charge?|Electron|Proton|Neutron|Photon
+hard|Who proposed the theory of relativity?|Albert Einstein|Isaac Newton|Niels Bohr|Max Planck
+hard|Who proposed the Turing machine?|Alan Turing|John von Neumann|Claude Shannon|Dennis Ritchie
+hard|Who created the C programming language?|Dennis Ritchie|Bjarne Stroustrup|James Gosling|Guido van Rossum
+hard|Who created the Linux kernel?|Linus Torvalds|Richard Stallman|Tim Berners-Lee|Ken Thompson
+hard|Who created the Python language?|Guido van Rossum|Dennis Ritchie|James Gosling|Larry Page
+hard|What does OOP stand for?|Object Oriented Programming|Open Output Protocol|Ordered Operation Process|Object Output Program
+hard|Which layer of the OSI model handles routing?|Network layer|Transport layer|Physical layer|Session layer
+hard|How many layers are in the OSI model?|7|4|5|6
+hard|How many bits are in an IPv4 address?|32|64|128|16
+hard|How many bits are in an IPv6 address?|128|32|64|256
+hard|Which data structure is used in breadth-first search?|Queue|Stack|Heap|Hash table
+hard|Which data structure is commonly used in depth-first search?|Stack|Queue|Heap|Hash table
+hard|What is the time complexity of accessing an array element by index?|O(1)|O(n)|O(log n)|O(n^2)
+hard|When did the Constitution of Bangladesh come into effect?|16 December 1972|26 March 1971|17 April 1971|21 February 1952
+hard|In which district was the Mujibnagar government sworn in?|Meherpur|Khulna|Jessore|Kushtia
+hard|Which is the longest bridge in Bangladesh?|Padma Bridge|Jamuna Bridge|Meghna Bridge|Karnaphuli Bridge
+hard|Which tree gives the Sundarbans its name?|Sundari|Banyan|Mango|Teak
+hard|Which is the largest delta in the world?|Ganges-Brahmaputra delta|Nile delta|Mississippi delta|Mekong delta
+hard|Which of these is a NoSQL database?|MongoDB|MySQL|PostgreSQL|Oracle
+hard|What does API stand for?|Application Programming Interface|Applied Program Integration|Automated Process Input|Advanced Protocol Interface
+hard|Which company originally developed the Java language?|Sun Microsystems|Microsoft|Apple|IBM
+hard|What is 2 to the power 10?|1024|512|2048|100

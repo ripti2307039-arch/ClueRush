@@ -2,6 +2,7 @@ package com.ripti.cluerush.task;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.SystemClock;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -29,6 +30,8 @@ public class TaskOverlayView extends FrameLayout {
     private static final int MATCH = ViewGroup.LayoutParams.MATCH_PARENT;
     private static final int WRAP = ViewGroup.LayoutParams.WRAP_CONTENT;
     private static final int LOW_TIME_COLOR = 0xFFFF6B6B;
+    private static final int READY_SECONDS = 5;
+    private static final long READY_TICK_MS = 1000L;
     private static final long TICK_MS = 100L;
     private static final long FINISH_DELAY_MS = 600L;
 
@@ -38,13 +41,21 @@ public class TaskOverlayView extends FrameLayout {
     private final TextView hintText;
     private final View barFill;
     private final FrameLayout container;
+    private final FrameLayout readyLayer;
     private final Runnable tick = this::onTick;
+    private final Runnable readyTick = this::onReadyTick;
 
+    private TextView readyTitle;
+    private TextView readyRules;
+    private TextView readyTime;
+    private TextView readyButton;
     private BaseTaskView content;
     private Callback callback;
     private long limitMs;
     private long remainingMs;
     private long lastTickAt;
+    private int readyLeft;
+    private boolean readyActive;
     private boolean running;
     private boolean active;
     private boolean finishing;
@@ -95,9 +106,15 @@ public class TaskOverlayView extends FrameLayout {
         scroll.setOverScrollMode(OVER_SCROLL_NEVER);
         container = new FrameLayout(context);
         scroll.addView(container, new ViewGroup.LayoutParams(MATCH, WRAP));
-        LinearLayout.LayoutParams scrollParams = new LinearLayout.LayoutParams(MATCH, 0, 1f);
-        scrollParams.topMargin = dp(8);
-        root.addView(scroll, scrollParams);
+
+        FrameLayout body = new FrameLayout(context);
+        body.addView(scroll, new FrameLayout.LayoutParams(MATCH, MATCH));
+        readyLayer = buildReadyLayer(context);
+        body.addView(readyLayer, new FrameLayout.LayoutParams(MATCH, MATCH));
+
+        LinearLayout.LayoutParams bodyParams = new LinearLayout.LayoutParams(MATCH, 0, 1f);
+        bodyParams.topMargin = dp(8);
+        root.addView(body, bodyParams);
 
         addView(root, new FrameLayout.LayoutParams(MATCH, MATCH));
     }
@@ -108,41 +125,165 @@ public class TaskOverlayView extends FrameLayout {
 
     public void begin(TaskType type, Difficulty difficulty, BaseTaskView view, Callback callback) {
         removeCallbacks(tick);
+        removeCallbacks(readyTick);
         this.callback = callback;
         content = view;
         active = true;
         finishing = false;
         running = false;
         lowTime = false;
-        limitMs = type.timeLimitSeconds(difficulty) * 1000L;
+
+        int limitSeconds = type.timeLimitSeconds(difficulty);
+        limitMs = limitSeconds * 1000L;
         remainingMs = limitMs;
 
         titleText.setText(type.getTitleRes());
         hintText.setText(type.getHintRes());
+        readyTitle.setText(type.getTitleRes());
+        readyRules.setText(type.getHintRes());
+        readyTime.setText(getContext().getString(R.string.task_ready_time,
+                formatTime(limitSeconds)));
+
+        barFill.setBackgroundColor(color(R.color.treasure_gold));
+        timerText.setTextColor(color(R.color.treasure_gold));
+
         container.removeAllViews();
         container.addView(view, new FrameLayout.LayoutParams(MATCH, WRAP, Gravity.CENTER));
         view.setListener((solved, mistakes) -> onContentFinished(solved, mistakes));
         updateTimerUi();
+        showReady();
 
         animate().cancel();
         setAlpha(0f);
         setVisibility(VISIBLE);
         animate().alpha(1f).setDuration(200L).start();
-        resume();
     }
 
     public void pause() {
         running = false;
         removeCallbacks(tick);
+        removeCallbacks(readyTick);
     }
 
     public void resume() {
-        if (!active || finishing || running) {
+        if (!active || finishing) {
+            return;
+        }
+        if (readyActive) {
+            removeCallbacks(readyTick);
+            postDelayed(readyTick, READY_TICK_MS);
+            return;
+        }
+        if (running) {
             return;
         }
         running = true;
         lastTickAt = SystemClock.uptimeMillis();
         postDelayed(tick, TICK_MS);
+    }
+
+    private void showReady() {
+        readyActive = true;
+        readyLeft = READY_SECONDS;
+        updateReadyButton();
+        readyLayer.setVisibility(VISIBLE);
+        removeCallbacks(readyTick);
+        postDelayed(readyTick, READY_TICK_MS);
+    }
+
+    private void onReadyTick() {
+        if (!readyActive) {
+            return;
+        }
+        readyLeft--;
+        if (readyLeft <= 0) {
+            startPlaying();
+            return;
+        }
+        updateReadyButton();
+        postDelayed(readyTick, READY_TICK_MS);
+    }
+
+    private void startPlaying() {
+        if (!readyActive) {
+            return;
+        }
+        readyActive = false;
+        removeCallbacks(readyTick);
+        readyLayer.setVisibility(GONE);
+        resume();
+    }
+
+    private void updateReadyButton() {
+        readyButton.setText(getContext().getString(R.string.task_ready_start, readyLeft));
+    }
+
+    private FrameLayout buildReadyLayer(Context context) {
+        FrameLayout layer = new FrameLayout(context);
+        layer.setBackgroundColor(color(R.color.navy_950));
+        layer.setClickable(true);
+        layer.setVisibility(GONE);
+
+        LinearLayout column = new LinearLayout(context);
+        column.setOrientation(LinearLayout.VERTICAL);
+        column.setGravity(Gravity.CENTER_HORIZONTAL);
+
+        TextView label = text(12, R.color.hud_text_secondary);
+        label.setText(R.string.task_ready_label);
+        label.setLetterSpacing(0.15f);
+        label.setGravity(Gravity.CENTER);
+
+        readyTitle = text(26, R.color.treasure_gold);
+        readyTitle.setGravity(Gravity.CENTER);
+
+        readyRules = text(15, R.color.white);
+        readyRules.setTypeface(Typeface.DEFAULT);
+        readyRules.setGravity(Gravity.CENTER);
+        readyRules.setMaxWidth(dp(420));
+
+        readyTime = text(14, R.color.hud_text_secondary);
+        readyTime.setGravity(Gravity.CENTER);
+
+        TextView note = text(12, R.color.hud_text_secondary);
+        note.setTypeface(Typeface.DEFAULT);
+        note.setText(R.string.task_ready_note);
+        note.setGravity(Gravity.CENTER);
+
+        readyButton = text(17, R.color.navy_950);
+        readyButton.setGravity(Gravity.CENTER);
+        readyButton.setPadding(dp(36), dp(12), dp(36), dp(12));
+        readyButton.setBackground(rounded(color(R.color.treasure_gold), 14f));
+        readyButton.setClickable(true);
+        readyButton.setOnClickListener(v -> startPlaying());
+
+        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(WRAP, WRAP);
+        titleParams.topMargin = dp(4);
+        LinearLayout.LayoutParams rulesParams = new LinearLayout.LayoutParams(WRAP, WRAP);
+        rulesParams.topMargin = dp(10);
+        LinearLayout.LayoutParams timeParams = new LinearLayout.LayoutParams(WRAP, WRAP);
+        timeParams.topMargin = dp(8);
+        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(WRAP, WRAP);
+        buttonParams.topMargin = dp(16);
+        LinearLayout.LayoutParams noteParams = new LinearLayout.LayoutParams(WRAP, WRAP);
+        noteParams.topMargin = dp(8);
+
+        column.addView(label, new LinearLayout.LayoutParams(WRAP, WRAP));
+        column.addView(readyTitle, titleParams);
+        column.addView(readyRules, rulesParams);
+        column.addView(readyTime, timeParams);
+        column.addView(readyButton, buttonParams);
+        column.addView(note, noteParams);
+
+        layer.addView(column, new FrameLayout.LayoutParams(WRAP, WRAP, Gravity.CENTER));
+        return layer;
+    }
+
+    private GradientDrawable rounded(int fill, float radiusDp) {
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setShape(GradientDrawable.RECTANGLE);
+        drawable.setColor(fill);
+        drawable.setCornerRadius(dp(radiusDp));
+        return drawable;
     }
 
     private void onTick() {
@@ -191,7 +332,10 @@ public class TaskOverlayView extends FrameLayout {
         callback = null;
         active = false;
         finishing = false;
+        readyActive = false;
+        removeCallbacks(readyTick);
         setVisibility(GONE);
+        readyLayer.setVisibility(GONE);
         container.removeAllViews();
         content = null;
         if (cb != null) {
@@ -203,9 +347,13 @@ public class TaskOverlayView extends FrameLayout {
         return (int) Math.ceil(remainingMs / 1000.0);
     }
 
+    private static String formatTime(int seconds) {
+        return String.format(Locale.US, "%d:%02d", seconds / 60, seconds % 60);
+    }
+
     private void updateTimerUi() {
         int seconds = secondsLeft();
-        timerText.setText(String.format(Locale.US, "%d:%02d", seconds / 60, seconds % 60));
+        timerText.setText(formatTime(seconds));
         float fraction = limitMs <= 0L ? 0f : Math.max(0f, Math.min(1f, remainingMs / (float) limitMs));
         barFill.setScaleX(fraction);
         boolean low = fraction < 0.25f;
@@ -236,6 +384,7 @@ public class TaskOverlayView extends FrameLayout {
     @Override
     protected void onDetachedFromWindow() {
         removeCallbacks(tick);
+        removeCallbacks(readyTick);
         super.onDetachedFromWindow();
     }
 }

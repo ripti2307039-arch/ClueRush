@@ -18,12 +18,7 @@ import androidx.core.graphics.ColorUtils;
 
 import com.ripti.cluerush.R;
 
-/**
- * Animated "Neon Night-Map" decoration drawn on top of the window background.
- * Draws two slowly drifting glow orbs, a dashed treasure route between two pins,
- * and a gold dot travelling along the route.
- * Everything is cheap Canvas drawing, no bitmaps, no allocations per frame.
- */
+
 public class NeonMapBackgroundView extends View implements Choreographer.FrameCallback {
 
     private static final float ROUTE_PERIOD_SECONDS = 10f;
@@ -86,7 +81,6 @@ public class NeonMapBackgroundView extends View implements Choreographer.FrameCa
         setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
     }
 
-    /** Call with true to stop all animation (future "Reduce effects" setting). */
     public void setReduceEffects(boolean reduce) {
         reduceEffects = reduce;
         if (reduce) {

@@ -68,7 +68,7 @@ public class OverviewMap {
                 padded.getNorth(), padded.getEast(), padded.getSouth(), padded.getWest()));
     }
 
-    /** Puro arena screen-e fit kore. Map dekhanor por call korte hobe. */
+
     public void fit() {
         if (fitBox == null) {
             return;
