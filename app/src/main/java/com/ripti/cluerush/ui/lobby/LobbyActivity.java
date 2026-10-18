@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -21,11 +22,15 @@ import com.ripti.cluerush.databinding.ActivityLobbyBinding;
 import com.ripti.cluerush.model.Arena;
 import com.ripti.cluerush.model.Match;
 import com.ripti.cluerush.ui.BaseActivity;
+import com.ripti.cluerush.ui.game.GameActivity;
 import com.ripti.cluerush.util.EntranceAnimator;
+import com.ripti.cluerush.util.ServerClock;
 
 public class LobbyActivity extends BaseActivity {
 
     public static final String EXTRA_CODE = "extra_code";
+
+    private static final long START_DELAY_MS = 5000L;
 
     private final MatchRepository repository = new MatchRepository();
 
@@ -36,6 +41,8 @@ public class LobbyActivity extends BaseActivity {
     private String code;
     private String uid;
     private boolean leaving;
+    private boolean launched;
+    private boolean startRequested;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,6 +55,7 @@ public class LobbyActivity extends BaseActivity {
             return;
         }
         uid = user.getUid();
+        ServerClock.start();
 
         binding = ActivityLobbyBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -106,21 +114,52 @@ public class LobbyActivity extends BaseActivity {
     }
 
     private void handleMatch(Match match) {
+        if (launched) {
+            return;
+        }
         currentMatch = match;
         render(match);
 
-        if (match.isHost(uid)) {
-            boolean allReady = match.allPlayersReady();
-            if (Match.STATUS_WAITING.equals(match.getStatus()) && allReady) {
-                repository.setStatus(code, Match.STATUS_READY);
-            } else if (Match.STATUS_READY.equals(match.getStatus()) && !allReady) {
-                repository.setStatus(code, Match.STATUS_WAITING);
-            }
+        boolean started = (Match.STATUS_STARTING.equals(match.getStatus())
+                || Match.STATUS_PLAYING.equals(match.getStatus()))
+                && match.getStartAt() > 0L;
+        if (started) {
+            launchGame(match);
+            return;
+        }
+
+        if (!match.isHost(uid)) {
+            return;
+        }
+        boolean allReady = match.allPlayersReady();
+        if (!allReady) {
+            startRequested = false;
+        } else if (Match.STATUS_WAITING.equals(match.getStatus()) && !startRequested) {
+            startRequested = true;
+            repository.startMatch(code, ServerClock.now() + START_DELAY_MS);
         }
     }
 
+    private void launchGame(Match match) {
+        launched = true;
+        leaving = true;
+        if (match.isHost(uid)) {
+            repository.setStatus(code, Match.STATUS_PLAYING);
+        }
+        Intent intent = new Intent(this, GameActivity.class);
+        intent.putExtra(GameActivity.EXTRA_ARENA_ID, match.getArenaId());
+        intent.putExtra(GameActivity.EXTRA_DIFFICULTY, match.getDifficulty());
+        intent.putExtra(GameActivity.EXTRA_SEED, match.getSeed());
+        intent.putExtra(GameActivity.EXTRA_MATCH_CODE, code);
+        intent.putExtra(GameActivity.EXTRA_IS_HOST, match.isHost(uid));
+        intent.putExtra(GameActivity.EXTRA_START_AT, match.getStartAt() - ServerClock.offset());
+        intent.putExtra(GameActivity.EXTRA_DURATION, (long) match.getDurationSeconds());
+        startActivity(intent);
+        finish();
+    }
+
     private void handleRemoved() {
-        if (leaving || isFinishing() || isDestroyed()) {
+        if (leaving || launched || isFinishing() || isDestroyed()) {
             return;
         }
         leaving = true;
@@ -128,12 +167,21 @@ public class LobbyActivity extends BaseActivity {
         finish();
     }
 
+    @StringRes
+    private int difficultyLabel(String difficulty) {
+        if (Match.DIFFICULTY_HARD.equals(difficulty)) {
+            return R.string.difficulty_hard_short;
+        }
+        if (Match.DIFFICULTY_MEDIUM.equals(difficulty)) {
+            return R.string.difficulty_medium_short;
+        }
+        return R.string.difficulty_easy_short;
+    }
+
     private void render(Match match) {
         Arena arena = ArenaCatalog.findById(this, match.getArenaId());
         binding.arenaText.setText(arena != null ? arena.getName() : match.getArenaId());
-        binding.difficultyText.setText(Match.DIFFICULTY_HARD.equals(match.getDifficulty())
-                ? R.string.difficulty_hard_short
-                : R.string.difficulty_easy_short);
+        binding.difficultyText.setText(difficultyLabel(match.getDifficulty()));
 
         adapter.submit(match.getPlayers(), match.getMaxPlayers(), uid);
 
@@ -141,7 +189,12 @@ public class LobbyActivity extends BaseActivity {
                 ? R.string.action_unready
                 : R.string.action_ready);
 
-        if (match.getPlayers().size() < match.getMaxPlayers()) {
+        boolean starting = !Match.STATUS_WAITING.equals(match.getStatus());
+        binding.readyButton.setEnabled(!starting);
+
+        if (starting) {
+            binding.statusText.setText(R.string.lobby_status_starting);
+        } else if (match.getPlayers().size() < match.getMaxPlayers()) {
             binding.statusText.setText(R.string.lobby_status_waiting_opponent);
         } else if (match.allPlayersReady()) {
             binding.statusText.setText(R.string.lobby_status_all_ready);

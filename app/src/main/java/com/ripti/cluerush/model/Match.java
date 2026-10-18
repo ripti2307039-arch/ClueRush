@@ -8,6 +8,7 @@ public class Match {
 
     public static final String STATUS_WAITING = "waiting";
     public static final String STATUS_READY = "ready";
+    public static final String STATUS_STARTING = "starting";
     public static final String STATUS_PLAYING = "playing";
     public static final String STATUS_FINISHED = "finished";
 
@@ -16,7 +17,7 @@ public class Match {
     public static final String DIFFICULTY_HARD = "hard";
 
     public static final int DEFAULT_MAX_PLAYERS = 2;
-    public static final int DEFAULT_DURATION_SECONDS = 600;
+    public static final int DEFAULT_DURATION_SECONDS = 900;
 
     private final String code;
     private final String arenaId;
@@ -25,10 +26,13 @@ public class Match {
     private final String difficulty;
     private final int maxPlayers;
     private final int durationSeconds;
+    private final long seed;
+    private final long startAt;
     private final List<LobbyPlayer> players;
 
     public Match(String code, String arenaId, String hostUid, String status, String difficulty,
-                 int maxPlayers, int durationSeconds, List<LobbyPlayer> players) {
+                 int maxPlayers, int durationSeconds, long seed, long startAt,
+                 List<LobbyPlayer> players) {
         this.code = code;
         this.arenaId = arenaId;
         this.hostUid = hostUid;
@@ -36,7 +40,19 @@ public class Match {
         this.difficulty = difficulty;
         this.maxPlayers = Math.max(1, maxPlayers);
         this.durationSeconds = durationSeconds;
+        this.seed = seed;
+        this.startAt = startAt;
         this.players = Collections.unmodifiableList(new ArrayList<>(players));
+    }
+
+    public static int durationFor(String difficulty) {
+        if (DIFFICULTY_HARD.equals(difficulty)) {
+            return 1080;
+        }
+        if (DIFFICULTY_MEDIUM.equals(difficulty)) {
+            return 900;
+        }
+        return 720;
     }
 
     public String getCode() {
@@ -65,6 +81,14 @@ public class Match {
 
     public int getDurationSeconds() {
         return durationSeconds;
+    }
+
+    public long getSeed() {
+        return seed;
+    }
+
+    public long getStartAt() {
+        return startAt;
     }
 
     public List<LobbyPlayer> getPlayers() {

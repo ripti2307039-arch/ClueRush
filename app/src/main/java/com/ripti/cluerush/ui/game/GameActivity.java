@@ -9,17 +9,21 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -31,8 +35,11 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.ripti.cluerush.R;
 import com.ripti.cluerush.data.ArenaCatalog;
+import com.ripti.cluerush.data.MatchRepository;
 import com.ripti.cluerush.databinding.ActivityGameBinding;
 import com.ripti.cluerush.game.BestScoreStore;
 import com.ripti.cluerush.game.GameLoop;
@@ -51,6 +58,7 @@ import com.ripti.cluerush.map.OverviewMap;
 import com.ripti.cluerush.model.Arena;
 import com.ripti.cluerush.model.CampusLocation;
 import com.ripti.cluerush.model.Difficulty;
+import com.ripti.cluerush.model.Match;
 import com.ripti.cluerush.model.Round;
 import com.ripti.cluerush.task.BaseTaskView;
 import com.ripti.cluerush.task.TaskFactory;
@@ -71,10 +79,15 @@ public class GameActivity extends BaseActivity {
     public static final String EXTRA_ARENA_ID = "extra_arena_id";
     public static final String EXTRA_DIFFICULTY = "extra_difficulty";
     public static final String EXTRA_SEED = "extra_seed";
+    public static final String EXTRA_MATCH_CODE = "extra_match_code";
+    public static final String EXTRA_IS_HOST = "extra_is_host";
+    public static final String EXTRA_START_AT = "extra_start_at";
+    public static final String EXTRA_DURATION = "extra_duration";
 
     private static final String PICK_TAG = "MapPick";
     private static final String TASK_TAG = "GameTask";
     private static final int MAX_ROUNDS = 5;
+    private static final int MATCH_LOW_SECONDS = 60;
     private static final double VISION_RADIUS_METERS = 80.0;
     private static final float MAX_ZOOM_OUT = 0.35f;
     private static final float ZOOM_RESPONSE = 3f;
@@ -86,21 +99,31 @@ public class GameActivity extends BaseActivity {
     private static final long WRONG_COOLDOWN_MS = 900L;
     private static final long MAP_FADE_MS = 180L;
     private static final long SCORE_COUNT_MS = 600L;
+    private static final long COUNTDOWN_TICK_MS = 100L;
     private static final int LOSS_COLOR = 0xFFFF6B6B;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable hideHint = this::dismissHint;
+    private final Runnable countdownTick = this::onCountdownTick;
+    private final MatchRepository matchRepository = new MatchRepository();
 
     private Random random;
     private ActivityGameBinding binding;
     private GameMap gameMap;
     private OverviewMap overviewMap;
     private TaskOverlayView taskOverlay;
+    private TextView countdownText;
     private PlayerController player;
     private GameLoop gameLoop;
     private GameSession session;
     private Arena arena;
     private Difficulty difficulty;
+    private String matchCode;
+    private boolean matchHost;
+    private long matchStartAt;
+    private long matchEndAt;
+    private boolean matchTimeUp;
+    private int lastShownSeconds;
     private double baseZoom;
     private float zoomOffset;
     private float appliedZoomOffset;
@@ -133,6 +156,16 @@ public class GameActivity extends BaseActivity {
         }
 
         difficulty = Difficulty.fromKey(getIntent().getStringExtra(EXTRA_DIFFICULTY));
+        matchCode = getIntent().getStringExtra(EXTRA_MATCH_CODE);
+        if (isMatch()) {
+            matchHost = getIntent().getBooleanExtra(EXTRA_IS_HOST, false);
+            matchStartAt = getIntent().getLongExtra(EXTRA_START_AT, System.currentTimeMillis());
+            long duration = getIntent().getLongExtra(EXTRA_DURATION,
+                    Match.DEFAULT_DURATION_SECONDS);
+            matchEndAt = matchStartAt + duration * 1000L;
+            lastShownSeconds = (int) duration;
+        }
+
         long seed = getIntent().getLongExtra(EXTRA_SEED, System.nanoTime());
         random = new Random(seed);
         int rounds = Math.min(MAX_ROUNDS, TaskType.values().length);
@@ -154,7 +187,7 @@ public class GameActivity extends BaseActivity {
                         ViewGroup.LayoutParams.MATCH_PARENT));
         applyInsets(taskOverlay);
 
-        binding.scoreText.setText(getString(R.string.score_hud, 0));
+        renderScoreText();
 
         baseZoom = arena.getZoom();
         player = new PlayerController(arena.getCenterLatitude(), arena.getCenterLongitude(),
@@ -209,6 +242,10 @@ public class GameActivity extends BaseActivity {
 
         gameLoop = new GameLoop(this::onFrame);
         showRound();
+
+        if (isMatch()) {
+            beginMatchCountdown();
+        }
     }
 
     @Override
@@ -271,9 +308,103 @@ public class GameActivity extends BaseActivity {
         }
     }
 
+    private boolean isMatch() {
+        return matchCode != null;
+    }
+
+    private void beginMatchCountdown() {
+        if (System.currentTimeMillis() >= matchStartAt) {
+            return;
+        }
+        countdownText = new TextView(this);
+        countdownText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 72f);
+        countdownText.setTextColor(ContextCompat.getColor(this, R.color.treasure_gold));
+        countdownText.setTypeface(Typeface.DEFAULT_BOLD);
+        countdownText.setGravity(Gravity.CENTER);
+        countdownText.setBackgroundColor(ContextCompat.getColor(this, R.color.overlay_scrim));
+        countdownText.setClickable(true);
+        ((ViewGroup) binding.getRoot()).addView(countdownText,
+                new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT));
+        lockInput();
+        onCountdownTick();
+    }
+
+    private void onCountdownTick() {
+        long left = matchStartAt - System.currentTimeMillis();
+        if (left <= 0L) {
+            countdownText.setText(R.string.match_go);
+            inputLocked = false;
+            countdownText.animate()
+                    .alpha(0f)
+                    .setStartDelay(500L)
+                    .setDuration(300L)
+                    .withEndAction(() -> countdownText.setVisibility(View.GONE))
+                    .start();
+            return;
+        }
+        countdownText.setText(String.valueOf((left + 999L) / 1000L));
+        handler.postDelayed(countdownTick, COUNTDOWN_TICK_MS);
+    }
+
+    private void updateMatchClock() {
+        if (matchTimeUp || finishedState) {
+            return;
+        }
+        long now = Math.max(System.currentTimeMillis(), matchStartAt);
+        long left = matchEndAt - now;
+        int seconds = (int) Math.max(0L, (left + 999L) / 1000L);
+        if (seconds != lastShownSeconds) {
+            lastShownSeconds = seconds;
+            renderScoreText();
+        }
+        if (left <= 0L) {
+            onMatchTimeUp();
+        }
+    }
+
+    private void onMatchTimeUp() {
+        matchTimeUp = true;
+        if (taskOverlay.isActive()) {
+            taskOverlay.abort();
+            return;
+        }
+        if (binding.resultOverlay.getVisibility() == View.VISIBLE) {
+            return;
+        }
+        lockInput();
+        stopPulse();
+        showFinished();
+    }
+
+    private void renderScoreText() {
+        if (!isMatch()) {
+            binding.scoreText.setText(getString(R.string.score_hud, displayedScore));
+            return;
+        }
+        int seconds = Math.max(0, lastShownSeconds);
+        String clock = String.format(Locale.US, "%d:%02d", seconds / 60, seconds % 60);
+        binding.scoreText.setText(getString(R.string.score_hud_match, displayedScore, clock));
+        binding.scoreText.setTextColor(seconds <= MATCH_LOW_SECONDS
+                ? LOSS_COLOR : ContextCompat.getColor(this, R.color.treasure_gold));
+    }
+
+    private void leaveMatchIfNeeded() {
+        if (!isMatch()) {
+            return;
+        }
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            matchRepository.leaveMatch(matchCode, user.getUid(), matchHost);
+        }
+    }
+
     private void onFrame(float deltaSeconds) {
         if (!inputLocked) {
             roundSeconds += deltaSeconds;
+        }
+        if (isMatch()) {
+            updateMatchClock();
         }
         boolean moved = player.update(deltaSeconds);
         if (moved) {
@@ -503,7 +634,7 @@ public class GameActivity extends BaseActivity {
         scoreAnimator.setDuration(SCORE_COUNT_MS);
         scoreAnimator.addUpdateListener(animator -> {
             displayedScore = (int) animator.getAnimatedValue();
-            binding.scoreText.setText(getString(R.string.score_hud, displayedScore));
+            renderScoreText();
         });
         scoreAnimator.start();
     }
@@ -536,7 +667,7 @@ public class GameActivity extends BaseActivity {
         lockInput();
         stopPulse();
 
-        BaseTaskView view = TaskFactory.create(this, round.getTask());
+        BaseTaskView view = TaskFactory.create(this, round.getTask(), !isMatch());
         if (view == null) {
             Log.e(TASK_TAG, "Task content missing for " + round.getTask().getType()
                     + ", skipping the task");
@@ -591,7 +722,7 @@ public class GameActivity extends BaseActivity {
         return text.toString();
     }
 
-    private String buildFinalSummary(String bestLine) {
+    private String buildFinalSummary(@Nullable String bestLine) {
         StringBuilder text = new StringBuilder();
         text.append(getString(R.string.game_finished_body,
                 session.getTotal(), session.getWrongAttempts()));
@@ -619,7 +750,9 @@ public class GameActivity extends BaseActivity {
             appendLine(text, getString(R.string.score_perfect, session.getPerfectBonus()));
         }
         appendLine(text, getString(R.string.score_final, session.getTotalScore()));
-        appendLine(text, bestLine);
+        if (bestLine != null) {
+            appendLine(text, bestLine);
+        }
         return text.toString();
     }
 
@@ -731,11 +864,12 @@ public class GameActivity extends BaseActivity {
 
     private void onResultContinue() {
         if (finishedState) {
+            leaveMatchIfNeeded();
             finish();
             return;
         }
         session.advance();
-        if (session.isFinished()) {
+        if (session.isFinished() || matchTimeUp) {
             showFinished();
             return;
         }
@@ -754,14 +888,19 @@ public class GameActivity extends BaseActivity {
         animateScoreTo(session.getTotalScore());
 
         int score = session.getTotalScore();
-        int previousBest = BestScoreStore.get(this, arena.getId(), difficulty);
-        boolean newBest = BestScoreStore.submit(this, arena.getId(), difficulty, score);
-        String bestLine = newBest
-                ? getString(R.string.score_new_best)
-                : getString(R.string.score_best, previousBest);
+        String bestLine = null;
+        if (!isMatch()) {
+            int previousBest = BestScoreStore.get(this, arena.getId(), difficulty);
+            boolean newBest = BestScoreStore.submit(this, arena.getId(), difficulty, score);
+            bestLine = newBest
+                    ? getString(R.string.score_new_best)
+                    : getString(R.string.score_best, previousBest);
+        }
 
-        showResult(getString(R.string.game_finished_title), rankLine(session.getRank()),
-                buildFinalSummary(bestLine), R.string.action_back_home);
+        boolean timedOut = matchTimeUp && !session.isFinished();
+        showResult(getString(timedOut ? R.string.match_time_up : R.string.game_finished_title),
+                rankLine(session.getRank()), buildFinalSummary(bestLine),
+                R.string.action_back_home);
     }
 
     private void showResult(String title, String subtitle, String body,
@@ -840,7 +979,10 @@ public class GameActivity extends BaseActivity {
                 .setTitle(R.string.exit_match_title)
                 .setMessage(R.string.exit_match_message)
                 .setNegativeButton(R.string.action_cancel, null)
-                .setPositiveButton(R.string.action_leave_match, (dialog, which) -> finish())
+                .setPositiveButton(R.string.action_leave_match, (dialog, which) -> {
+                    leaveMatchIfNeeded();
+                    finish();
+                })
                 .show();
     }
 }

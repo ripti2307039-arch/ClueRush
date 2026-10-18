@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class MatchRepository {
 
@@ -89,7 +90,8 @@ public class MatchRepository {
                 data.put("hostUid", uid);
                 data.put("status", Match.STATUS_WAITING);
                 data.put("difficulty", difficulty);
-                data.put("durationSeconds", Match.DEFAULT_DURATION_SECONDS);
+                data.put("durationSeconds", Match.durationFor(difficulty));
+                data.put("seed", new Random().nextLong());
                 data.put("maxPlayers", Match.DEFAULT_MAX_PLAYERS);
                 data.put("createdAt", ServerValue.TIMESTAMP);
                 data.put("players", players);
@@ -189,6 +191,16 @@ public class MatchRepository {
         }
     }
 
+    public void startMatch(String code, long startAt) {
+        try {
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("status", Match.STATUS_STARTING);
+            updates.put("startAt", startAt);
+            matches().child(code).updateChildren(updates);
+        } catch (Exception ignored) {
+        }
+    }
+
     public void leaveMatch(String code, String uid, boolean isHost) {
         try {
             DatabaseReference reference = matches().child(code);
@@ -242,6 +254,8 @@ public class MatchRepository {
                 readString(snapshot, "difficulty", Match.DIFFICULTY_EASY),
                 (int) readLong(snapshot, "maxPlayers", Match.DEFAULT_MAX_PLAYERS),
                 (int) readLong(snapshot, "durationSeconds", Match.DEFAULT_DURATION_SECONDS),
+                readLong(snapshot, "seed", 0L),
+                readLong(snapshot, "startAt", 0L),
                 players);
     }
 
