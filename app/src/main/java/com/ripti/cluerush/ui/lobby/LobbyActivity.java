@@ -1,9 +1,11 @@
 package com.ripti.cluerush.ui.lobby;
 
+import android.animation.ObjectAnimator;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -31,6 +33,7 @@ public class LobbyActivity extends BaseActivity {
     public static final String EXTRA_CODE = "extra_code";
 
     private static final long START_DELAY_MS = 5000L;
+    private static final float START_DIM_ALPHA = 0.4f;
 
     private final MatchRepository repository = new MatchRepository();
 
@@ -42,7 +45,8 @@ public class LobbyActivity extends BaseActivity {
     private String uid;
     private boolean leaving;
     private boolean launched;
-    private boolean startRequested;
+    private boolean startClicked;
+    private boolean startWasActive;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,6 +75,7 @@ public class LobbyActivity extends BaseActivity {
         binding.copyButton.setOnClickListener(v -> copyCode());
         binding.shareButton.setOnClickListener(v -> shareCode());
         binding.readyButton.setOnClickListener(v -> toggleReady());
+        binding.startButton.setOnClickListener(v -> startMatch());
         binding.leaveButton.setOnClickListener(v -> confirmLeave());
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -113,31 +118,57 @@ public class LobbyActivity extends BaseActivity {
         super.onStop();
     }
 
+    private boolean isStarted(Match match) {
+        return (Match.STATUS_STARTING.equals(match.getStatus())
+                || Match.STATUS_PLAYING.equals(match.getStatus()))
+                && match.getStartAt() > 0L;
+    }
+
     private void handleMatch(Match match) {
         if (launched) {
             return;
         }
         currentMatch = match;
-        render(match);
-
-        boolean started = (Match.STATUS_STARTING.equals(match.getStatus())
-                || Match.STATUS_PLAYING.equals(match.getStatus()))
-                && match.getStartAt() > 0L;
-        if (started) {
+        if (isStarted(match)) {
             launchGame(match);
             return;
         }
+        if (!match.allPlayersReady()) {
+            startClicked = false;
+        }
+        render(match);
+    }
 
-        if (!match.isHost(uid)) {
+    private void startMatch() {
+        if (currentMatch == null || startClicked || !currentMatch.isHost(uid)) {
             return;
         }
-        boolean allReady = match.allPlayersReady();
-        if (!allReady) {
-            startRequested = false;
-        } else if (Match.STATUS_WAITING.equals(match.getStatus()) && !startRequested) {
-            startRequested = true;
-            repository.startMatch(code, ServerClock.now() + START_DELAY_MS);
+        if (!currentMatch.allPlayersReady()) {
+            shakeStartButton();
+            boolean missingOpponent =
+                    currentMatch.getPlayers().size() < currentMatch.getMaxPlayers();
+            Snackbar.make(binding.getRoot(),
+                    missingOpponent ? R.string.start_need_opponent : R.string.start_need_ready,
+                    Snackbar.LENGTH_SHORT).show();
+            return;
         }
+        startClicked = true;
+        binding.startButton.setEnabled(false);
+        repository.startMatch(code, ServerClock.now() + START_DELAY_MS);
+    }
+
+    private void shakeStartButton() {
+        float shift = 10f * getResources().getDisplayMetrics().density;
+        ObjectAnimator.ofFloat(binding.startButton, View.TRANSLATION_X,
+                        0f, -shift, shift, -shift * 0.6f, shift * 0.6f, 0f)
+                .setDuration(280L)
+                .start();
+    }
+
+    private void popStartButton() {
+        binding.startButton.setScaleX(0.92f);
+        binding.startButton.setScaleY(0.92f);
+        binding.startButton.animate().scaleX(1f).scaleY(1f).setDuration(220L).start();
     }
 
     private void launchGame(Match match) {
@@ -185,19 +216,34 @@ public class LobbyActivity extends BaseActivity {
 
         adapter.submit(match.getPlayers(), match.getMaxPlayers(), uid);
 
+        boolean host = match.isHost(uid);
+        boolean allReady = match.allPlayersReady();
+
         binding.readyButton.setText(match.isReady(uid)
                 ? R.string.action_unready
                 : R.string.action_ready);
+        binding.readyButton.setEnabled(!startClicked);
 
-        boolean starting = !Match.STATUS_WAITING.equals(match.getStatus());
-        binding.readyButton.setEnabled(!starting);
+        boolean startActive = host && allReady && !startClicked;
+        binding.startButton.setVisibility(host ? View.VISIBLE : View.GONE);
+        binding.startButton.setEnabled(!startClicked);
+        binding.startButton.animate()
+                .alpha(startActive || startClicked ? 1f : START_DIM_ALPHA)
+                .setDuration(200L)
+                .start();
+        if (startActive && !startWasActive) {
+            popStartButton();
+        }
+        startWasActive = startActive;
 
-        if (starting) {
+        if (startClicked) {
             binding.statusText.setText(R.string.lobby_status_starting);
         } else if (match.getPlayers().size() < match.getMaxPlayers()) {
             binding.statusText.setText(R.string.lobby_status_waiting_opponent);
-        } else if (match.allPlayersReady()) {
-            binding.statusText.setText(R.string.lobby_status_all_ready);
+        } else if (allReady) {
+            binding.statusText.setText(host
+                    ? R.string.lobby_status_all_ready
+                    : R.string.lobby_status_waiting_host);
         } else {
             binding.statusText.setText(R.string.lobby_status_waiting_ready);
         }
