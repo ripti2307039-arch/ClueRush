@@ -12,27 +12,38 @@ import java.util.Arrays;
 
 public class SudokuTaskView extends BaseTaskView {
 
-    private static final int CELLS = 16;
-
+    private final int size;
+    private final int boxRows;
+    private final int boxCols;
     private final int[] solution;
     private final int[] values;
-    private final boolean[] given = new boolean[CELLS];
-    private final boolean[] wrong = new boolean[CELLS];
-    private final TextView[] cells = new TextView[CELLS];
+    private final boolean[] given;
+    private final boolean[] wrong;
+    private final TextView[] cells;
     private final LinearLayout grid;
     private int selected = -1;
     private int mistakes;
 
-    public SudokuTaskView(Context context, int[] puzzle, int[] solution) {
+    public SudokuTaskView(Context context, SudokuGenerator.Puzzle puzzle) {
         super(context);
-        this.solution = solution.clone();
-        this.values = puzzle.clone();
-        for (int i = 0; i < CELLS; i++) {
-            given[i] = puzzle[i] != 0;
+        size = puzzle.size;
+        boxRows = puzzle.boxRows;
+        boxCols = puzzle.boxCols;
+        int total = size * size;
+        solution = puzzle.solution.clone();
+        values = puzzle.cells.clone();
+        given = new boolean[total];
+        wrong = new boolean[total];
+        cells = new TextView[total];
+        for (int i = 0; i < total; i++) {
+            given[i] = puzzle.cells[i] != 0;
             if (selected < 0 && !given[i]) {
                 selected = i;
             }
         }
+
+        int cellSize = size == 4 ? 46 : 34;
+        float textSp = size == 4 ? 22f : 18f;
 
         LinearLayout root = new LinearLayout(context);
         root.setOrientation(LinearLayout.HORIZONTAL);
@@ -40,17 +51,16 @@ public class SudokuTaskView extends BaseTaskView {
 
         grid = new LinearLayout(context);
         grid.setOrientation(LinearLayout.VERTICAL);
-        int cellSize = dp(46);
-        for (int r = 0; r < 4; r++) {
+        for (int r = 0; r < size; r++) {
             LinearLayout row = new LinearLayout(context);
             row.setOrientation(LinearLayout.HORIZONTAL);
-            for (int c = 0; c < 4; c++) {
-                final int pos = r * 4 + c;
-                TextView cell = label("", 22, color(R.color.white), true);
+            for (int c = 0; c < size; c++) {
+                final int pos = r * size + c;
+                TextView cell = label("", textSp, color(R.color.white), true);
                 cell.setOnClickListener(v -> select(pos));
                 LinearLayout.LayoutParams params =
-                        new LinearLayout.LayoutParams(cellSize, cellSize);
-                params.setMargins(dp(2), dp(2), dp(c == 1 ? 8 : 2), dp(r == 1 ? 8 : 2));
+                        new LinearLayout.LayoutParams(dp(cellSize), dp(cellSize));
+                params.setMargins(dp(2), dp(2), dp(gap(c, boxCols)), dp(gap(r, boxRows)));
                 row.addView(cell, params);
                 cells[pos] = cell;
             }
@@ -71,28 +81,41 @@ public class SudokuTaskView extends BaseTaskView {
         return mistakes;
     }
 
+    private int gap(int index, int boxLength) {
+        return (index + 1) % boxLength == 0 && index < size - 1 ? 8 : 2;
+    }
+
     private LinearLayout buildPad(Context context) {
+        int columns = size == 4 ? 2 : 3;
+        int rows = size / columns;
+        int button = size == 4 ? 46 : 40;
+
         LinearLayout pad = new LinearLayout(context);
         pad.setOrientation(LinearLayout.VERTICAL);
-        int size = dp(46);
-        for (int rowIndex = 0; rowIndex < 2; rowIndex++) {
+        for (int r = 0; r < rows; r++) {
             LinearLayout row = new LinearLayout(context);
             row.setOrientation(LinearLayout.HORIZONTAL);
-            for (int col = 0; col < 2; col++) {
-                final int number = rowIndex * 2 + col + 1;
-                TextView button = label(String.valueOf(number), 22, color(R.color.treasure_gold), true);
-                button.setBackground(box(color(R.color.navy_900), color(R.color.treasure_gold), 12, 1.5f));
-                button.setOnClickListener(v -> place(number));
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
+            for (int c = 0; c < columns; c++) {
+                final int number = r * columns + c + 1;
+                TextView key = label(String.valueOf(number), 22,
+                        color(R.color.treasure_gold), true);
+                key.setBackground(box(color(R.color.navy_900), color(R.color.treasure_gold),
+                        12, 1.5f));
+                key.setOnClickListener(v -> place(number));
+                LinearLayout.LayoutParams params =
+                        new LinearLayout.LayoutParams(dp(button), dp(button));
                 params.setMargins(dp(3), dp(3), dp(3), dp(3));
-                row.addView(button, params);
+                row.addView(key, params);
             }
             pad.addView(row, new LinearLayout.LayoutParams(WRAP, WRAP));
         }
-        TextView erase = label(context.getString(R.string.task_erase), 14, color(R.color.white), true);
+
+        TextView erase = label(context.getString(R.string.task_erase), 14,
+                color(R.color.white), true);
         erase.setBackground(box(color(R.color.navy_900), color(R.color.hud_stroke), 12, 1.5f));
         erase.setOnClickListener(v -> place(0));
-        LinearLayout.LayoutParams eraseParams = new LinearLayout.LayoutParams(size * 2 + dp(6), size);
+        LinearLayout.LayoutParams eraseParams = new LinearLayout.LayoutParams(
+                dp((button + 6) * columns - 6), dp(button));
         eraseParams.setMargins(dp(3), dp(3), dp(3), dp(3));
         pad.addView(erase, eraseParams);
         return pad;
@@ -123,7 +146,7 @@ public class SudokuTaskView extends BaseTaskView {
             }
         }
         boolean allRight = true;
-        for (int i = 0; i < CELLS; i++) {
+        for (int i = 0; i < values.length; i++) {
             wrong[i] = values[i] != solution[i];
             if (wrong[i]) {
                 allRight = false;
@@ -142,7 +165,7 @@ public class SudokuTaskView extends BaseTaskView {
 
     private void refresh() {
         int gold = color(R.color.treasure_gold);
-        for (int i = 0; i < CELLS; i++) {
+        for (int i = 0; i < values.length; i++) {
             TextView cell = cells[i];
             cell.setText(values[i] == 0 ? "" : String.valueOf(values[i]));
             boolean isSelected = i == selected;

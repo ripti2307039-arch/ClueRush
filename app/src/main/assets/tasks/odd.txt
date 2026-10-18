@@ -1,0 +1,38 @@
+easy|Carrot|Apple|Banana|Mango
+easy|Dog|Chair|Table|Bed
+easy|Red|Dhaka|Khulna|Sylhet
+easy|Tiger|Sparrow|Eagle|Crow
+easy|Pen|Cat|Cow|Goat
+easy|Rice|Shirt|Pants|Cap
+easy|Monday|January|March|June
+easy|Pencil|Football|Cricket|Hockey
+easy|Car|Banana|Apple|Orange
+easy|Moon|Rose|Lily|Jasmine
+easy|Rainbow|Bus|Train|Truck
+easy|Spoon|Tea|Water|Milk
+
+medium|Whale|Shark|Tuna|Salmon
+medium|Bat|Eagle|Sparrow|Pigeon
+medium|Spider|Ant|Bee|Butterfly
+medium|Chrome|Keyboard|Monitor|Printer
+medium|Sundarbans|Padma|Meghna|Jamuna
+medium|Water|Oxygen|Nitrogen|Hydrogen
+medium|Triangle|Cube|Sphere|Cone
+medium|Eagle|Tiger|Lion|Leopard
+medium|Nile|Dhaka|Tokyo|Paris
+medium|Hexagon|Square|Rectangle|Rhombus
+medium|February|April|June|September
+medium|Moon|Mars|Venus|Earth
+
+hard|Python|HTML|CSS|XML
+hard|RAM|Hard disk|SSD|Flash drive
+hard|Fraction|Binary|Octal|Hexadecimal
+hard|Compiler|Stack|Queue|Array
+hard|Virus|Nucleus|Ribosome|Mitochondria
+hard|Battery|Resistor|Capacitor|Inductor
+hard|MySQL|Linux|Windows|Android
+hard|Isaac Newton|Rabindranath Tagore|Kazi Nazrul Islam|Jibanananda Das
+hard|Logarithm|Sine|Cosine|Tangent
+hard|Evaporation|Photosynthesis|Digestion|Respiration
+hard|Ethernet|Wi-Fi|Bluetooth|NFC
+hard|Binary search|Bubble sort|Merge sort|Quick sort

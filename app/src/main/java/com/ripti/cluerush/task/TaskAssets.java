@@ -12,9 +12,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 final class TaskAssets {
 
@@ -29,11 +31,14 @@ final class TaskAssets {
             this.level = level;
             this.columns = columns;
         }
+
+        String id() {
+            return level.getKey() + ":" + Integer.toHexString(columns[0].hashCode());
+        }
     }
 
     private TaskAssets() {
     }
-
 
     static synchronized List<LevelRow> load(Context context, String path, int minColumns) {
         List<LevelRow> cached = CACHE.get(path);
@@ -71,21 +76,49 @@ final class TaskAssets {
         return result;
     }
 
+    static List<LevelRow> pick(Context context, String category, List<LevelRow> all,
+                               Difficulty level, int count, Random random,
+                               boolean avoidRepeats) {
+        Set<String> seen = avoidRepeats
+                ? SeenStore.get(context, category) : new HashSet<String>();
 
-    static List<LevelRow> pick(List<LevelRow> all, Difficulty level, int count, Random random) {
-        List<LevelRow> exact = new ArrayList<>();
+        List<LevelRow> fresh = new ArrayList<>();
+        List<LevelRow> used = new ArrayList<>();
         List<LevelRow> others = new ArrayList<>();
         for (LevelRow row : all) {
-            (row.level == level ? exact : others).add(row);
+            if (row.level != level) {
+                others.add(row);
+            } else if (seen.contains(row.id())) {
+                used.add(row);
+            } else {
+                fresh.add(row);
+            }
         }
-        Collections.shuffle(exact, random);
+        Collections.shuffle(fresh, random);
+        Collections.shuffle(used, random);
         Collections.shuffle(others, random);
         final int target = level.ordinal();
         Collections.sort(others, (a, b) ->
                 Math.abs(a.level.ordinal() - target) - Math.abs(b.level.ordinal() - target));
 
-        List<LevelRow> result = new ArrayList<>(exact);
-        result.addAll(others);
-        return new ArrayList<>(result.subList(0, Math.min(count, result.size())));
+        List<LevelRow> ordered = new ArrayList<>(fresh);
+        ordered.addAll(used);
+        ordered.addAll(others);
+        List<LevelRow> chosen = new ArrayList<>(
+                ordered.subList(0, Math.min(count, ordered.size())));
+
+        if (avoidRepeats) {
+            Set<String> updated = new HashSet<>(seen);
+            if (fresh.size() < count) {
+                for (LevelRow row : used) {
+                    updated.remove(row.id());
+                }
+            }
+            for (LevelRow row : chosen) {
+                updated.add(row.id());
+            }
+            SeenStore.save(context, category, updated);
+        }
+        return chosen;
     }
 }

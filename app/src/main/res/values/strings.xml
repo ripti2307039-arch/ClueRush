@@ -161,7 +161,7 @@
     <string name="task_quiz_hint">Pick the right answers before time runs out.</string>
     <string name="task_quiz_progress">Question %1$d of %2$d</string>
     <string name="task_sudoku_title">Mini Sudoku</string>
-    <string name="task_sudoku_hint">Fill every row, column and 2×2 box with 1 to 4.</string>
+    <string name="task_sudoku_hint">Fill every row, column and box with each number once.</string>
     <string name="task_word_title">Word Scramble</string>
     <string name="task_word_hint">Tap the letters in the right order.</string>
     <string name="task_word_progress">Word %1$d of %2$d</string>
@@ -191,4 +191,17 @@
     <string name="score_new_best">New best score!</string>
     <string name="score_best">Best: %1$d</string>
     <string name="rank_line">Rank %1$s %2$s</string>
+    <string name="task_sliding_title">Sliding Puzzle</string>
+    <string name="task_sliding_hint">Slide the tiles into order, 1 first and the empty space last.</string>
+    <string name="task_math_title">Quick Math</string>
+    <string name="task_math_hint">Solve each problem, then press OK.</string>
+    <string name="task_math_progress">Problem %1$d of %2$d</string>
+    <string name="task_sequence_title">Number Sequence</string>
+    <string name="task_sequence_hint">Find the pattern and pick the next number.</string>
+    <string name="task_odd_title">Odd One Out</string>
+    <string name="task_odd_hint">Pick the one that does not belong with the others.</string>
+    <string name="task_odd_question">Which one does not belong?</string>
+    <string name="task_puzzle_progress">Puzzle %1$d of %2$d</string>
+    <string name="task_ok">OK</string>
+
 </resources>

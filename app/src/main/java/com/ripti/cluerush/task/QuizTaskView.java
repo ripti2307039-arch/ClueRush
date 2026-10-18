@@ -7,6 +7,8 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.StringRes;
+
 import com.ripti.cluerush.R;
 
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ public class QuizTaskView extends BaseTaskView {
 
     private final List<Question> questions;
     private final int passMark;
+    private final int progressRes;
     private final TextView progressText;
     private final TextView questionText;
     private final LinearLayout optionsBox;
@@ -42,9 +45,15 @@ public class QuizTaskView extends BaseTaskView {
     private boolean answering;
 
     public QuizTaskView(Context context, List<Question> questions, int passMark) {
+        this(context, questions, passMark, R.string.task_quiz_progress);
+    }
+
+    public QuizTaskView(Context context, List<Question> questions, int passMark,
+                        @StringRes int progressRes) {
         super(context);
         this.questions = new ArrayList<>(questions);
         this.passMark = passMark;
+        this.progressRes = progressRes;
 
         LinearLayout column = new LinearLayout(context);
         column.setOrientation(LinearLayout.VERTICAL);
@@ -75,8 +84,7 @@ public class QuizTaskView extends BaseTaskView {
 
     private void showQuestion() {
         Question question = questions.get(index);
-        progressText.setText(getContext().getString(R.string.task_quiz_progress,
-                index + 1, questions.size()));
+        progressText.setText(getContext().getString(progressRes, index + 1, questions.size()));
         questionText.setText(question.text);
         optionsBox.removeAllViews();
         optionViews.clear();
