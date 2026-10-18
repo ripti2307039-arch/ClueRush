@@ -4,8 +4,11 @@ import com.ripti.cluerush.model.Arena;
 import com.ripti.cluerush.model.CampusLocation;
 import com.ripti.cluerush.model.Difficulty;
 import com.ripti.cluerush.model.Round;
+import com.ripti.cluerush.task.TaskSpec;
+import com.ripti.cluerush.task.TaskType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -19,11 +22,17 @@ public final class RoundGenerator {
                                        Random random) {
         List<CampusLocation> pool = new ArrayList<>(arena.getLocations());
         Collections.shuffle(pool, random);
+
+        List<TaskType> types = new ArrayList<>(Arrays.asList(TaskType.values()));
+        Collections.shuffle(types, random);
+
         int count = Math.min(roundCount, pool.size());
         List<Round> rounds = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             CampusLocation location = pool.get(i);
-            rounds.add(new Round(location, location.pickClue(random, difficulty)));
+            TaskType type = types.get(i % types.size());
+            TaskSpec task = new TaskSpec(type, difficulty, random.nextLong());
+            rounds.add(new Round(location, location.pickClue(random, difficulty), task));
         }
         return rounds;
     }

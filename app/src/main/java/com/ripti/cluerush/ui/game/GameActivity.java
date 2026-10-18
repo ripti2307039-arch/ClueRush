@@ -17,7 +17,9 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -46,6 +48,10 @@ import com.ripti.cluerush.model.Arena;
 import com.ripti.cluerush.model.CampusLocation;
 import com.ripti.cluerush.model.Difficulty;
 import com.ripti.cluerush.model.Round;
+import com.ripti.cluerush.task.BaseTaskView;
+import com.ripti.cluerush.task.TaskFactory;
+import com.ripti.cluerush.task.TaskOverlayView;
+import com.ripti.cluerush.task.TaskType;
 import com.ripti.cluerush.ui.BaseActivity;
 import com.ripti.cluerush.util.GeoMath;
 import com.ripti.cluerush.util.MapConfig;
@@ -60,9 +66,11 @@ public class GameActivity extends BaseActivity {
 
     public static final String EXTRA_ARENA_ID = "extra_arena_id";
     public static final String EXTRA_DIFFICULTY = "extra_difficulty";
+    public static final String EXTRA_SEED = "extra_seed";
 
     private static final String PICK_TAG = "MapPick";
-    private static final int ROUND_COUNT = 5;
+    private static final String TASK_TAG = "GameTask";
+    private static final int MAX_ROUNDS = 5;
     private static final double VISION_RADIUS_METERS = 80.0;
     private static final float MAX_ZOOM_OUT = 0.35f;
     private static final float ZOOM_RESPONSE = 3f;
@@ -74,13 +82,14 @@ public class GameActivity extends BaseActivity {
     private static final long WRONG_COOLDOWN_MS = 900L;
     private static final long MAP_FADE_MS = 180L;
 
-    private final Random random = new Random();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable hideHint = this::dismissHint;
 
+    private Random random;
     private ActivityGameBinding binding;
     private GameMap gameMap;
     private OverviewMap overviewMap;
+    private TaskOverlayView taskOverlay;
     private PlayerController player;
     private GameLoop gameLoop;
     private GameSession session;
@@ -115,8 +124,10 @@ public class GameActivity extends BaseActivity {
         }
 
         difficulty = Difficulty.fromKey(getIntent().getStringExtra(EXTRA_DIFFICULTY));
-        session = new GameSession(
-                RoundGenerator.generate(arena, ROUND_COUNT, difficulty, random));
+        long seed = getIntent().getLongExtra(EXTRA_SEED, System.nanoTime());
+        random = new Random(seed);
+        int rounds = Math.min(MAX_ROUNDS, TaskType.values().length);
+        session = new GameSession(RoundGenerator.generate(arena, rounds, difficulty, random));
 
         configureWindow();
         MapConfig.init(this);
@@ -125,6 +136,13 @@ public class GameActivity extends BaseActivity {
         setContentView(binding.getRoot());
         applyInsets(binding.hudLayer);
         applyInsets(binding.mapUiLayer);
+
+        taskOverlay = new TaskOverlayView(this);
+        ViewGroup root = (ViewGroup) binding.getRoot();
+        root.addView(taskOverlay, root.indexOfChild(binding.resultOverlay),
+                new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT));
+        applyInsets(taskOverlay);
 
         baseZoom = arena.getZoom();
         player = new PlayerController(arena.getCenterLatitude(), arena.getCenterLongitude(),
@@ -193,6 +211,9 @@ public class GameActivity extends BaseActivity {
             overviewMap.onResume();
         }
         gameLoop.start();
+        if (taskOverlay.isActive()) {
+            taskOverlay.resume();
+        }
         if (insideLocation != null && !inputLocked) {
             startPulse();
         }
@@ -206,6 +227,7 @@ public class GameActivity extends BaseActivity {
             player.setInput(0f, 0f);
             stopPulse();
             handler.removeCallbacks(hideHint);
+            taskOverlay.pause();
             gameMap.onPause();
             if (mapOpen) {
                 overviewMap.onPause();
@@ -408,7 +430,7 @@ public class GameActivity extends BaseActivity {
             return;
         }
         if (insideLocation.getId().equals(round.getLocation().getId())) {
-            openLocationResult();
+            startTask();
             return;
         }
 
@@ -447,6 +469,43 @@ public class GameActivity extends BaseActivity {
                 .setDuration(220L)
                 .withEndAction(() -> binding.hintBanner.setVisibility(View.GONE))
                 .start();
+    }
+
+    // ---- Task ----
+
+    private void startTask() {
+        Round round = session.getCurrent();
+        if (round == null) {
+            return;
+        }
+        lockInput();
+        stopPulse();
+
+        BaseTaskView view = TaskFactory.create(this, round.getTask());
+        if (view == null) {
+            Log.e(TASK_TAG, "Task content missing for " + round.getTask().getType()
+                    + ", skipping the task");
+            onTaskFinished(true, 0, 0);
+            return;
+        }
+        taskOverlay.begin(round.getTask().getType(), difficulty, view,
+                (solved, mistakes, secondsLeft) -> onTaskFinished(solved, mistakes, secondsLeft));
+    }
+
+    private void onTaskFinished(boolean solved, int mistakes, int secondsLeft) {
+        Round round = session.getCurrent();
+        if (round == null) {
+            return;
+        }
+        session.recordTask(solved, mistakes, secondsLeft);
+        if (solved) {
+            binding.getRoot().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+        }
+        String title = getString(solved ? R.string.task_solved_title : R.string.task_failed_title);
+        String body = solved
+                ? getString(R.string.task_solved_body, secondsLeft, mistakes)
+                : getString(R.string.task_failed_body, mistakes);
+        showResult(title, round.getLocation().getName(), body, R.string.action_continue);
     }
 
     // ---- Full-screen map + debug tools ----
@@ -541,19 +600,6 @@ public class GameActivity extends BaseActivity {
 
     // ---- Result overlay ----
 
-    private void openLocationResult() {
-        Round round = session.getCurrent();
-        if (round == null) {
-            return;
-        }
-        lockInput();
-        stopPulse();
-        showResult(getString(R.string.location_reached_title),
-                round.getLocation().getName(),
-                getString(R.string.location_reached_body),
-                R.string.action_continue);
-    }
-
     private void lockInput() {
         inputLocked = true;
         binding.joystick.reset();
@@ -582,10 +628,11 @@ public class GameActivity extends BaseActivity {
         finishedState = true;
         gameMap.hideZone();
         publishMarkers();
-        showResult(getString(R.string.game_finished_title), "",
-                getString(R.string.game_finished_body, session.getTotal(),
-                        session.getWrongAttempts()),
-                R.string.action_back_home);
+        String body = getString(R.string.game_finished_body,
+                session.getTotal(), session.getWrongAttempts())
+                + "\n"
+                + getString(R.string.task_summary, session.getTasksSolved(), session.getTotal());
+        showResult(getString(R.string.game_finished_title), "", body, R.string.action_back_home);
     }
 
     private void showResult(String title, String subtitle, String body,

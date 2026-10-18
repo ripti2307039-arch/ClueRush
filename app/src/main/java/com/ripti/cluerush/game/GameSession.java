@@ -3,6 +3,7 @@ package com.ripti.cluerush.game;
 import com.ripti.cluerush.model.Round;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,8 +12,33 @@ public class GameSession {
 
     public static final int WRONG_PLACE_PENALTY = 10;
 
+    public static final class TaskOutcome {
+        private final boolean solved;
+        private final int mistakes;
+        private final int secondsLeft;
+
+        TaskOutcome(boolean solved, int mistakes, int secondsLeft) {
+            this.solved = solved;
+            this.mistakes = mistakes;
+            this.secondsLeft = secondsLeft;
+        }
+
+        public boolean isSolved() {
+            return solved;
+        }
+
+        public int getMistakes() {
+            return mistakes;
+        }
+
+        public int getSecondsLeft() {
+            return secondsLeft;
+        }
+    }
+
     private final List<Round> rounds;
     private final Set<String> discovered = new HashSet<>();
+    private final List<TaskOutcome> outcomes = new ArrayList<>();
     private int index;
     private int wrongAttempts;
 
@@ -68,5 +94,31 @@ public class GameSession {
 
     public int getPenaltyPoints() {
         return wrongAttempts * WRONG_PLACE_PENALTY;
+    }
+
+    public void recordTask(boolean solved, int mistakes, int secondsLeft) {
+        outcomes.add(new TaskOutcome(solved, mistakes, secondsLeft));
+    }
+
+    public List<TaskOutcome> getTaskOutcomes() {
+        return Collections.unmodifiableList(outcomes);
+    }
+
+    public int getTasksSolved() {
+        int solved = 0;
+        for (TaskOutcome outcome : outcomes) {
+            if (outcome.isSolved()) {
+                solved++;
+            }
+        }
+        return solved;
+    }
+
+    public int getTaskMistakes() {
+        int total = 0;
+        for (TaskOutcome outcome : outcomes) {
+            total += outcome.getMistakes();
+        }
+        return total;
     }
 }

@@ -1,0 +1,27 @@
+# level|WORD|hint
+easy|CHAIR|You sit on it
+easy|TABLE|Four legs and a flat top
+easy|PAPER|You write on it
+easy|PHONE|Calls and apps
+easy|WATER|You drink it
+easy|BRAIN|Used for thinking
+easy|CLOCK|Shows the time
+easy|EXAM|Students dread it
+
+medium|STUDENT|Learns at a university
+medium|LIBRARY|Full of books
+medium|TEACHER|Explains the lesson
+medium|BATTERY|Powers a phone
+medium|CAMPUS|University grounds
+medium|MACHINE|Engineers build it
+medium|CIRCUIT|A path for current
+medium|PROJECT|Final year work
+
+hard|ENGINEER|Designs and builds things
+hard|DATABASE|Stores organized data
+hard|ALGORITHM|Step by step procedure
+hard|PROCESSOR|The brain of a computer
+hard|UNIVERSITY|Where degrees are earned
+hard|LABORATORY|Where experiments happen
+hard|TRANSISTOR|Tiny electronic switch
+hard|RESISTANCE|Opposes electric current

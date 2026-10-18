@@ -157,4 +157,21 @@
     <string name="debug_pick_result">%1$s · nearest: %2$s (%3$d m)</string>
     <string name="debug_copy">Copy</string>
     <string name="debug_copied">Copied. Paste it into the XML.</string>
+    <string name="task_quiz_title">Quiz</string>
+    <string name="task_quiz_hint">Pick the right answers before time runs out.</string>
+    <string name="task_quiz_progress">Question %1$d of %2$d</string>
+    <string name="task_sudoku_title">Mini Sudoku</string>
+    <string name="task_sudoku_hint">Fill every row, column and 2×2 box with 1 to 4.</string>
+    <string name="task_word_title">Word Scramble</string>
+    <string name="task_word_hint">Tap the letters in the right order.</string>
+    <string name="task_word_progress">Word %1$d of %2$d</string>
+    <string name="task_word_clue">Hint: %1$s</string>
+    <string name="task_memory_title">Memory Match</string>
+    <string name="task_memory_hint">Flip two cards at a time and find all the pairs.</string>
+    <string name="task_erase">Erase</string>
+    <string name="task_solved_title">Task solved!</string>
+    <string name="task_failed_title">Task failed</string>
+    <string name="task_solved_body">Time left: %1$d s · Mistakes: %2$d</string>
+    <string name="task_failed_body">Time ran out. Mistakes: %1$d. The hunt goes on.</string>
+    <string name="task_summary">Tasks solved: %1$d of %2$d.</string>
 </resources>

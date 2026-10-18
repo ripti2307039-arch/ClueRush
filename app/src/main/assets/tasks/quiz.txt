@@ -1,0 +1,41 @@
+# level|question|correct|wrong1|wrong2|wrong3
+# level = easy / medium / hard. First answer is always the correct one.
+
+easy|What is the capital of Bangladesh?|Dhaka|Khulna|Chattogram|Rajshahi
+easy|How many days are in a week?|7|5|6|8
+easy|Which planet do we live on?|Earth|Mars|Venus|Jupiter
+easy|Mixing blue and yellow gives which color?|Green|Purple|Orange|Brown
+easy|What is the national fruit of Bangladesh?|Jackfruit|Mango|Banana|Apple
+easy|How many hours are in a day?|24|12|20|48
+easy|What is the national animal of Bangladesh?|Royal Bengal Tiger|Elephant|Deer|Lion
+easy|Which is the largest ocean?|Pacific Ocean|Atlantic Ocean|Indian Ocean|Arctic Ocean
+easy|What do bees make?|Honey|Milk|Silk|Sugar
+easy|International Mother Language Day is in which month?|February|March|December|April
+easy|What is 7 x 8?|56|54|48|64
+easy|Which organ pumps blood around the body?|Heart|Lung|Liver|Kidney
+easy|In which city is KUET located?|Khulna|Dhaka|Sylhet|Barishal
+
+medium|In what year did Bangladesh gain independence?|1971|1947|1952|1975
+medium|What does CPU stand for?|Central Processing Unit|Central Program Unit|Computer Power Unit|Core Processing Utility
+medium|Which gas do plants absorb from the air?|Carbon dioxide|Oxygen|Nitrogen|Hydrogen
+medium|What is the chemical symbol for gold?|Au|Ag|Gd|Go
+medium|What is the SI unit of electric current?|Ampere|Volt|Ohm|Watt
+medium|Which is the largest mangrove forest in the world?|Sundarbans|Bhawal|Madhupur|Lawachara
+medium|Who wrote the national anthem of Bangladesh?|Rabindranath Tagore|Kazi Nazrul Islam|Jibanananda Das|Michael Madhusudan Dutt
+medium|How many bits are in a byte?|8|4|16|10
+medium|Which planet is known as the Red Planet?|Mars|Mercury|Saturn|Neptune
+medium|What is the value of pi to two decimal places?|3.14|3.41|2.14|3.24
+medium|What does HTTP stand for?|HyperText Transfer Protocol|HighText Transfer Program|HyperText Transmission Process|Home Tool Transfer Protocol
+medium|What is the SI unit of force?|Newton|Joule|Pascal|Watt
+
+hard|What is the time complexity of binary search?|O(log n)|O(n)|O(n log n)|O(1)
+hard|Which logic gate outputs 1 only when both inputs are 1?|AND|OR|XOR|NOR
+hard|What is the derivative of sin(x)?|cos(x)|-cos(x)|-sin(x)|tan(x)
+hard|On which date is Victory Day of Bangladesh celebrated?|16 December|26 March|21 February|17 April
+hard|Which data structure follows FIFO order?|Queue|Stack|Tree|Graph
+hard|What is decimal 10 in binary?|1010|1100|1001|1110
+hard|What is the SI unit of capacitance?|Farad|Henry|Tesla|Coulomb
+hard|Who invented the World Wide Web?|Tim Berners-Lee|Bill Gates|Vint Cerf|Linus Torvalds
+hard|Which element has atomic number 6?|Carbon|Oxygen|Nitrogen|Boron
+hard|Approximately what is the speed of light?|300,000 km/s|150,000 km/s|30,000 km/s|3,000 km/s
+hard|Which law states V = I x R?|Ohm's law|Faraday's law|Kirchhoff's law|Newton's law
