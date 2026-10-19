@@ -43,6 +43,10 @@ public class MinimapView extends View {
     private double playerLat = Double.NaN;
     private double playerLng = Double.NaN;
     private double visionMeters;
+    private final Paint opponentPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private double opponentLat = Double.NaN;
+    private double opponentLng = Double.NaN;
+    private boolean opponentVisible;
 
     public MinimapView(Context context) {
         this(context, null);
@@ -114,6 +118,12 @@ public class MinimapView extends View {
         visionMeters = meters;
         invalidate();
     }
+    public void setOpponent(double latitude, double longitude, boolean visible) {
+        opponentLat = latitude;
+        opponentLng = longitude;
+        opponentVisible = visible;
+        invalidate();
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -167,6 +177,14 @@ public class MinimapView extends View {
             }
             dotPaint.setColor(marker.isCompleted() ? completedColor : pendingColor);
             canvas.drawCircle(x, y, 3.5f * density, dotPaint);
+        }
+        if (opponentVisible && !Double.isNaN(opponentLat) && !Double.isNaN(opponentLng)) {
+            float ox = left + (float) ((opponentLng - west) * cosLat * scale);
+            float oy = top + (float) ((north - opponentLat) * scale);
+            ox = Math.max(left, Math.min(left + mapW, ox));
+            oy = Math.max(top, Math.min(top + mapH, oy));
+            opponentPaint.setColor(ContextCompat.getColor(getContext(), R.color.heat_hot));
+            canvas.drawCircle(ox, oy, 4f * density, opponentPaint);
         }
 
         if (!Double.isNaN(playerLat) && !Double.isNaN(playerLng)) {

@@ -43,4 +43,12 @@ public final class ServerClock {
     public static long now() {
         return System.currentTimeMillis() + offsetMs;
     }
+
+    public static long toLocal(long serverMs) {
+        return serverMs - offsetMs;
+    }
+
+    public static long fromLocal(long localMs) {
+        return localMs + offsetMs;
+    }
 }

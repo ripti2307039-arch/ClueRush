@@ -39,13 +39,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.ripti.cluerush.R;
 import com.ripti.cluerush.data.ArenaCatalog;
-import com.ripti.cluerush.data.MatchRepository;
+import com.ripti.cluerush.data.MatchLiveRepository;
 import com.ripti.cluerush.databinding.ActivityGameBinding;
 import com.ripti.cluerush.game.BestScoreStore;
 import com.ripti.cluerush.game.GameLoop;
 import com.ripti.cluerush.game.GameSession;
 import com.ripti.cluerush.game.HeatLevel;
 import com.ripti.cluerush.game.LocationScanner;
+import com.ripti.cluerush.game.MatchCoordinator;
+import com.ripti.cluerush.game.MatchResult;
 import com.ripti.cluerush.game.PlayerController;
 import com.ripti.cluerush.game.Rank;
 import com.ripti.cluerush.game.RoundGenerator;
@@ -59,6 +61,7 @@ import com.ripti.cluerush.model.Arena;
 import com.ripti.cluerush.model.CampusLocation;
 import com.ripti.cluerush.model.Difficulty;
 import com.ripti.cluerush.model.Match;
+import com.ripti.cluerush.model.PlayerState;
 import com.ripti.cluerush.model.Round;
 import com.ripti.cluerush.task.BaseTaskView;
 import com.ripti.cluerush.task.TaskFactory;
@@ -67,6 +70,7 @@ import com.ripti.cluerush.task.TaskType;
 import com.ripti.cluerush.ui.BaseActivity;
 import com.ripti.cluerush.util.GeoMath;
 import com.ripti.cluerush.util.MapConfig;
+import com.ripti.cluerush.util.ServerClock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,8 +90,10 @@ public class GameActivity extends BaseActivity {
 
     private static final String PICK_TAG = "MapPick";
     private static final String TASK_TAG = "GameTask";
+    private static final boolean OPPONENT_ALWAYS_ON_MINIMAP = false;
     private static final int MAX_ROUNDS = 5;
     private static final int MATCH_LOW_SECONDS = 60;
+    private static final int URGENT_SECONDS = 10;
     private static final double VISION_RADIUS_METERS = 80.0;
     private static final float MAX_ZOOM_OUT = 0.35f;
     private static final float ZOOM_RESPONSE = 3f;
@@ -105,7 +111,6 @@ public class GameActivity extends BaseActivity {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable hideHint = this::dismissHint;
     private final Runnable countdownTick = this::onCountdownTick;
-    private final MatchRepository matchRepository = new MatchRepository();
 
     private Random random;
     private ActivityGameBinding binding;
@@ -118,12 +123,17 @@ public class GameActivity extends BaseActivity {
     private GameSession session;
     private Arena arena;
     private Difficulty difficulty;
+    private MatchCoordinator coordinator;
+    private MatchCoordinator.Opponent opponent;
+    private MatchCoordinator.Reason forceReason;
     private String matchCode;
     private boolean matchHost;
     private long matchStartAt;
     private long matchEndAt;
-    private boolean matchTimeUp;
     private int lastShownSeconds;
+    private boolean runEnded;
+    private boolean resultShown;
+    private boolean forcedEnd;
     private double baseZoom;
     private float zoomOffset;
     private float appliedZoomOffset;
@@ -157,7 +167,13 @@ public class GameActivity extends BaseActivity {
 
         difficulty = Difficulty.fromKey(getIntent().getStringExtra(EXTRA_DIFFICULTY));
         matchCode = getIntent().getStringExtra(EXTRA_MATCH_CODE);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (isMatch() && user == null) {
+            finish();
+            return;
+        }
         if (isMatch()) {
+            ServerClock.start();
             matchHost = getIntent().getBooleanExtra(EXTRA_IS_HOST, false);
             matchStartAt = getIntent().getLongExtra(EXTRA_START_AT, System.currentTimeMillis());
             long duration = getIntent().getLongExtra(EXTRA_DURATION,
@@ -240,10 +256,33 @@ public class GameActivity extends BaseActivity {
             }
         });
 
+        if (isMatch()) {
+            coordinator = new MatchCoordinator(new MatchLiveRepository(), matchCode,
+                    user.getUid(), matchHost, difficulty, session.getTotal(), matchEndAt,
+                    new MatchCoordinator.Listener() {
+                        @Override
+                        public void onOpponent(MatchCoordinator.Opponent info) {
+                            onOpponentUpdate(info);
+                        }
+
+                        @Override
+                        public void onForceFinish(MatchCoordinator.Reason reason) {
+                            handleForceFinish(reason);
+                        }
+
+                        @Override
+                        public void onResult(MatchResult result) {
+                            handleMatchResult(result);
+                        }
+                    });
+        }
+
         gameLoop = new GameLoop(this::onFrame);
         showRound();
 
         if (isMatch()) {
+            coordinator.start();
+            coordinator.publishPosition(player.getLatitude(), player.getLongitude());
             beginMatchCountdown();
         }
     }
@@ -288,6 +327,10 @@ public class GameActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         handler.removeCallbacksAndMessages(null);
+        if (coordinator != null) {
+            coordinator.forfeitMine();
+            coordinator.stop();
+        }
         if (scoreAnimator != null) {
             scoreAnimator.cancel();
         }
@@ -334,7 +377,9 @@ public class GameActivity extends BaseActivity {
         long left = matchStartAt - System.currentTimeMillis();
         if (left <= 0L) {
             countdownText.setText(R.string.match_go);
-            inputLocked = false;
+            if (!runEnded) {
+                inputLocked = false;
+            }
             countdownText.animate()
                     .alpha(0f)
                     .setStartDelay(500L)
@@ -348,7 +393,7 @@ public class GameActivity extends BaseActivity {
     }
 
     private void updateMatchClock() {
-        if (matchTimeUp || finishedState) {
+        if (resultShown) {
             return;
         }
         long now = Math.max(System.currentTimeMillis(), matchStartAt);
@@ -358,23 +403,6 @@ public class GameActivity extends BaseActivity {
             lastShownSeconds = seconds;
             renderScoreText();
         }
-        if (left <= 0L) {
-            onMatchTimeUp();
-        }
-    }
-
-    private void onMatchTimeUp() {
-        matchTimeUp = true;
-        if (taskOverlay.isActive()) {
-            taskOverlay.abort();
-            return;
-        }
-        if (binding.resultOverlay.getVisibility() == View.VISIBLE) {
-            return;
-        }
-        lockInput();
-        stopPulse();
-        showFinished();
     }
 
     private void renderScoreText() {
@@ -383,19 +411,214 @@ public class GameActivity extends BaseActivity {
             return;
         }
         int seconds = Math.max(0, lastShownSeconds);
-        String clock = String.format(Locale.US, "%d:%02d", seconds / 60, seconds % 60);
-        binding.scoreText.setText(getString(R.string.score_hud_match, displayedScore, clock));
+        binding.scoreText.setText(getString(R.string.score_hud_match, displayedScore,
+                formatClock(seconds)));
         binding.scoreText.setTextColor(seconds <= MATCH_LOW_SECONDS
                 ? LOSS_COLOR : ContextCompat.getColor(this, R.color.treasure_gold));
     }
 
-    private void leaveMatchIfNeeded() {
-        if (!isMatch()) {
+    private static String formatClock(int seconds) {
+        return String.format(Locale.US, "%d:%02d", seconds / 60, seconds % 60);
+    }
+
+    private void publishProgress(boolean solving) {
+        if (coordinator == null) {
             return;
         }
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            matchRepository.leaveMatch(matchCode, user.getUid(), matchHost);
+        coordinator.publishProgress(session.getRoundsPlayed(), solving,
+                session.getTotalScore(), session.getTasksSolved(), session.getWrongAttempts());
+    }
+
+    private void onOpponentUpdate(MatchCoordinator.Opponent info) {
+        if (isFinishing() || isDestroyed() || resultShown) {
+            return;
+        }
+        opponent = info;
+        renderOpponent();
+        updateOpponentMarkers();
+        if (runEnded) {
+            binding.resultBody.setText(buildWaitingBody());
+        }
+    }
+
+    private void renderOpponent() {
+        if (opponent == null || runEnded || resultShown) {
+            binding.opponentText.setVisibility(View.GONE);
+            return;
+        }
+        MatchCoordinator.Opponent info = opponent;
+        int total = session.getTotal();
+        String text;
+        boolean urgent = false;
+        if (info.offlineSeconds >= 0) {
+            text = getString(R.string.opp_status_offline, info.name, info.offlineSeconds);
+        } else if (PlayerState.PHASE_FINISHED.equals(info.phase)) {
+            if (info.countdownSeconds >= 0) {
+                text = getString(R.string.opp_status_finished_clock, info.name,
+                        formatClock(info.countdownSeconds));
+                urgent = info.countdownSeconds <= URGENT_SECONDS;
+            } else {
+                text = getString(R.string.opp_status_finished, info.name);
+            }
+        } else if (info.rounds >= total) {
+            text = getString(R.string.opp_status_finishing, info.name);
+        } else if (PlayerState.PHASE_SOLVING.equals(info.phase)) {
+            text = getString(R.string.opp_status_solving, info.name, info.rounds + 1, total);
+        } else {
+            text = getString(R.string.opp_status_exploring, info.name, info.rounds + 1, total);
+        }
+        binding.opponentText.setText(text);
+        binding.opponentText.setTextColor(urgent
+                ? LOSS_COLOR : ContextCompat.getColor(this, R.color.white));
+        binding.opponentText.setVisibility(View.VISIBLE);
+    }
+
+    private void updateOpponentMarkers() {
+        if (opponent == null || !opponent.hasPosition || resultShown) {
+            gameMap.setOpponent(0.0, 0.0, false, "");
+            binding.minimapView.setOpponent(0.0, 0.0, false);
+            return;
+        }
+        double lat = opponent.latitude;
+        double lng = opponent.longitude;
+        boolean near = GeoMath.distanceMeters(player.getLatitude(), player.getLongitude(),
+                lat, lng) <= VISION_RADIUS_METERS;
+        String label = opponent.name.isEmpty()
+                ? "?" : opponent.name.substring(0, 1).toUpperCase(Locale.ROOT);
+        gameMap.setOpponent(lat, lng, near, label);
+        binding.minimapView.setOpponent(lat, lng, near || OPPONENT_ALWAYS_ON_MINIMAP);
+    }
+
+    private void handleForceFinish(MatchCoordinator.Reason reason) {
+        if (isFinishing() || isDestroyed() || runEnded || forcedEnd) {
+            return;
+        }
+        forcedEnd = true;
+        forceReason = reason;
+        if (taskOverlay.isActive()) {
+            taskOverlay.abort();
+            return;
+        }
+        if (session.getRoundsPlayed() > session.getIndex()) {
+            session.advance();
+        }
+        endRun();
+    }
+
+    private void endRun() {
+        if (runEnded) {
+            return;
+        }
+        runEnded = true;
+        lockInput();
+        stopPulse();
+        gameMap.hideZone();
+        publishMarkers();
+        binding.opponentText.setVisibility(View.GONE);
+
+        boolean completed = session.isFinished() && !forcedEnd;
+        if (completed) {
+            long left = Math.max(0L, matchEndAt - System.currentTimeMillis());
+            int totalSeconds = (int) ((matchEndAt - matchStartAt) / 1000L);
+            session.setFinishBonus(
+                    ScoreRules.finishBonus(difficulty, (int) (left / 1000L), totalSeconds));
+        }
+        animateScoreTo(session.getTotalScore());
+        coordinator.finishMine(session.getTotalScore(), session.getTasksSolved(),
+                session.getWrongAttempts(), session.getRoundsPlayed(),
+                session.getRoundPointsCsv());
+        showWaiting();
+    }
+
+    private void showWaiting() {
+        boolean timeOut = forcedEnd && forceReason != MatchCoordinator.Reason.CLINCH;
+        showResult(getString(timeOut ? R.string.match_time_up : R.string.match_waiting_title),
+                rankLine(session.getRank()), buildWaitingBody(), R.string.action_leave);
+    }
+
+    private String buildWaitingBody() {
+        StringBuilder text = new StringBuilder();
+        String name = opponent == null
+                ? getString(R.string.match_opponent_fallback) : opponent.name;
+        text.append(getString(R.string.match_waiting_for, name));
+        if (opponent != null) {
+            if (opponent.offlineSeconds >= 0) {
+                appendLine(text, getString(R.string.opp_status_offline, name,
+                        opponent.offlineSeconds));
+            } else if (opponent.countdownSeconds >= 0) {
+                appendLine(text, getString(R.string.match_waiting_clock, name,
+                        formatClock(opponent.countdownSeconds)));
+            } else {
+                appendLine(text, getString(R.string.match_waiting_progress, name,
+                        Math.min(opponent.rounds + 1, session.getTotal()), session.getTotal()));
+            }
+        }
+        text.append("\n");
+        text.append(buildFinalSummary(null, null));
+        return text.toString();
+    }
+
+    private void handleMatchResult(MatchResult result) {
+        if (isFinishing() || isDestroyed() || resultShown) {
+            return;
+        }
+        resultShown = true;
+        runEnded = true;
+        finishedState = true;
+        lockInput();
+        stopPulse();
+        taskOverlay.cancel();
+        if (mapOpen) {
+            closeMap();
+        }
+        gameMap.hideZone();
+        gameMap.setOpponent(0.0, 0.0, false, "");
+        binding.minimapView.setOpponent(0.0, 0.0, false);
+        binding.opponentText.setVisibility(View.GONE);
+        animateScoreTo(result.getMyScore());
+
+        int titleRes;
+        switch (result.getOutcome()) {
+            case WIN:
+                titleRes = R.string.match_result_win;
+                break;
+            case LOSS:
+                titleRes = R.string.match_result_loss;
+                break;
+            default:
+                titleRes = R.string.match_result_draw;
+                break;
+        }
+        String opponentScore = result.isOpponentScoreKnown()
+                ? String.valueOf(result.getOpponentScore()) : "\u2014";
+        String subtitle = getString(R.string.match_vs_line, result.getMyScore(),
+                result.getOpponentName(), opponentScore);
+        String body = deciderLine(result) + "\n" + rankLine(session.getRank()) + "\n"
+                + buildFinalSummary(null, result);
+        showResult(getString(titleRes), subtitle, body, R.string.action_back_home);
+    }
+
+    private String deciderLine(MatchResult result) {
+        String name = result.getOpponentName();
+        switch (result.getDecider()) {
+            case SCORE:
+                return getString(R.string.decided_score);
+            case SOLVED:
+                return getString(R.string.decided_solved);
+            case WRONG_PLACES:
+                return getString(R.string.decided_wrong);
+            case TIME:
+                return getString(R.string.decided_time);
+            case FORFEIT:
+                return getString(R.string.decided_forfeit, name);
+            case DISCONNECT_OPPONENT:
+                return getString(R.string.decided_disconnect_opp, name);
+            case DISCONNECT_ME:
+                return getString(R.string.decided_disconnect_me);
+            case CLINCH:
+                return getString(R.string.decided_clinch, name);
+            default:
+                return getString(R.string.decided_draw);
         }
     }
 
@@ -412,6 +635,10 @@ public class GameActivity extends BaseActivity {
             gameMap.setPlayerPosition(player.getLatitude(), player.getLongitude());
             binding.minimapView.setPlayer(player.getLatitude(), player.getLongitude());
             addTrailIfNeeded();
+            if (coordinator != null) {
+                coordinator.publishPosition(player.getLatitude(), player.getLongitude());
+                updateOpponentMarkers();
+            }
         }
         binding.avatarView.setMoving(player.isMoving());
         binding.avatarView.setFacingRight(player.isFacingRight());
@@ -451,6 +678,7 @@ public class GameActivity extends BaseActivity {
                 session.getIndex() + 1, session.getTotal()));
         binding.clueText.setText(round.getClue());
         publishMarkers();
+        publishProgress(false);
         updateProximity();
     }
 
@@ -593,6 +821,7 @@ public class GameActivity extends BaseActivity {
         shakeActionButton();
         animateScoreTo(session.getTotalScore());
         showScoreDelta(-ScoreRules.WRONG_PLACE_PENALTY);
+        publishProgress(false);
         showHint(getString(R.string.hint_wrong_place, insideLocation.getName(),
                 GameSession.WRONG_PLACE_PENALTY));
     }
@@ -666,6 +895,7 @@ public class GameActivity extends BaseActivity {
         }
         lockInput();
         stopPulse();
+        publishProgress(true);
 
         BaseTaskView view = TaskFactory.create(this, round.getTask(), !isMatch());
         if (view == null) {
@@ -687,6 +917,23 @@ public class GameActivity extends BaseActivity {
         RoundScore score = session.recordTask(solved, mistakes, secondsLeft, limit, roundSeconds);
         animateScoreTo(session.getTotalScore());
         showScoreDelta(score.getTotal());
+        publishProgress(false);
+
+        if (isMatch()) {
+            if (forcedEnd) {
+                if (session.getRoundsPlayed() > session.getIndex()) {
+                    session.advance();
+                }
+                endRun();
+                return;
+            }
+            if (session.getRoundsPlayed() >= session.getTotal()) {
+                session.advance();
+                endRun();
+                return;
+            }
+        }
+
         if (solved) {
             binding.getRoot().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
         }
@@ -722,13 +969,19 @@ public class GameActivity extends BaseActivity {
         return text.toString();
     }
 
-    private String buildFinalSummary(@Nullable String bestLine) {
+    private String buildFinalSummary(@Nullable String bestLine, @Nullable MatchResult result) {
         StringBuilder text = new StringBuilder();
-        text.append(getString(R.string.game_finished_body,
-                session.getTotal(), session.getWrongAttempts()));
+        if (isMatch()) {
+            text.append(getString(R.string.match_progress_body,
+                    session.getRoundsPlayed(), session.getTotal(), session.getWrongAttempts()));
+        } else {
+            text.append(getString(R.string.game_finished_body,
+                    session.getTotal(), session.getWrongAttempts()));
+        }
         appendLine(text, getString(R.string.task_summary,
                 session.getTasksSolved(), session.getTotal()));
 
+        int[] opponentPoints = result == null ? null : result.getOpponentRoundPoints();
         List<RoundScore> scores = session.getRoundScores();
         for (int i = 0; i < scores.size() && i < session.getTotal(); i++) {
             Round round = session.getRound(i);
@@ -736,9 +989,16 @@ public class GameActivity extends BaseActivity {
             if (i == 0) {
                 text.append("\n");
             }
-            text.append(getString(R.string.score_round_line, i + 1,
-                    getString(round.getTask().getType().getTitleRes()),
-                    scores.get(i).getTotal()));
+            String title = getString(round.getTask().getType().getTitleRes());
+            if (opponentPoints != null) {
+                String theirs = i < opponentPoints.length
+                        ? String.valueOf(opponentPoints[i]) : "\u2014";
+                text.append(getString(R.string.score_round_line_vs, i + 1, title,
+                        scores.get(i).getTotal(), theirs));
+            } else {
+                text.append(getString(R.string.score_round_line, i + 1, title,
+                        scores.get(i).getTotal()));
+            }
         }
 
         text.append("\n");
@@ -748,6 +1008,9 @@ public class GameActivity extends BaseActivity {
         }
         if (session.getPerfectBonus() > 0) {
             appendLine(text, getString(R.string.score_perfect, session.getPerfectBonus()));
+        }
+        if (session.getFinishBonus() > 0) {
+            appendLine(text, getString(R.string.score_finish_bonus, session.getFinishBonus()));
         }
         appendLine(text, getString(R.string.score_final, session.getTotalScore()));
         if (bestLine != null) {
@@ -863,13 +1126,20 @@ public class GameActivity extends BaseActivity {
     }
 
     private void onResultContinue() {
+        if (isMatch() && runEnded) {
+            if (resultShown) {
+                leaveAfterResult();
+            } else {
+                confirmLeaveWaiting();
+            }
+            return;
+        }
         if (finishedState) {
-            leaveMatchIfNeeded();
             finish();
             return;
         }
         session.advance();
-        if (session.isFinished() || matchTimeUp) {
+        if (session.isFinished()) {
             showFinished();
             return;
         }
@@ -881,6 +1151,13 @@ public class GameActivity extends BaseActivity {
         }
     }
 
+    private void leaveAfterResult() {
+        if (coordinator != null) {
+            coordinator.deleteMatch();
+        }
+        finish();
+    }
+
     private void showFinished() {
         finishedState = true;
         gameMap.hideZone();
@@ -888,19 +1165,14 @@ public class GameActivity extends BaseActivity {
         animateScoreTo(session.getTotalScore());
 
         int score = session.getTotalScore();
-        String bestLine = null;
-        if (!isMatch()) {
-            int previousBest = BestScoreStore.get(this, arena.getId(), difficulty);
-            boolean newBest = BestScoreStore.submit(this, arena.getId(), difficulty, score);
-            bestLine = newBest
-                    ? getString(R.string.score_new_best)
-                    : getString(R.string.score_best, previousBest);
-        }
+        int previousBest = BestScoreStore.get(this, arena.getId(), difficulty);
+        boolean newBest = BestScoreStore.submit(this, arena.getId(), difficulty, score);
+        String bestLine = newBest
+                ? getString(R.string.score_new_best)
+                : getString(R.string.score_best, previousBest);
 
-        boolean timedOut = matchTimeUp && !session.isFinished();
-        showResult(getString(timedOut ? R.string.match_time_up : R.string.game_finished_title),
-                rankLine(session.getRank()), buildFinalSummary(bestLine),
-                R.string.action_back_home);
+        showResult(getString(R.string.game_finished_title), rankLine(session.getRank()),
+                buildFinalSummary(bestLine, null), R.string.action_back_home);
     }
 
     private void showResult(String title, String subtitle, String body,
@@ -974,13 +1246,33 @@ public class GameActivity extends BaseActivity {
         return mask == Configuration.UI_MODE_NIGHT_YES;
     }
 
-    private void confirmExit() {
+    private void confirmLeaveWaiting() {
         new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.exit_match_title)
-                .setMessage(R.string.exit_match_message)
+                .setTitle(R.string.leave_waiting_title)
+                .setMessage(R.string.leave_waiting_message)
+                .setNegativeButton(R.string.action_cancel, null)
+                .setPositiveButton(R.string.action_leave, (dialog, which) -> finish())
+                .show();
+    }
+
+    private void confirmExit() {
+        if (isMatch() && resultShown) {
+            leaveAfterResult();
+            return;
+        }
+        if (isMatch() && runEnded) {
+            confirmLeaveWaiting();
+            return;
+        }
+        boolean match = isMatch();
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(match ? R.string.forfeit_title : R.string.exit_match_title)
+                .setMessage(match ? R.string.forfeit_message : R.string.exit_match_message)
                 .setNegativeButton(R.string.action_cancel, null)
                 .setPositiveButton(R.string.action_leave_match, (dialog, which) -> {
-                    leaveMatchIfNeeded();
+                    if (coordinator != null) {
+                        coordinator.forfeitMine();
+                    }
                     finish();
                 })
                 .show();

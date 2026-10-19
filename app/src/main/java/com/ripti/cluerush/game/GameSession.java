@@ -20,6 +20,7 @@ public class GameSession {
     private int index;
     private int wrongAttempts;
     private int streak;
+    private int finishBonus;
 
     public GameSession(List<Round> rounds, Difficulty difficulty) {
         this.rounds = new ArrayList<>(rounds);
@@ -93,6 +94,21 @@ public class GameSession {
         return Collections.unmodifiableList(roundScores);
     }
 
+    public int getRoundsPlayed() {
+        return roundScores.size();
+    }
+
+    public String getRoundPointsCsv() {
+        StringBuilder text = new StringBuilder();
+        for (int i = 0; i < roundScores.size(); i++) {
+            if (i > 0) {
+                text.append(',');
+            }
+            text.append(roundScores.get(i).getTotal());
+        }
+        return text.toString();
+    }
+
     public int getTasksSolved() {
         int solved = 0;
         for (RoundScore score : roundScores) {
@@ -128,8 +144,17 @@ public class GameSession {
         return isPerfect() ? ScoreRules.perfectBonus(difficulty) : 0;
     }
 
+    public void setFinishBonus(int bonus) {
+        finishBonus = Math.max(0, bonus);
+    }
+
+    public int getFinishBonus() {
+        return finishBonus;
+    }
+
     public int getTotalScore() {
-        return Math.max(0, getEarnedPoints() - getPenaltyPoints()) + getPerfectBonus();
+        return Math.max(0, getEarnedPoints() - getPenaltyPoints())
+                + getPerfectBonus() + finishBonus;
     }
 
     public Rank getRank() {

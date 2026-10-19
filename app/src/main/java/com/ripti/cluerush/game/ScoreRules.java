@@ -8,6 +8,7 @@ public final class ScoreRules {
 
     private static final double TIME_BONUS_SHARE = 0.5;
     private static final double FIND_BONUS_SHARE = 0.5;
+    private static final double FINISH_BONUS_SHARE = 0.5;
     private static final double MIN_SOLVED_SHARE = 0.2;
     private static final double PERFECT_SHARE = 1.5;
     private static final double MAX_POINTS_SHARE = 2.0;
@@ -54,8 +55,23 @@ public final class ScoreRules {
         return (int) Math.round(base(difficulty) * PERFECT_SHARE);
     }
 
+    public static int finishBonus(Difficulty difficulty, int secondsLeft, int totalSeconds) {
+        double fraction = totalSeconds <= 0 ? 0.0 : clamp(secondsLeft / (double) totalSeconds);
+        return (int) Math.round(perfectBonus(difficulty) * FINISH_BONUS_SHARE * fraction);
+    }
+
     public static int maxPoints(Difficulty difficulty, int rounds) {
         return (int) Math.round(rounds * base(difficulty) * MAX_POINTS_SHARE);
+    }
+
+    public static int maxRoundPoints(Difficulty difficulty) {
+        int base = base(difficulty);
+        double task = base * (1.0 + TIME_BONUS_SHARE) * streakMultiplier(STREAK_CAP);
+        return (int) Math.ceil(task + base * FIND_BONUS_SHARE);
+    }
+
+    public static int maxBonusPoints(Difficulty difficulty) {
+        return (int) Math.ceil(perfectBonus(difficulty) * (1.0 + FINISH_BONUS_SHARE));
     }
 
     public static double streakMultiplier(int streak) {

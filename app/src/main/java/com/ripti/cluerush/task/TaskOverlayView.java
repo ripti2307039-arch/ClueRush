@@ -109,6 +109,16 @@ public class TaskOverlayView extends FrameLayout {
     public void abort() {
         timeUp();
     }
+    public void cancel() {
+        removeCallbacks(tick);
+        callback = null;
+        active = false;
+        finishing = false;
+        running = false;
+        setVisibility(GONE);
+        container.removeAllViews();
+        content = null;
+    }
 
     public void begin(TaskType type, Difficulty difficulty, BaseTaskView view, Callback callback) {
         removeCallbacks(tick);

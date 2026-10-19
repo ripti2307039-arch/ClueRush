@@ -20,6 +20,8 @@ public interface GameMap {
 
     void setVisionRadius(double meters);
 
+    void setOpponent(double latitude, double longitude, boolean visible, String label);
+
     void showZone(double latitude, double longitude, double radiusMeters);
 
     void hideZone();
