@@ -6,67 +6,51 @@
     subtitle="Bangladesh University of Engineering and Technology"
     colorStart="#7C3AED"
     colorEnd="#BE185D"
-    centerLat="23.726626"
-    centerLng="90.392696"
+    centerLat="23.726100"
+    centerLng="90.391800"
     zoom="18"
-    north="23.728121"
-    south="23.725542"
+    north="23.728800"
+    south="23.723400"
     east="90.395635"
-    west="90.389576">
+    west="90.387900">
 
-    <location id="ece" name="ECE Building" lat="23.7275" lng="90.3905" radius="30">
-        <clue level="easy">The building of electrical and computer engineering.</clue>
-        <clue level="medium">Circuits, code and a long list of labs.</clue>
-        <clue level="hard">Where electrons and algorithms share the same corridor.</clue>
+    <location id="ece" name="ECE Building" lat="23.726630" lng="90.388508" radius="25">
+        <clue>The building of electrical and computer engineering.</clue>
     </location>
-    <location id="admin" name="Administrative Building" lat="23.7275" lng="90.3922" radius="30">
-        <clue level="easy">Where the university's official papers are handled.</clue>
-        <clue level="medium">Every certificate and notice begins its journey here.</clue>
-        <clue level="hard">The desk where a student's fate is stamped and signed.</clue>
+    <location id="admin" name="Administrative Building" lat="23.725979" lng="90.393462" radius="25">
+        <clue>Where the university's official papers are handled.</clue>
     </location>
-    <location id="health" name="BUET Health Complex" lat="23.7275" lng="90.3939" radius="30">
-        <clue level="easy">Where sick students get checked by a doctor.</clue>
-        <clue level="medium">The first stop for fevers, cuts and headaches.</clue>
-        <clue level="hard">Where a white coat and a prescription pad wait for you.</clue>
+    <location id="health" name="BUET Health Complex" lat="23.727962" lng="90.392455" radius="25">
+        <clue>Where sick students get checked by a doctor.</clue>
     </location>
-    <location id="gym" name="Gymnasium" lat="23.7275" lng="90.3953" radius="30">
-        <clue level="easy">A place for exercise and indoor sports.</clue>
-        <clue level="medium">Weights, mats and sweaty evenings.</clue>
-        <clue level="hard">Where muscles are built after a long day of brain work.</clue>
+    <location id="gym" name="Gymnasium" lat="23.725077" lng="90.390572" radius="25">
+        <clue>A place for exercise and indoor sports.</clue>
     </location>
-    <location id="shaheed_minar" name="Shaheed Minar" lat="23.7266" lng="90.3905" radius="30">
-        <clue level="easy">A monument that remembers the language movement.</clue>
-        <clue level="medium">Flowers are laid here every February.</clue>
-        <clue level="hard">Bare feet and a sunrise procession on the twenty-first.</clue>
+    <location id="shaheed_minar" name="Shaheed Minar" lat="23.726107" lng="90.391948" radius="20">
+        <clue>A monument that remembers the language movement.</clue>
     </location>
-    <location id="mosque" name="Central Mosque" lat="23.7266" lng="90.3922" radius="30">
-        <clue level="easy">A place of prayer on campus.</clue>
-        <clue level="medium">A calm place where the day is measured in prayers.</clue>
-        <clue level="hard">Five times a day, a call from here is heard across campus.</clue>
+    <location id="mosque" name="Central Mosque" lat="23.723958" lng="90.392132" radius="25">
+        <clue>A place of prayer on campus.</clue>
     </location>
-    <location id="cafeteria" name="BUET Cafeteria" lat="23.7266" lng="90.3939" radius="30">
-        <clue level="easy">Where students go to eat and drink tea.</clue>
-        <clue level="medium">Tea, snacks and the loudest conversations on campus.</clue>
-        <clue level="hard">Empty stomachs, full tables and the best gossip in town.</clue>
+    <location id="cafeteria" name="BUET Cafeteria" lat="23.726999" lng="90.391247" radius="25">
+        <clue>Where students go to eat and drink tea.</clue>
     </location>
-    <location id="staff_canteen" name="Staff Canteen" lat="23.7266" lng="90.3953" radius="30">
-        <clue level="easy">A canteen mostly used by university staff.</clue>
-        <clue level="medium">Lunch for teachers and employees, away from the student crowd.</clue>
-        <clue level="hard">A quieter table where the university's grown-ups eat.</clue>
+    <location id="staff_canteen" name="Staff Canteen" lat="23.725445" lng="90.393132" radius="22">
+        <clue>A canteen mostly used by university staff.</clue>
     </location>
-    <location id="eme" name="EME Building" lat="23.7257" lng="90.3905" radius="30">
-        <clue level="easy">The building of electrical and mechanical engineering.</clue>
-        <clue level="medium">Machines, motors and heavy equipment.</clue>
-        <clue level="hard">Where power and motion are both studied.</clue>
+    <location id="eme" name="EME Building" lat="23.725945" lng="90.392658" radius="25">
+        <clue>The building of electrical and mechanical engineering.</clue>
     </location>
-    <location id="civil" name="Civil Building" lat="23.7257" lng="90.3922" radius="30">
-        <clue level="easy">The building of the civil engineering department.</clue>
-        <clue level="medium">Bridges, concrete and structures are studied here.</clue>
-        <clue level="hard">Future builders of roads and bridges practice their calculations here.</clue>
+    <location id="civil" name="Civil Building" lat="23.726517" lng="90.392538" radius="25">
+        <clue>The building of the civil engineering department.</clue>
     </location>
-    <location id="architecture" name="Architecture Building" lat="23.7257" lng="90.3939" radius="30">
-        <clue level="easy">The building of the architecture department.</clue>
-        <clue level="medium">Sketches, models and sleepless design nights.</clue>
-        <clue level="hard">Where students draw tomorrow's buildings on paper today.</clue>
+    <location id="architecture" name="Architecture Building" lat="23.727555" lng="90.391094" radius="25">
+        <clue>The building of the architecture department.</clue>
+    </location>
+    <location id="playground" name="Playground" lat="23.725994" lng="90.394639" radius="30">
+        <clue>A big open field for sports.</clue>
+    </location>
+    <location id="power_plant" name="Power Plant" lat="23.726089" lng="90.388945" radius="25">
+        <clue>The building that supplies electricity to the campus.</clue>
     </location>
 </arena>

@@ -14,69 +14,49 @@
     east="89.538714"
     west="89.529756">
 
-    <location id="library" name="Kazi Nazrul Islam Central Library" lat="22.8045" lng="89.5305" radius="40">
-        <clue level="easy">The building full of books, named after the rebel poet.</clue>
-        <clue level="medium">A library carrying the name of the national poet.</clue>
-        <clue level="hard">Where the rebel poet's name guards a thousand silent pages.</clue>
+    <location id="library" name="Kazi Nazrul Islam Central Library" lat="22.803541" lng="89.535013" radius="22">
+        <clue>The building full of books, named after the rebel poet.</clue>
     </location>
-    <location id="academic" name="Academic Buildings" lat="22.8045" lng="89.5325" radius="40">
-        <clue level="easy">Where lectures and classes are held.</clue>
-        <clue level="medium">Rows of benches, a board and a long morning lecture.</clue>
-        <clue level="hard">Where attendance is taken and naps are attempted.</clue>
+    <location id="academic" name="Academic Buildings" lat="22.802287" lng="89.532947" radius="25">
+        <clue>Where lectures and classes are held.</clue>
     </location>
-    <location id="admin" name="Administrative Buildings" lat="22.8045" lng="89.5345" radius="40">
-        <clue level="easy">Where the university's official papers are handled.</clue>
-        <clue level="medium">Every certificate and notice begins its journey here.</clue>
-        <clue level="hard">The desk where a student's fate is stamped and signed.</clue>
+    <location id="admin" name="Administrative Buildings" lat="22.800516" lng="89.534074" radius="25">
+        <clue>Where the university's official papers are handled.</clue>
     </location>
-    <location id="aparajita_hall" name="Aparajita Hall" lat="22.8045" lng="89.5365" radius="40">
-        <clue level="easy">The residential hall for girls.</clue>
-        <clue level="medium">Its name means the one who is never defeated.</clue>
-        <clue level="hard">A hall named for those who never lose.</clue>
+    <location id="aparajita_hall" name="Aparajita Hall" lat="22.802016" lng="89.530716" radius="25">
+        <clue>The residential hall for girls.</clue>
     </location>
-    <location id="bijoy24_hall" name="Bijoy 24 Hall" lat="22.8045" lng="89.5385" radius="40">
-        <clue level="easy">A residential hall named after a recent victory.</clue>
-        <clue level="medium">The year in its name remembers a great uprising.</clue>
-        <clue level="hard">A hall whose name is a victory and a year.</clue>
+    <location id="bijoy24_hall" name="Bijoy 24 Hall" lat="22.803130" lng="89.530461" radius="25">
+        <clue>A residential hall whose name has a year in it.</clue>
     </location>
-    <location id="ahsanullah_hall" name="Khan Bahadur Ahsanullah Hall" lat="22.8025" lng="89.5305" radius="40">
-        <clue level="easy">A residential hall for students.</clue>
-        <clue level="medium">A hall named after a famous educator with a long title.</clue>
-        <clue level="hard">A hall carrying a title of honour from colonial times.</clue>
+    <location id="khan_jahan_hall" name="Khan Jahan Ali Hall" lat="22.804737" lng="89.536542" radius="25">
+        <clue>A residential hall named after a historic figure of this region.</clue>
     </location>
-    <location id="mosque" name="Central Mosque" lat="22.8025" lng="89.5325" radius="40">
-        <clue level="easy">A place of prayer on campus.</clue>
-        <clue level="medium">A calm place where the day is measured in prayers.</clue>
-        <clue level="hard">Five times a day, a call from here is heard across campus.</clue>
+    <location id="mosque" name="Central Mosque" lat="22.802115" lng="89.535705" radius="20">
+        <clue>A place of prayer on campus.</clue>
     </location>
-    <location id="temple" name="Central Temple" lat="22.8025" lng="89.5345" radius="40">
-        <clue level="easy">A place of worship for Hindu students.</clue>
-        <clue level="medium">Bells and incense on a quiet corner of campus.</clue>
-        <clue level="hard">Where the evening arati lights a small corner of the campus.</clue>
+    <location id="temple" name="Central Temple" lat="22.801727" lng="89.532051" radius="22">
+        <clue>A place of worship for Hindu students.</clue>
     </location>
-    <location id="mukto_moncho" name="Open Stage" lat="22.8025" lng="89.5365" radius="30">
-        <clue level="easy">An open stage for events and performances.</clue>
-        <clue level="medium">Concerts and cultural shows happen under the open sky here.</clue>
-        <clue level="hard">No roof, no walls, only a stage and an audience.</clue>
+    <location id="mukto_moncho" name="Open Stage" lat="22.801673" lng="89.533882" radius="15">
+        <clue>An open stage for events and performances.</clue>
     </location>
-    <location id="cafeteria" name="Cafeteria" lat="22.8025" lng="89.5385" radius="40">
-        <clue level="easy">Where students go to eat and drink tea.</clue>
-        <clue level="medium">Tea, snacks and the loudest conversations on campus.</clue>
-        <clue level="hard">Empty stomachs, full tables and the best gossip in town.</clue>
+    <location id="cafeteria" name="Cafeteria" lat="22.802871" lng="89.532852" radius="22">
+        <clue>Where students go to eat and drink tea.</clue>
     </location>
-    <location id="medical" name="Medical Center" lat="22.8005" lng="89.5305" radius="40">
-        <clue level="easy">Where sick students get checked by a doctor.</clue>
-        <clue level="medium">The first stop for fevers, cuts and headaches.</clue>
-        <clue level="hard">Where a white coat and a prescription pad wait for you.</clue>
+    <location id="medical" name="Medical Center" lat="22.801691" lng="89.535852" radius="20">
+        <clue>Where sick students get checked by a doctor.</clue>
     </location>
-    <location id="playground" name="Playground" lat="22.8005" lng="89.5325" radius="40">
-        <clue level="easy">A big open field for sports.</clue>
-        <clue level="medium">Wide open grass where matches begin at sunset.</clue>
-        <clue level="hard">Eleven players, one ball and a crowd that never sits still.</clue>
+    <location id="playground" name="Playground" lat="22.803565" lng="89.536520" radius="30">
+        <clue>A big open field for sports.</clue>
     </location>
-    <location id="jibanananda_pond" name="Pond near Jibanananda Das Academic Building" lat="22.8005" lng="89.5345" radius="30">
-        <clue level="easy">A pond in front of an academic building named after a poet.</clue>
-        <clue level="medium">A quiet pond facing the building of the poet of nature.</clue>
-        <clue level="hard">Water that mirrors the building of the poet who loved Bengal's rivers.</clue>
+    <location id="rajakar_pond" name="Rajakar Pond" lat="22.803302" lng="89.534604" radius="20">
+        <clue>A pond in front of an academic building named after a poet.</clue>
+    </location>
+    <location id="shaheed_minar" name="Shaheed Minar" lat="22.801811" lng="89.533518" radius="15">
+        <clue>A monument that remembers the language movement.</clue>
+    </location>
+    <location id="adamya_bangla" name="Adamya Bangla" lat="22.802821" lng="89.533781" radius="20">
+        <clue>A sculpture on campus that stands for courage.</clue>
     </location>
 </arena>

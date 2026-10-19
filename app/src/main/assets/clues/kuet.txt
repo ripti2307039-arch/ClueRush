@@ -379,3 +379,21 @@ architecture|hard|Here imagination gets a ruler and a pencil.
 architecture|hard|Studios where space is shaped before bricks are laid.
 architecture|hard|Dreams here are scaled down to one to one hundred.
 architecture|hard|Cutting, pasting and dreaming are all homework here.
+durbar_bangla|easy|A sculpture on campus that remembers the liberation war.
+durbar_bangla|easy|Find the monument named Durbar Bangla.
+durbar_bangla|easy|A statue that stands for strength and courage is here.
+durbar_bangla|easy|Students take photos in front of this sculpture.
+durbar_bangla|easy|A landmark artwork near the heart of the campus.
+durbar_bangla|easy|The monument whose name means an unstoppable Bengal.
+durbar_bangla|medium|Its name tells you that Bengal cannot be stopped.
+durbar_bangla|medium|A sculpture that stands for courage and sacrifice.
+durbar_bangla|medium|A popular meeting point before heading to class.
+durbar_bangla|medium|Visitors to the campus often stop here for a picture.
+durbar_bangla|medium|An artwork that tells a story without a single word.
+durbar_bangla|medium|A landmark that students cross every single day.
+durbar_bangla|hard|A name that means no force can bend it.
+durbar_bangla|hard|Strength cast in an artwork, not written in a book.
+durbar_bangla|hard|It does not speak, yet it says never give up.
+durbar_bangla|hard|A silent monument that shouts courage.
+durbar_bangla|hard|An artwork that refuses to bow.
+durbar_bangla|hard|Here history stands still so that you can walk past it.

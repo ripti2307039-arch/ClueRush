@@ -206,3 +206,40 @@ architecture|hard|Here imagination gets a ruler and a pencil.
 architecture|hard|Studios where space is shaped before bricks are laid.
 architecture|hard|Dreams here are scaled down to one to one hundred.
 architecture|hard|Cutting, pasting and dreaming are all homework here.
+playground|easy|A big open field for sports.
+playground|easy|Students play football and cricket here.
+playground|easy|Green grass and goalposts are found here.
+playground|easy|The widest open ground on campus.
+playground|easy|Find the field where matches are played.
+playground|easy|Sports tournaments are held on this ground.
+playground|medium|Wide open grass where matches begin at sunset.
+playground|medium|Evening runners and football teams share this space.
+playground|medium|Inter-department matches are held here.
+playground|medium|The loudest cheering on campus happens here.
+playground|medium|Muddy shoes after the rain tell you someone was here.
+playground|medium|A morning jog starts at this wide space.
+playground|hard|Eleven players, one ball and a crowd that never sits still.
+playground|hard|A battlefield where the weapon is a ball.
+playground|hard|Where a goal can make a stranger hug you.
+playground|hard|Grass that has felt a thousand running feet.
+playground|hard|No walls, no roof, only rules and a whistle.
+playground|hard|Sweat is the entry ticket here.
+
+power_plant|easy|The building that supplies electricity to the campus.
+power_plant|easy|Generators and electrical panels are inside.
+power_plant|easy|Find the power plant of the university.
+power_plant|easy|A building that keeps the lights on.
+power_plant|easy|Cables and switchgear fill this building.
+power_plant|easy|Where electric power is produced or controlled.
+power_plant|medium|A low hum can be heard near this building.
+power_plant|medium|Blackouts are avoided because of this place.
+power_plant|medium|Students of electrical engineering often visit it for practical study.
+power_plant|medium|Warning signs and high voltage boards are everywhere.
+power_plant|medium|Machines here work day and night.
+power_plant|medium|The campus would go dark without it.
+power_plant|hard|The reason a lecture never ends in darkness.
+power_plant|hard|A heart that pumps current instead of blood.
+power_plant|hard|Where the campus's electricity begins its journey.
+power_plant|hard|Silent giants that never ask for a break.
+power_plant|hard|A building whose job is to be invisible until it fails.
+power_plant|hard|Ohm's law is applied here at full scale.

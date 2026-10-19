@@ -14,104 +14,67 @@
     east="89.506921"
     west="89.496762">
 
-    <location id="library" name="Central Library" lat="22.9040" lng="89.4985" radius="40">
-        <clue level="easy">The building full of books and silent readers.</clue>
-        <clue level="medium">Borrowing is free here, but late returns cost you.</clue>
-        <clue level="hard">Where knowledge sleeps on shelves until someone wakes it.</clue>
+    <location id="library" name="Central Library" lat="22.899181" lng="89.501841" radius="18">
+        <clue>The building full of books and silent readers.</clue>
     </location>
-    <location id="mosque" name="Central Mosque" lat="22.9040" lng="89.5005" radius="40">
-        <clue level="easy">A place of prayer on campus.</clue>
-        <clue level="medium">A calm place where the day is measured in prayers.</clue>
-        <clue level="hard">Five times a day, a call from here is heard across campus.</clue>
+    <location id="mosque" name="Central Mosque" lat="22.899214" lng="89.500320" radius="25">
+        <clue>A place of prayer on campus.</clue>
     </location>
-    <location id="medical" name="Medical Center" lat="22.9040" lng="89.5025" radius="40">
-        <clue level="easy">Where sick students get checked by a doctor.</clue>
-        <clue level="medium">The first stop for fevers, cuts and headaches.</clue>
-        <clue level="hard">Where a white coat and a prescription pad wait for you.</clue>
+    <location id="medical" name="Medical Center" lat="22.900004" lng="89.500544" radius="25">
+        <clue>Where sick students get checked by a doctor.</clue>
     </location>
-    <location id="lotus_pond" name="Lotus Pond" lat="22.9040" lng="89.5045" radius="30">
-        <clue level="easy">A pond with beautiful flowers floating on it.</clue>
-        <clue level="medium">Pink petals on still water, a favourite photo spot.</clue>
-        <clue level="hard">Mud gives birth to a flower here, and everyone stops to look.</clue>
+    <location id="lotus_pond" name="Lotus Pond" lat="22.899885" lng="89.502364" radius="20">
+        <clue>A pond with beautiful flowers floating on it.</clue>
     </location>
-    <location id="it_park" name="IT Park" lat="22.9040" lng="89.5065" radius="40">
-        <clue level="easy">A technology hub where computers and startups live.</clue>
-        <clue level="medium">Code, servers and late-night developers work here.</clue>
-        <clue level="hard">Where ideas turn into software before sunrise.</clue>
+    <location id="it_park" name="IT Park" lat="22.900441" lng="89.498674" radius="25">
+        <clue>A technology hub where computers and startups live.</clue>
     </location>
-    <location id="foreign_dorm" name="Foreign Dormitory" lat="22.9020" lng="89.4985" radius="40">
-        <clue level="easy">A residence for students from other countries.</clue>
-        <clue level="medium">Guests from far away sleep under this roof.</clue>
-        <clue level="hard">Many passports, many languages, one corridor.</clue>
+    <location id="foreign_dorm" name="Foreign Dormitory" lat="22.901401" lng="89.499702" radius="25">
+        <clue>A residence for students from other countries.</clue>
     </location>
-    <location id="mukto_mancha" name="Open Stage" lat="22.9020" lng="89.5005" radius="30">
-        <clue level="easy">An open stage for events and performances.</clue>
-        <clue level="medium">Concerts and cultural shows happen under the open sky here.</clue>
-        <clue level="hard">No roof, no walls, only a stage and an audience.</clue>
+    <location id="mukto_mancha" name="Open Stage" lat="22.898143" lng="89.503437" radius="20">
+        <clue>An open stage for events and performances.</clue>
     </location>
-    <location id="playground" name="Play Ground" lat="22.9020" lng="89.5025" radius="40">
-        <clue level="easy">A big open field for sports.</clue>
-        <clue level="medium">Wide open grass where matches begin at sunset.</clue>
-        <clue level="hard">Eleven players, one ball and a crowd that never sits still.</clue>
+    <location id="playground" name="Play Ground" lat="22.899506" lng="89.504297" radius="30">
+        <clue>A big open field for sports.</clue>
     </location>
-    <location id="khajar_pond" name="Khajar Pond" lat="22.9020" lng="89.5045" radius="30">
-        <clue level="easy">A pond near the trees on campus.</clue>
-        <clue level="medium">Palm trees stand guard around this water.</clue>
-        <clue level="hard">Sweet fruit trees watch over the water, and the water watches back.</clue>
+    <location id="khajar_pond" name="Khajar Pond" lat="22.898245" lng="89.504043" radius="20">
+        <clue>A pond near the trees on campus.</clue>
     </location>
-    <location id="it_pond" name="IT Pond" lat="22.9020" lng="89.5065" radius="30">
-        <clue level="easy">A pond beside the IT area.</clue>
-        <clue level="medium">After a long coding session, students come to stare at this water.</clue>
-        <clue level="hard">Debugging stops here when the screen hurts the eyes.</clue>
+    <location id="it_pond" name="IT Pond" lat="22.900376" lng="89.499643" radius="20">
+        <clue>A pond beside the IT area.</clue>
     </location>
-    <location id="admin" name="Administrative Building" lat="22.9000" lng="89.4985" radius="40">
-        <clue level="easy">Where the university's official papers are handled.</clue>
-        <clue level="medium">Every certificate and notice begins its journey here.</clue>
-        <clue level="hard">The desk where a student's fate is stamped and signed.</clue>
+    <location id="admin" name="Administrative Building" lat="22.900615" lng="89.502393" radius="25">
+        <clue>Where the university's official papers are handled.</clue>
     </location>
-    <location id="auditorium" name="Auditorium" lat="22.9000" lng="89.5005" radius="40">
-        <clue level="easy">A big hall with a stage and many seats.</clue>
-        <clue level="medium">Seminars, cultural nights and convocations happen here.</clue>
-        <clue level="hard">Where graduates wait for their names to be called.</clue>
+    <location id="auditorium" name="Auditorium" lat="22.899050" lng="89.502964" radius="22">
+        <clue>A big hall with a stage and many seats.</clue>
     </location>
-    <location id="main_gate" name="Main Gate" lat="22.9000" lng="89.5025" radius="30">
-        <clue level="easy">The entrance of the campus.</clue>
-        <clue level="medium">Everyone enters through here, nobody ignores it.</clue>
-        <clue level="hard">The first thing a visitor meets and the last thing they leave behind.</clue>
+    <location id="main_gate" name="Main Gate" lat="22.897957" lng="89.506518" radius="20">
+        <clue>The entrance of the campus.</clue>
     </location>
-    <location id="shaheed_minar" name="Shaheed Minar" lat="22.9000" lng="89.5045" radius="30">
-        <clue level="easy">A monument that remembers the language movement.</clue>
-        <clue level="medium">Flowers are laid here every February.</clue>
-        <clue level="hard">Bare feet and a sunrise procession on the twenty-first.</clue>
+    <location id="shaheed_minar" name="Shaheed Minar" lat="22.899382" lng="89.505176" radius="20">
+        <clue>A monument that remembers the language movement.</clue>
     </location>
-    <location id="rokeya_hall" name="Rokeya Hall" lat="22.9000" lng="89.5065" radius="40">
-        <clue level="easy">The residential hall for girls.</clue>
-        <clue level="medium">Named after a pioneer of women's education.</clue>
-        <clue level="hard">A hall named after the woman who dreamed of Sultana's world.</clue>
+    <location id="rokeya_hall" name="Rokeya Hall" lat="22.900655" lng="89.503278" radius="22">
+        <clue>The residential hall for girls.</clue>
     </location>
-    <location id="academic" name="Academic Buildings" lat="22.8980" lng="89.4985" radius="40">
-        <clue level="easy">Where lectures and classes are held.</clue>
-        <clue level="medium">Rows of benches, a board and a long morning lecture.</clue>
-        <clue level="hard">Where attendance is taken and naps are attempted.</clue>
+    <location id="academic" name="Academic Buildings" lat="22.899185" lng="89.501457" radius="18">
+        <clue>Where lectures and classes are held.</clue>
     </location>
-    <location id="mech_workshop" name="Mechanical Workshop" lat="22.8980" lng="89.5005" radius="40">
-        <clue level="easy">Where engineering students work with machines and tools.</clue>
-        <clue level="medium">Sparks, metal and the smell of oil.</clue>
-        <clue level="hard">Theory ends at the door and hands-on learning begins.</clue>
+    <location id="mech_workshop" name="Mechanical Workshop" lat="22.900930" lng="89.501537" radius="25">
+        <clue>Where engineering students work with machines and tools.</clue>
     </location>
-    <location id="eee" name="EEE Building" lat="22.8980" lng="89.5025" radius="40">
-        <clue level="easy">The building of the electrical engineering department.</clue>
-        <clue level="medium">Circuits, current and a lot of wires.</clue>
-        <clue level="hard">Where students fight with voltage and sometimes lose.</clue>
+    <location id="eee" name="EEE Building" lat="22.899804" lng="89.502932" radius="22">
+        <clue>The building of the electrical engineering department.</clue>
     </location>
-    <location id="civil_ext" name="Civil Extension Building" lat="22.8980" lng="89.5045" radius="40">
-        <clue level="easy">An extra building of the civil engineering department.</clue>
-        <clue level="medium">Bridges, concrete and structures are studied here.</clue>
-        <clue level="hard">Future builders of roads and bridges practice their calculations here.</clue>
+    <location id="civil_ext" name="Civil Extension Building" lat="22.900257" lng="89.503489" radius="22">
+        <clue>An extra building of the civil engineering department.</clue>
     </location>
-    <location id="architecture" name="Architecture Building" lat="22.8980" lng="89.5065" radius="40">
-        <clue level="easy">The building of the architecture department.</clue>
-        <clue level="medium">Sketches, models and sleepless design nights.</clue>
-        <clue level="hard">Where students draw tomorrow's buildings on paper today.</clue>
+    <location id="architecture" name="Architecture Building" lat="22.899706" lng="89.501261" radius="22">
+        <clue>The building of the architecture department.</clue>
+    </location>
+    <location id="durbar_bangla" name="Durbar Bangla" lat="22.899097" lng="89.502365" radius="20">
+        <clue>A sculpture on campus that stands for courage.</clue>
     </location>
 </arena>

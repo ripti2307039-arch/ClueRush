@@ -93,24 +93,6 @@ bijoy24_hall|hard|Four digits and a word of success make up its name.
 bijoy24_hall|hard|A home that carries a memory of a very loud year.
 bijoy24_hall|hard|Here a calendar year became an address.
 
-ahsanullah_hall|easy|A residential hall for students.
-ahsanullah_hall|easy|Students live in this hall.
-ahsanullah_hall|easy|Find the hall with a long name starting with Khan Bahadur.
-ahsanullah_hall|easy|A hostel named after a famous educator.
-ahsanullah_hall|easy|A residential building on campus.
-ahsanullah_hall|easy|The hall named after Ahsanullah.
-ahsanullah_hall|medium|A hall named after a famous educator with a long title.
-ahsanullah_hall|medium|Its name begins with a title of honour.
-ahsanullah_hall|medium|Students here walk to class with a long name behind them.
-ahsanullah_hall|medium|Rooms, corridors and midnight snacks.
-ahsanullah_hall|medium|A hall that has a long name and many residents.
-ahsanullah_hall|medium|Dining and common room noise fill this hall in the evening.
-ahsanullah_hall|hard|A hall carrying a title of honour from colonial times.
-ahsanullah_hall|hard|Its signboard needs the longest line on campus.
-ahsanullah_hall|hard|A name that was a title before it was a building.
-ahsanullah_hall|hard|A home away from home with a curfew and a roommate.
-ahsanullah_hall|hard|Residents here spell their address slowly.
-ahsanullah_hall|hard|A title and a surname hold up this building.
 
 mosque|easy|A place of prayer on campus.
 mosque|easy|Students come here to pray together.
@@ -225,22 +207,78 @@ playground|hard|Where a goal can make a stranger hug you.
 playground|hard|Grass that has felt a thousand running feet.
 playground|hard|No walls, no roof, only rules and a whistle.
 playground|hard|Sweat is the entry ticket here.
+khan_jahan_hall|easy|A residential hall for students.
+khan_jahan_hall|easy|Find the hall named after Khan Jahan Ali.
+khan_jahan_hall|easy|A hostel named after a famous saint and ruler of this region.
+khan_jahan_hall|easy|Students live in this hall.
+khan_jahan_hall|easy|A hall named after a historic figure of Khulna's region.
+khan_jahan_hall|easy|A residential building on campus.
+khan_jahan_hall|medium|Named after the man who built a city near Bagerhat.
+khan_jahan_hall|medium|Its namesake built mosques across southwestern Bengal.
+khan_jahan_hall|medium|A hall named after a fifteenth century ruler.
+khan_jahan_hall|medium|Its name links this hall to the Sixty Dome Mosque.
+khan_jahan_hall|medium|A hall that carries the region's history in its name.
+khan_jahan_hall|medium|Rooms, corridors and midnight snacks.
+khan_jahan_hall|hard|The builder of a mosque with many domes gave his name to this hall.
+khan_jahan_hall|hard|A saint and governor lives on as a signboard.
+khan_jahan_hall|hard|Local history sleeps in the name of this building.
+khan_jahan_hall|hard|A name from the 1400s on a modern hostel.
+khan_jahan_hall|hard|Even the hall's name is older than the university.
+khan_jahan_hall|hard|A home named after the man behind Bagerhat's mosque city.
 
-jibanananda_pond|easy|A pond in front of an academic building named after a poet.
-jibanananda_pond|easy|Find the pond facing the Jibanananda Das building.
-jibanananda_pond|easy|A calm pond right in front of an academic building.
-jibanananda_pond|easy|Students sit beside this pond between classes.
-jibanananda_pond|easy|A small water body near the poet's building.
-jibanananda_pond|easy|The pond that faces a building named after a famous poet.
-jibanananda_pond|medium|A quiet pond facing the building of the poet of nature.
-jibanananda_pond|medium|Lecture notes and calm water share this spot.
-jibanananda_pond|medium|Students rest here after a long day of classes.
-jibanananda_pond|medium|The building opposite carries the name of a beloved Bengali poet.
-jibanananda_pond|medium|Reflections of a building ripple on this water.
-jibanananda_pond|medium|A shady place for study breaks and quiet talks.
-jibanananda_pond|hard|Water that mirrors the building of the poet who loved Bengal's rivers.
-jibanananda_pond|hard|A poet who wrote about Bengal's beauty has his name across this water.
-jibanananda_pond|hard|The reflection is a building, the water is a verse.
-jibanananda_pond|hard|A poem would feel at home beside this pond.
-jibanananda_pond|hard|The poet of the golden fields has his name on the opposite bank.
-jibanananda_pond|hard|Water here is calm enough to read a poem in.
+rajakar_pond|easy|A pond near the academic buildings on campus.
+rajakar_pond|easy|A calm pond where students sit and talk.
+rajakar_pond|easy|Find the pond in front of the Jibanananda Das academic building.
+rajakar_pond|easy|A small water body on campus.
+rajakar_pond|easy|Students relax beside this pond between classes.
+rajakar_pond|easy|A pond that every student knows by name.
+rajakar_pond|medium|A quiet pond facing an academic building named after a poet.
+rajakar_pond|medium|Lecture notes and calm water share this spot.
+rajakar_pond|medium|Students rest here after a long day of classes.
+rajakar_pond|medium|Reflections of a building ripple on this water.
+rajakar_pond|medium|A shady place for study breaks and quiet talks.
+rajakar_pond|medium|The pond that students use as a landmark when giving directions.
+rajakar_pond|hard|Water that mirrors the building of a poet who loved Bengal's rivers.
+rajakar_pond|hard|A poem would feel at home beside this pond.
+rajakar_pond|hard|The reflection is a building, the water is a verse.
+rajakar_pond|hard|Water here is calm enough to read a poem in.
+rajakar_pond|hard|Its name is known by every batch, passed on like a story.
+rajakar_pond|hard|Ripples here carry gossip faster than any group chat.
+
+shaheed_minar|easy|A monument that remembers the language movement.
+shaheed_minar|easy|The memorial for the language martyrs.
+shaheed_minar|easy|Flowers are placed here on 21st February.
+shaheed_minar|easy|Find the monument of the language movement.
+shaheed_minar|easy|A memorial with pillars on campus.
+shaheed_minar|easy|The place where students honour the martyrs.
+shaheed_minar|medium|Flowers are laid here every February.
+shaheed_minar|medium|Students walk here barefoot in the early morning of a special day.
+shaheed_minar|medium|Black badges and red flowers gather here.
+shaheed_minar|medium|A monument that is silent but says a lot.
+shaheed_minar|medium|Songs of the language movement are sung at this spot.
+shaheed_minar|medium|A memorial for those who gave their lives for Bangla.
+shaheed_minar|hard|Bare feet and a sunrise procession on the twenty-first.
+shaheed_minar|hard|Here a mother tongue is remembered with flowers.
+shaheed_minar|hard|A place where the heart walks slower than the feet.
+shaheed_minar|hard|Stone columns that stand for a language.
+shaheed_minar|hard|The date on the calendar makes this place the busiest.
+shaheed_minar|hard|Every February this monument is covered with colour.
+
+adamya_bangla|easy|A sculpture on campus that remembers the liberation war.
+adamya_bangla|easy|Find the monument named Adamya Bangla.
+adamya_bangla|easy|A statue that stands for strength and courage is here.
+adamya_bangla|easy|Students take photos in front of this sculpture.
+adamya_bangla|easy|A landmark artwork on campus.
+adamya_bangla|easy|The monument whose name means an invincible Bengal.
+adamya_bangla|medium|Its name tells you that Bengal cannot be defeated.
+adamya_bangla|medium|A sculpture that stands for courage and sacrifice.
+adamya_bangla|medium|A popular meeting point on campus.
+adamya_bangla|medium|Visitors to the campus often stop here for a picture.
+adamya_bangla|medium|An artwork that tells a story without a single word.
+adamya_bangla|medium|A landmark that students cross every single day.
+adamya_bangla|hard|A name that means it can never be tamed.
+adamya_bangla|hard|Strength cast in an artwork, not written in a book.
+adamya_bangla|hard|It does not speak, yet it says never surrender.
+adamya_bangla|hard|A silent monument that shouts courage.
+adamya_bangla|hard|An artwork that refuses to bow.
+adamya_bangla|hard|Here history stands still so that you can walk past it.
