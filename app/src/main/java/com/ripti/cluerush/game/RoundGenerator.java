@@ -1,5 +1,7 @@
 package com.ripti.cluerush.game;
 
+import android.content.Context;
+
 import com.ripti.cluerush.model.Arena;
 import com.ripti.cluerush.model.CampusLocation;
 import com.ripti.cluerush.model.Difficulty;
@@ -18,8 +20,9 @@ public final class RoundGenerator {
     private RoundGenerator() {
     }
 
-    public static List<Round> generate(Arena arena, int roundCount, Difficulty difficulty,
-                                       Random random) {
+    public static List<Round> generate(Context context, Arena arena, int roundCount,
+                                       Difficulty difficulty, Random random,
+                                       boolean avoidRepeats) {
         List<CampusLocation> pool = new ArrayList<>(arena.getLocations());
         Collections.shuffle(pool, random);
 
@@ -32,7 +35,9 @@ public final class RoundGenerator {
             CampusLocation location = pool.get(i);
             TaskType type = types.get(i % types.size());
             TaskSpec task = new TaskSpec(type, difficulty, random.nextLong());
-            rounds.add(new Round(location, location.pickClue(random, difficulty), task));
+            String clue = ClueBank.pick(context, arena.getId(), location, difficulty,
+                    random, avoidRepeats);
+            rounds.add(new Round(location, clue, task));
         }
         return rounds;
     }

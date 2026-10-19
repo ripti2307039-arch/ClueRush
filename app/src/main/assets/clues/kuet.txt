@@ -1,0 +1,381 @@
+# location_id|level|clue
+
+library|easy|The building full of books and silent readers.
+library|easy|You come here to borrow books and read in silence.
+library|easy|Shelves, reading tables and a very quiet atmosphere.
+library|easy|Students prepare for exams here with piles of books.
+library|easy|Find the place where a librarian stamps your due date.
+library|easy|A building where whispering is the rule.
+library|medium|Borrowing is free here, but late returns cost you.
+library|medium|Exam week makes every seat here precious.
+library|medium|A place where the loudest sound is turning a page.
+library|medium|Thousands of stories live here, and none of them speak.
+library|medium|Students hunt for a window seat here before the morning rush.
+library|medium|The only place on campus where a cough feels rude.
+library|hard|Where knowledge sleeps on shelves until someone wakes it.
+library|hard|A silent crowd of paper and ink waits for you here.
+library|hard|The more you take from here, the richer you become.
+library|hard|Here you can travel across centuries without leaving your chair.
+library|hard|Thousands of authors are inside, yet nobody is talking.
+library|hard|Return what you borrow, or this place will remember your name.
+
+mosque|easy|A place of prayer on campus.
+mosque|easy|Students come here to pray together.
+mosque|easy|The call to prayer comes from this building.
+mosque|easy|Shoes are left outside before entering.
+mosque|easy|A peaceful house of worship on campus.
+mosque|easy|Friday prayers gather a big crowd here.
+mosque|medium|A calm place where the day is measured in prayers.
+mosque|medium|On Fridays this place fills up and spills outside.
+mosque|medium|Lines of students stand shoulder to shoulder here.
+mosque|medium|Its dome and minaret are easy to spot from afar.
+mosque|medium|The quietest corner of campus when the call ends.
+mosque|medium|Dawn, noon, afternoon, sunset and night all start here.
+mosque|hard|Five times a day, a call from here is heard across campus.
+mosque|hard|You take off your shoes to enter, and take off your worries too.
+mosque|hard|Where a single voice calls everyone, and everyone answers.
+mosque|hard|A clock that never uses numbers, only calls.
+mosque|hard|Where rich and poor stand in the same line.
+mosque|hard|Silence here is not empty, it is full of prayers.
+
+medical|easy|Where sick students get checked by a doctor.
+medical|easy|Go here when you have a fever.
+medical|easy|Doctors and nurses work in this building.
+medical|easy|You can get medicine here if you feel unwell.
+medical|easy|A place with a stethoscope and a prescription pad.
+medical|easy|Students visit this center for a health checkup.
+medical|medium|The first stop for fevers, cuts and headaches.
+medical|medium|A waiting bench, a doctor and a small pharmacy.
+medical|medium|Students with sore throats queue up here before exams.
+medical|medium|A white coat is always on duty in this building.
+medical|medium|When a football match injury happens, people run here.
+medical|medium|Campus first aid begins at this door.
+medical|hard|Where a white coat and a prescription pad wait for you.
+medical|hard|The place where pain gets a name and a tablet.
+medical|hard|Healing starts here, but only if you remember to come.
+medical|hard|A building that students visit unwillingly and leave grateful.
+medical|hard|Thermometers outnumber textbooks inside.
+medical|hard|Where a cough turns into a diagnosis.
+
+lotus_pond|easy|A pond with beautiful flowers floating on it.
+lotus_pond|easy|Find the pond that is famous for lotus flowers.
+lotus_pond|easy|Pink flowers float on the water here.
+lotus_pond|easy|A pond where students come to take photos.
+lotus_pond|easy|Green leaves and flowers cover this pond.
+lotus_pond|easy|The pond named after a famous water flower.
+lotus_pond|medium|Pink petals on still water, a favourite photo spot.
+lotus_pond|medium|Wide round leaves rest on the surface like plates.
+lotus_pond|medium|A national flower of this country grows on this pond.
+lotus_pond|medium|Evening walkers stop here to watch the flowers.
+lotus_pond|medium|Water that blooms best in the rainy season.
+lotus_pond|medium|A pond where the flowers close at night.
+lotus_pond|hard|Mud gives birth to a flower here, and everyone stops to look.
+lotus_pond|hard|Beauty rises from dirty water, and the leaves stay dry.
+lotus_pond|hard|Droplets roll off the leaves like tiny silver balls.
+lotus_pond|hard|A flower that sits on water like a queen on a throne.
+lotus_pond|hard|It grows in the mud and still looks like a painting.
+lotus_pond|hard|Its name is its flower, and its flower is a symbol.
+
+it_park|easy|A technology hub where computers and startups live.
+it_park|easy|The building for IT and software work.
+it_park|easy|Computers and young programmers are everywhere here.
+it_park|easy|A place for technology and new businesses.
+it_park|easy|Look for the park built for software and IT.
+it_park|easy|Students and companies work together on computers here.
+it_park|medium|Code, servers and late-night developers work here.
+it_park|medium|Keyboards click here louder than conversations.
+it_park|medium|Startups begin as a small idea on a laptop here.
+it_park|medium|A place where bugs are hunted instead of insects.
+it_park|medium|Wi-Fi is the most valuable resource in this building.
+it_park|medium|Freelancers and teams build apps and websites here.
+it_park|hard|Where ideas turn into software before sunrise.
+it_park|hard|The product here is invisible, but people pay for it.
+it_park|hard|A factory without smoke, where the machines are laptops.
+it_park|hard|Zeros and ones are manufactured here all day.
+it_park|hard|Where a missing semicolon can ruin a whole afternoon.
+it_park|hard|Tomorrow's apps are born in these rooms.
+
+foreign_dorm|easy|A residence for students from other countries.
+foreign_dorm|easy|International students live in this building.
+foreign_dorm|easy|A hostel for guests from abroad.
+foreign_dorm|easy|Find the dormitory built for foreign students.
+foreign_dorm|easy|Students from other countries sleep here.
+foreign_dorm|easy|A residential building for international students.
+foreign_dorm|medium|Guests from far away sleep under this roof.
+foreign_dorm|medium|You may hear many languages on this corridor.
+foreign_dorm|medium|A small world gathered in one residential building.
+foreign_dorm|medium|Different flags, one dormitory.
+foreign_dorm|medium|Students here miss both their home and their mother's cooking.
+foreign_dorm|medium|A home away from home for visiting scholars.
+foreign_dorm|hard|Many passports, many languages, one corridor.
+foreign_dorm|hard|A tiny United Nations that sleeps in bunk rooms.
+foreign_dorm|hard|Where a goodnight is said in a dozen tongues.
+foreign_dorm|hard|Visas expire, friendships here do not.
+foreign_dorm|hard|Travelers who came to learn, not to tour, live here.
+foreign_dorm|hard|A border you cross by walking through the front door.
+
+mukto_mancha|easy|An open stage for events and performances.
+mukto_mancha|easy|A stage without a roof where programs are held.
+mukto_mancha|easy|Cultural shows are performed on this stage.
+mukto_mancha|easy|Find the open-air platform for events.
+mukto_mancha|easy|Singers and dancers perform here under the sky.
+mukto_mancha|easy|A big stage in the open where students gather.
+mukto_mancha|medium|Concerts and cultural shows happen under the open sky here.
+mukto_mancha|medium|Spotlights and a crowd on the grass in the evening.
+mukto_mancha|medium|Festival nights are celebrated on this stage.
+mukto_mancha|medium|Rain can cancel a show on this stage.
+mukto_mancha|medium|Microphone checks echo here before every big event.
+mukto_mancha|medium|Students gather here for songs, poems and speeches.
+mukto_mancha|hard|No roof, no walls, only a stage and an audience.
+mukto_mancha|hard|Where the sky is the ceiling and the stars are the lights.
+mukto_mancha|hard|A stage that has no curtain to close.
+mukto_mancha|hard|The name of this place means freedom of expression.
+mukto_mancha|hard|Voices here are free, and so is the breeze.
+mukto_mancha|hard|Applause is the only wall here.
+
+playground|easy|A big open field for sports.
+playground|easy|Students play football and cricket here.
+playground|easy|Green grass and goalposts are found here.
+playground|easy|The widest open ground on campus.
+playground|easy|Find the field where matches are played.
+playground|easy|Sports tournaments are held on this ground.
+playground|medium|Wide open grass where matches begin at sunset.
+playground|medium|Evening runners and football teams share this space.
+playground|medium|Inter-department matches are held here.
+playground|medium|The loudest cheering on campus happens here.
+playground|medium|Muddy shoes after the rain tell you someone was here.
+playground|medium|A morning jog starts at this wide space.
+playground|hard|Eleven players, one ball and a crowd that never sits still.
+playground|hard|A battlefield where the weapon is a ball.
+playground|hard|Where a goal can make a stranger hug you.
+playground|hard|Grass that has felt a thousand running feet.
+playground|hard|No walls, no roof, only rules and a whistle.
+playground|hard|Sweat is the entry ticket here.
+
+khajar_pond|easy|A pond near the trees on campus.
+khajar_pond|easy|A pond named after a type of palm tree.
+khajar_pond|easy|Date palm trees grow beside this pond.
+khajar_pond|easy|Find the pond with the sweet fruit tree name.
+khajar_pond|easy|A quiet pond where students sit and talk.
+khajar_pond|easy|The pond whose name means date palm.
+khajar_pond|medium|Palm trees stand guard around this water.
+khajar_pond|medium|A quiet bank for evening chats and breeze.
+khajar_pond|medium|Winter mornings here bring a sweet sap smell.
+khajar_pond|medium|A peaceful spot where the only noise is birds.
+khajar_pond|medium|Its name comes from the tall tree beside the water.
+khajar_pond|medium|Fishes and trees keep company here.
+khajar_pond|hard|Sweet fruit trees watch over the water, and the water watches back.
+khajar_pond|hard|A pond named after the tree that gives winter its sweetness.
+khajar_pond|hard|The tree's reflection is longer than the tree.
+khajar_pond|hard|Where winter morning sap and calm water meet.
+khajar_pond|hard|It is named for a tree, not for a fish or a flower.
+khajar_pond|hard|Tall trees lean over to see their own faces.
+
+it_pond|easy|A pond beside the IT area.
+it_pond|easy|The pond near the IT building.
+it_pond|easy|A small pond close to the technology park.
+it_pond|easy|Find the pond that has IT in its name.
+it_pond|easy|A pond where programmers take a break.
+it_pond|easy|A pond not far from the computer building.
+it_pond|medium|After a long coding session, students come to stare at this water.
+it_pond|medium|The best place to rest your eyes after a screen.
+it_pond|medium|Laptop bags and calm water sit side by side here.
+it_pond|medium|A short walk from the computers, a long way from the stress.
+it_pond|medium|Programmers come here to clear their heads.
+it_pond|medium|A pond where tired eyes get a green view.
+it_pond|hard|Debugging stops here when the screen hurts the eyes.
+it_pond|hard|Water is the only thing here that does not refresh.
+it_pond|hard|A calm place that no compiler can reach.
+it_pond|hard|Where brain cache is cleared by a gentle breeze.
+it_pond|hard|It has no password, only ripples.
+it_pond|hard|Where the only buffering is the slow wind.
+
+admin|easy|Where the university's official papers are handled.
+admin|easy|Offices of the university's leaders are in this building.
+admin|easy|You come here for certificates and official notices.
+admin|easy|The main office building of the university.
+admin|easy|Important forms and letters are processed here.
+admin|easy|The registrar and other officers work in this building.
+admin|medium|Every certificate and notice begins its journey here.
+admin|medium|Files, stamps and long queues are common here.
+admin|medium|Students come here with applications and leave with patience.
+admin|medium|The place where decisions about the whole campus are made.
+admin|medium|A signature here can change a student's semester.
+admin|medium|The busiest office hours on campus happen here.
+admin|hard|The desk where a student's fate is stamped and signed.
+admin|hard|Where paper moves slower than people.
+admin|hard|A building that runs on signatures and tea.
+admin|hard|A single stamp here is worth many words.
+admin|hard|Rules are written here and sometimes bent here.
+admin|hard|Forms enter in the morning and leave in the afternoon, approved or not.
+
+auditorium|easy|A big hall with a stage and many seats.
+auditorium|easy|Seminars and programs take place in this hall.
+auditorium|easy|Rows of chairs face a stage here.
+auditorium|easy|Convocations are held in this large hall.
+auditorium|easy|A hall used for big events and talks.
+auditorium|easy|A stage, a microphone and hundreds of seats.
+auditorium|medium|Seminars, cultural nights and convocations happen here.
+auditorium|medium|Air conditioning and soft seats for big crowds.
+auditorium|medium|Guest speakers usually give their talks here.
+auditorium|medium|Students wear their best clothes for events here.
+auditorium|medium|The curtain opens and the whole campus watches.
+auditorium|medium|A hall that sounds different when it is full.
+auditorium|hard|Where graduates wait for their names to be called.
+auditorium|hard|A room that makes everyone quiet when the lights go down.
+auditorium|hard|Every seat faces the same direction.
+auditorium|hard|A stage that has heard speeches both brilliant and boring.
+auditorium|hard|Big dreams are announced here in front of big crowds.
+auditorium|hard|Where a clap from the back row can echo like thunder.
+
+main_gate|easy|The entrance of the campus.
+main_gate|easy|Everyone enters the university through this gate.
+main_gate|easy|Security guards stand at this place.
+main_gate|easy|The first thing visitors see on campus.
+main_gate|easy|Cars and rickshaws pass through here.
+main_gate|easy|Find the way in and out of the university.
+main_gate|medium|Everyone enters through here, nobody ignores it.
+main_gate|medium|The place where visitors tell the guard why they came.
+main_gate|medium|Rickshaws line up outside this place in the evening.
+main_gate|medium|Goodbyes and welcomes both happen at this spot.
+main_gate|medium|The campus meets the main road here.
+main_gate|medium|A signboard here tells you which university you reached.
+main_gate|hard|The first thing a visitor meets and the last thing they leave behind.
+main_gate|hard|A door that has no door, only a name above it.
+main_gate|hard|The campus begins and ends here.
+main_gate|hard|A threshold crossed by every student, every day.
+main_gate|hard|Where the outside world says hello to the campus.
+main_gate|hard|Guarded by uniforms, entered by dreams.
+
+shaheed_minar|easy|A monument that remembers the language movement.
+shaheed_minar|easy|The memorial for the language martyrs.
+shaheed_minar|easy|Flowers are placed here on 21st February.
+shaheed_minar|easy|Find the monument of the language movement.
+shaheed_minar|easy|A white memorial with pillars on campus.
+shaheed_minar|easy|The place where students honour the martyrs.
+shaheed_minar|medium|Flowers are laid here every February.
+shaheed_minar|medium|Students walk here barefoot in the early morning of a special day.
+shaheed_minar|medium|Black badges and red flowers gather here.
+shaheed_minar|medium|A monument that is silent but says a lot.
+shaheed_minar|medium|Songs of the language movement are sung at this spot.
+shaheed_minar|medium|A memorial for those who gave their lives for Bangla.
+shaheed_minar|hard|Bare feet and a sunrise procession on the twenty-first.
+shaheed_minar|hard|Here a mother tongue is remembered with flowers.
+shaheed_minar|hard|A place where the heart walks slower than the feet.
+shaheed_minar|hard|Stone columns that stand for a language.
+shaheed_minar|hard|The date on the calendar makes this place the busiest.
+shaheed_minar|hard|Every February this monument is covered with colour.
+
+rokeya_hall|easy|The residential hall for girls.
+rokeya_hall|easy|Female students live in this hall.
+rokeya_hall|easy|A hall named after a famous woman writer.
+rokeya_hall|easy|Find the hall named Rokeya.
+rokeya_hall|easy|The girls' hostel of the university.
+rokeya_hall|easy|A hall for female students on campus.
+rokeya_hall|medium|Named after a pioneer of women's education.
+rokeya_hall|medium|Its name belongs to the author of Sultana's Dream.
+rokeya_hall|medium|A hall named after a champion of girls' schools.
+rokeya_hall|medium|Female students call this building their home.
+rokeya_hall|medium|The hall of a famous Begum.
+rokeya_hall|medium|The name on this hall is a famous author and reformer.
+rokeya_hall|hard|A hall named after the woman who dreamed of Sultana's world.
+rokeya_hall|hard|A building that carries the name of a revolution in education.
+rokeya_hall|hard|The author of a story where women rule and men stay home.
+rokeya_hall|hard|A home named after a woman who opened school doors.
+rokeya_hall|hard|Every room here owes a debt to a great reformer.
+rokeya_hall|hard|A hall with a legendary name and a quiet gate.
+
+academic|easy|Where lectures and classes are held.
+academic|easy|Classrooms and teachers' rooms are in these buildings.
+academic|easy|Students attend their daily classes here.
+academic|easy|Find the buildings where lessons are taught.
+academic|easy|Benches, boards and lecture rooms are found here.
+academic|easy|The main place for studying during the day.
+academic|medium|Rows of benches, a board and a long morning lecture.
+academic|medium|Class schedules decide how busy these corridors are.
+academic|medium|Roll calls and class tests happen in these buildings.
+academic|medium|Students rush here when the bell rings.
+academic|medium|A place where every department has a room.
+academic|medium|Chalk, marker and projector are all used here.
+academic|hard|Where attendance is taken and naps are attempted.
+academic|hard|The place where schedules rule your life.
+academic|hard|Where the loudest sound is a professor's voice.
+academic|hard|Corridors here are quiet during class and chaotic after.
+academic|hard|Everyone arrives here with a bag and leaves with homework.
+academic|hard|A building of many rooms and one purpose.
+
+mech_workshop|easy|Where engineering students work with machines and tools.
+mech_workshop|easy|The workshop of the mechanical department.
+mech_workshop|easy|Students practise with lathes and tools here.
+mech_workshop|easy|Find the building full of machines.
+mech_workshop|easy|Hammers, drills and metal are used here.
+mech_workshop|easy|A place for practical engineering work.
+mech_workshop|medium|Sparks, metal and the smell of oil.
+mech_workshop|medium|Safety goggles are a must in this building.
+mech_workshop|medium|Lathes and welding machines are used here.
+mech_workshop|medium|The loudest building on campus on a working day.
+mech_workshop|medium|Students come out with greasy hands and big smiles.
+mech_workshop|medium|A place where metal gets shaped into parts.
+mech_workshop|hard|Theory ends at the door and hands-on learning begins.
+mech_workshop|hard|Where a book is replaced by a spanner.
+mech_workshop|hard|Where drawings on paper become parts in your hand.
+mech_workshop|hard|Noise, dust and learning all share this room.
+mech_workshop|hard|Metal obeys only those who respect it here.
+mech_workshop|hard|Where an engineer gets dirty before getting a degree.
+
+eee|easy|The building of the electrical engineering department.
+eee|easy|The department building for EEE.
+eee|easy|Students study electricity and electronics here.
+eee|easy|Find the building of electrical and electronic engineering.
+eee|easy|Labs for circuits and power are located here.
+eee|easy|The EEE department works in this building.
+eee|medium|Circuits, current and a lot of wires.
+eee|medium|Oscilloscopes and soldering irons are common inside.
+eee|medium|Students here argue about AC and DC.
+eee|medium|Transformers and microcontrollers are studied here.
+eee|medium|A building where a short circuit is a lesson, not a joke.
+eee|medium|Signals and systems are taught in this building.
+eee|hard|Where students fight with voltage and sometimes lose.
+eee|hard|Where Ohm's law is not a suggestion.
+eee|hard|The lights stay on here because of the people inside.
+eee|hard|Electrons are the only guests that never get tired here.
+eee|hard|A building where wires are a form of art.
+eee|hard|Here the smallest current can teach the biggest lesson.
+
+civil_ext|easy|An extra building of the civil engineering department.
+civil_ext|easy|The extension building of the civil department.
+civil_ext|easy|Civil engineering students have classes in this building.
+civil_ext|easy|Find the added building for civil engineering.
+civil_ext|easy|A newer building for the civil department.
+civil_ext|easy|The civil engineering extension is located here.
+civil_ext|medium|Bridges, concrete and structures are studied here.
+civil_ext|medium|Students here learn how to make buildings stand.
+civil_ext|medium|Soil, steel and water are the subjects of this building.
+civil_ext|medium|Surveying tools often come out of this building.
+civil_ext|medium|A place for future road and bridge makers.
+civil_ext|medium|Beam and column calculations happen here.
+civil_ext|hard|Future builders of roads and bridges practice their calculations here.
+civil_ext|hard|Where students learn why things do not fall down.
+civil_ext|hard|The department that shapes how the country looks.
+civil_ext|hard|Concrete ideas are poured here.
+civil_ext|hard|A building built to teach the art of building.
+civil_ext|hard|Every road and bridge you cross starts with people from here.
+
+architecture|easy|The building of the architecture department.
+architecture|easy|Architecture students study in this building.
+architecture|easy|Models and drawings are made here.
+architecture|easy|Find the department of designing buildings.
+architecture|easy|Students draw and design houses in this building.
+architecture|easy|The architecture department is located here.
+architecture|medium|Sketches, models and sleepless design nights.
+architecture|medium|Drawing boards and paper models cover every desk.
+architecture|medium|Students carry long tubes with drawings in them.
+architecture|medium|Late-night lights stay on in the studios here.
+architecture|medium|Foam boards and glue are everywhere in this building.
+architecture|medium|A place where cities begin as small paper models.
+architecture|hard|Where students draw tomorrow's buildings on paper today.
+architecture|hard|A building where every desk is a tiny city.
+architecture|hard|Here imagination gets a ruler and a pencil.
+architecture|hard|Studios where space is shaped before bricks are laid.
+architecture|hard|Dreams here are scaled down to one to one hundred.
+architecture|hard|Cutting, pasting and dreaming are all homework here.

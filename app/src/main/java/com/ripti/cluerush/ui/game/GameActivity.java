@@ -186,8 +186,8 @@ public class GameActivity extends BaseActivity {
         random = new Random(seed);
         int rounds = Math.min(MAX_ROUNDS, TaskType.values().length);
         session = new GameSession(
-                RoundGenerator.generate(arena, rounds, difficulty, random), difficulty);
-
+                RoundGenerator.generate(this, arena, rounds, difficulty, random, !isMatch()),
+                difficulty);
         configureWindow();
         MapConfig.init(this);
 

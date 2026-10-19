@@ -58,6 +58,7 @@ public final class MatchCoordinator {
     private static final long RESULT_GRACE_MS = 15_000L;
     private static final long POSITION_INTERVAL_MS = 1500L;
     private static final double POSITION_MIN_METERS = 3.0;
+    private static final boolean EARLY_CLINCH = false;
 
     private final MatchLiveRepository repository;
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -303,11 +304,13 @@ public final class MatchCoordinator {
                 conclude(MatchRules.decide(currentMe(), opp));
                 return;
             }
-            int oppPotential = MatchRules.potential(difficulty, totalRounds,
-                    opp.getRounds(), opp.getScore());
-            if (oppPotential < myFinal) {
-                conclude(MatchResult.Outcome.WIN, MatchResult.Decider.CLINCH, opp);
-                return;
+            if (EARLY_CLINCH) {
+                int oppPotential = MatchRules.potential(difficulty, totalRounds,
+                        opp.getRounds(), opp.getScore());
+                if (oppPotential < myFinal) {
+                    conclude(MatchResult.Outcome.WIN, MatchResult.Decider.CLINCH, opp);
+                    return;
+                }
             }
             if (now >= matchEndLocal + RESULT_GRACE_MS) {
                 PlayerState synthetic = new PlayerState(opp.getUid(), opp.getName(),
@@ -318,10 +321,11 @@ public final class MatchCoordinator {
                 conclude(MatchRules.decide(currentMe(), synthetic));
                 return;
             }
+
         } else if (!forced) {
             if (oppFinished && opp.getFinishedAt() > 0L) {
                 int myPotential = MatchRules.potential(difficulty, totalRounds, myRounds, myScore);
-                if (myPotential < opp.getFinalScore()) {
+                if (EARLY_CLINCH && myPotential < opp.getFinalScore()) {
                     force(Reason.CLINCH);
                 } else if (now >= countdownDeadline(ServerClock.toLocal(opp.getFinishedAt()))) {
                     force(Reason.COUNTDOWN);
