@@ -1,0 +1,246 @@
+library|easy|The building full of books, named after the rebel poet.
+library|easy|Students borrow books and read in silence here.
+library|easy|Shelves, reading tables and a very quiet atmosphere.
+library|easy|Find the library named after Kazi Nazrul Islam.
+library|easy|Exam preparation happens here with piles of books.
+library|easy|A building where whispering is the rule.
+library|medium|A library carrying the name of the national poet.
+library|medium|Exam week makes every seat here precious.
+library|medium|The only place on campus where a cough feels rude.
+library|medium|Thousands of stories live here, and none of them speak.
+library|medium|Students hunt for a window seat here before the morning rush.
+library|medium|A reading room named after a poet who wrote of rebellion.
+library|hard|Where the rebel poet's name guards a thousand silent pages.
+library|hard|A rebel's name hangs over a room that demands silence.
+library|hard|Here you can travel across centuries without leaving your chair.
+library|hard|Thousands of authors are inside, yet nobody is talking.
+library|hard|Return what you borrow, or this place will remember your name.
+library|hard|The poet shouted in his verses, but his name keeps this place hushed.
+
+academic|easy|Where lectures and classes are held.
+academic|easy|Classrooms and teachers' rooms are in these buildings.
+academic|easy|Students attend their daily classes here.
+academic|easy|Find the buildings where lessons are taught.
+academic|easy|Benches, boards and lecture rooms are found here.
+academic|easy|The main place for studying during the day.
+academic|medium|Rows of benches, a board and a long morning lecture.
+academic|medium|Class schedules decide how busy these corridors are.
+academic|medium|Roll calls and class tests happen in these buildings.
+academic|medium|Students rush here when the bell rings.
+academic|medium|A place where every discipline has a room.
+academic|medium|Chalk, marker and projector are all used here.
+academic|hard|Where attendance is taken and naps are attempted.
+academic|hard|The place where schedules rule your life.
+academic|hard|Where the loudest sound is a professor's voice.
+academic|hard|Corridors here are quiet during class and chaotic after.
+academic|hard|Everyone arrives here with a bag and leaves with homework.
+academic|hard|A building of many rooms and one purpose.
+
+admin|easy|Where the university's official papers are handled.
+admin|easy|Offices of the university's leaders are in these buildings.
+admin|easy|You come here for certificates and official notices.
+admin|easy|The main office building of the university.
+admin|easy|Important forms and letters are processed here.
+admin|easy|The registrar and other officers work in these buildings.
+admin|medium|Every certificate and notice begins its journey here.
+admin|medium|Files, stamps and long queues are common here.
+admin|medium|Students come here with applications and leave with patience.
+admin|medium|The place where decisions about the whole campus are made.
+admin|medium|A signature here can change a student's semester.
+admin|medium|The busiest office hours on campus happen here.
+admin|hard|The desk where a student's fate is stamped and signed.
+admin|hard|Where paper moves slower than people.
+admin|hard|A building that runs on signatures and tea.
+admin|hard|A single stamp here is worth many words.
+admin|hard|Rules are written here and sometimes bent here.
+admin|hard|Forms enter in the morning and leave in the afternoon, approved or not.
+
+aparajita_hall|easy|The residential hall for girls.
+aparajita_hall|easy|Female students live in this hall.
+aparajita_hall|easy|Find the hall whose name means unconquered.
+aparajita_hall|easy|The girls' hostel of the university.
+aparajita_hall|easy|A hall for female students on campus.
+aparajita_hall|easy|A residential building with a very strong name.
+aparajita_hall|medium|Its name means the one who is never defeated.
+aparajita_hall|medium|A home for female students, named after courage.
+aparajita_hall|medium|The name of this hall is a word for the unbeaten.
+aparajita_hall|medium|Evening lights and a quiet gate mark this hall.
+aparajita_hall|medium|A hall with a name that sounds like a promise.
+aparajita_hall|medium|Female students call this building their home.
+aparajita_hall|hard|A hall named for those who never lose.
+aparajita_hall|hard|Its name is a battle cry that nobody shouts.
+aparajita_hall|hard|Defeat is not a word in the name of this home.
+aparajita_hall|hard|A name that tells you to keep standing.
+aparajita_hall|hard|Behind this gate, every room carries an unbeaten name.
+aparajita_hall|hard|Even the building refuses to be conquered, at least by name.
+
+bijoy24_hall|easy|A residential hall whose name has a year in it.
+bijoy24_hall|easy|Students live in this hall.
+bijoy24_hall|easy|Find the hall with Bijoy and a number in its name.
+bijoy24_hall|easy|A hostel named after a victory.
+bijoy24_hall|easy|A residential building for students on campus.
+bijoy24_hall|easy|The hall that remembers the year 2024.
+bijoy24_hall|medium|The year in its name remembers a great uprising.
+bijoy24_hall|medium|A hall named after a victory and a year.
+bijoy24_hall|medium|Its name is a reminder of a recent movement.
+bijoy24_hall|medium|Students here sleep under a name of triumph.
+bijoy24_hall|medium|A newer hall with a very meaningful name.
+bijoy24_hall|medium|The name on the gate says victory and a date.
+bijoy24_hall|hard|A hall whose name is a victory and a year.
+bijoy24_hall|hard|A date turned into a building.
+bijoy24_hall|hard|History was written on the streets, and then on this signboard.
+bijoy24_hall|hard|Four digits and a word of success make up its name.
+bijoy24_hall|hard|A home that carries a memory of a very loud year.
+bijoy24_hall|hard|Here a calendar year became an address.
+
+ahsanullah_hall|easy|A residential hall for students.
+ahsanullah_hall|easy|Students live in this hall.
+ahsanullah_hall|easy|Find the hall with a long name starting with Khan Bahadur.
+ahsanullah_hall|easy|A hostel named after a famous educator.
+ahsanullah_hall|easy|A residential building on campus.
+ahsanullah_hall|easy|The hall named after Ahsanullah.
+ahsanullah_hall|medium|A hall named after a famous educator with a long title.
+ahsanullah_hall|medium|Its name begins with a title of honour.
+ahsanullah_hall|medium|Students here walk to class with a long name behind them.
+ahsanullah_hall|medium|Rooms, corridors and midnight snacks.
+ahsanullah_hall|medium|A hall that has a long name and many residents.
+ahsanullah_hall|medium|Dining and common room noise fill this hall in the evening.
+ahsanullah_hall|hard|A hall carrying a title of honour from colonial times.
+ahsanullah_hall|hard|Its signboard needs the longest line on campus.
+ahsanullah_hall|hard|A name that was a title before it was a building.
+ahsanullah_hall|hard|A home away from home with a curfew and a roommate.
+ahsanullah_hall|hard|Residents here spell their address slowly.
+ahsanullah_hall|hard|A title and a surname hold up this building.
+
+mosque|easy|A place of prayer on campus.
+mosque|easy|Students come here to pray together.
+mosque|easy|The call to prayer comes from this building.
+mosque|easy|Shoes are left outside before entering.
+mosque|easy|A peaceful house of worship on campus.
+mosque|easy|Friday prayers gather a big crowd here.
+mosque|medium|A calm place where the day is measured in prayers.
+mosque|medium|On Fridays this place fills up and spills outside.
+mosque|medium|Lines of students stand shoulder to shoulder here.
+mosque|medium|Its dome and minaret are easy to spot from afar.
+mosque|medium|The quietest corner of campus when the call ends.
+mosque|medium|Dawn, noon, afternoon, sunset and night all start here.
+mosque|hard|Five times a day, a call from here is heard across campus.
+mosque|hard|You take off your shoes to enter, and take off your worries too.
+mosque|hard|Where a single voice calls everyone, and everyone answers.
+mosque|hard|A clock that never uses numbers, only calls.
+mosque|hard|Where rich and poor stand in the same line.
+mosque|hard|Silence here is not empty, it is full of prayers.
+
+temple|easy|A place of worship for Hindu students.
+temple|easy|Students come here to pray and offer flowers.
+temple|easy|Find the temple on campus.
+temple|easy|A peaceful place of worship with a bell.
+temple|easy|Festivals like Saraswati Puja are celebrated here.
+temple|easy|The central temple of the university.
+temple|medium|Bells and incense on a quiet corner of campus.
+temple|medium|Flowers and lamps are brought here on festival days.
+temple|medium|A colourful crowd gathers here during a spring festival.
+temple|medium|The smell of incense reaches the path outside.
+temple|medium|Students offer prayers here before big exams.
+temple|medium|A small corner of devotion in the middle of the campus.
+temple|hard|Where the evening arati lights a small corner of the campus.
+temple|hard|A ringing bell is its alarm clock.
+temple|hard|Garlands, conch shells and a quiet courtyard belong here.
+temple|hard|Here students ask for wisdom before an exam.
+temple|hard|A place where marigolds are as common as books.
+temple|hard|The sound of a conch shell travels from here at dusk.
+
+mukto_moncho|easy|An open stage for events and performances.
+mukto_moncho|easy|A stage without a roof where programs are held.
+mukto_moncho|easy|Cultural shows are performed on this stage.
+mukto_moncho|easy|Find the open-air platform for events.
+mukto_moncho|easy|Singers and dancers perform here under the sky.
+mukto_moncho|easy|A big stage in the open where students gather.
+mukto_moncho|medium|Concerts and cultural shows happen under the open sky here.
+mukto_moncho|medium|Spotlights and a crowd on the grass in the evening.
+mukto_moncho|medium|Festival nights are celebrated on this stage.
+mukto_moncho|medium|Rain can cancel a show on this stage.
+mukto_moncho|medium|Microphone checks echo here before every big event.
+mukto_moncho|medium|Students gather here for songs, poems and speeches.
+mukto_moncho|hard|No roof, no walls, only a stage and an audience.
+mukto_moncho|hard|Where the sky is the ceiling and the stars are the lights.
+mukto_moncho|hard|A stage that has no curtain to close.
+mukto_moncho|hard|The name of this place means freedom of expression.
+mukto_moncho|hard|Voices here are free, and so is the breeze.
+mukto_moncho|hard|Applause is the only wall here.
+
+cafeteria|easy|Where students go to eat and drink tea.
+cafeteria|easy|Snacks, tea and lunch are sold here.
+cafeteria|easy|Students meet their friends here to eat.
+cafeteria|easy|Find the place that smells of tea and fried snacks.
+cafeteria|easy|A place to eat on campus between classes.
+cafeteria|easy|Tables, chairs and a menu board are found here.
+cafeteria|medium|Tea, snacks and the loudest conversations on campus.
+cafeteria|medium|Between classes, this place is full to the brim.
+cafeteria|medium|A shared table and a shared plate of singara.
+cafeteria|medium|Group projects are planned here over a cup of tea.
+cafeteria|medium|Lunch hour turns this place into a market.
+cafeteria|medium|Students pay here with pocket money and borrowed coins.
+cafeteria|hard|Empty stomachs, full tables and the best gossip in town.
+cafeteria|hard|Where a cup of tea lasts longer than a lecture.
+cafeteria|hard|The real classroom of campus life, with no syllabus.
+cafeteria|hard|Friendships begin here with a simple question: who is paying?
+cafeteria|hard|Where the menu is short and the conversation is long.
+cafeteria|hard|A building that is judged by its tea.
+
+medical|easy|Where sick students get checked by a doctor.
+medical|easy|Go here when you have a fever.
+medical|easy|Doctors and nurses work in this building.
+medical|easy|You can get medicine here if you feel unwell.
+medical|easy|A place with a stethoscope and a prescription pad.
+medical|easy|Students visit this center for a health checkup.
+medical|medium|The first stop for fevers, cuts and headaches.
+medical|medium|A waiting bench, a doctor and a small pharmacy.
+medical|medium|Students with sore throats queue up here before exams.
+medical|medium|A white coat is always on duty in this building.
+medical|medium|When a football match injury happens, people run here.
+medical|medium|Campus first aid begins at this door.
+medical|hard|Where a white coat and a prescription pad wait for you.
+medical|hard|The place where pain gets a name and a tablet.
+medical|hard|Healing starts here, but only if you remember to come.
+medical|hard|A building that students visit unwillingly and leave grateful.
+medical|hard|Thermometers outnumber textbooks inside.
+medical|hard|Where a cough turns into a diagnosis.
+
+playground|easy|A big open field for sports.
+playground|easy|Students play football and cricket here.
+playground|easy|Green grass and goalposts are found here.
+playground|easy|The widest open ground on campus.
+playground|easy|Find the field where matches are played.
+playground|easy|Sports tournaments are held on this ground.
+playground|medium|Wide open grass where matches begin at sunset.
+playground|medium|Evening runners and football teams share this space.
+playground|medium|Inter-department matches are held here.
+playground|medium|The loudest cheering on campus happens here.
+playground|medium|Muddy shoes after the rain tell you someone was here.
+playground|medium|A morning jog starts at this wide space.
+playground|hard|Eleven players, one ball and a crowd that never sits still.
+playground|hard|A battlefield where the weapon is a ball.
+playground|hard|Where a goal can make a stranger hug you.
+playground|hard|Grass that has felt a thousand running feet.
+playground|hard|No walls, no roof, only rules and a whistle.
+playground|hard|Sweat is the entry ticket here.
+
+jibanananda_pond|easy|A pond in front of an academic building named after a poet.
+jibanananda_pond|easy|Find the pond facing the Jibanananda Das building.
+jibanananda_pond|easy|A calm pond right in front of an academic building.
+jibanananda_pond|easy|Students sit beside this pond between classes.
+jibanananda_pond|easy|A small water body near the poet's building.
+jibanananda_pond|easy|The pond that faces a building named after a famous poet.
+jibanananda_pond|medium|A quiet pond facing the building of the poet of nature.
+jibanananda_pond|medium|Lecture notes and calm water share this spot.
+jibanananda_pond|medium|Students rest here after a long day of classes.
+jibanananda_pond|medium|The building opposite carries the name of a beloved Bengali poet.
+jibanananda_pond|medium|Reflections of a building ripple on this water.
+jibanananda_pond|medium|A shady place for study breaks and quiet talks.
+jibanananda_pond|hard|Water that mirrors the building of the poet who loved Bengal's rivers.
+jibanananda_pond|hard|A poet who wrote about Bengal's beauty has his name across this water.
+jibanananda_pond|hard|The reflection is a building, the water is a verse.
+jibanananda_pond|hard|A poem would feel at home beside this pond.
+jibanananda_pond|hard|The poet of the golden fields has his name on the opposite bank.
+jibanananda_pond|hard|Water here is calm enough to read a poem in.

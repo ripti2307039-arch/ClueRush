@@ -1,0 +1,208 @@
+ece|easy|The building of electrical and computer engineering.
+ece|easy|Students of ECE have their classes and labs here.
+ece|easy|Find the building for electronics and computer engineering.
+ece|easy|Circuits and computers are studied in this building.
+ece|easy|The ECE department works in this building.
+ece|easy|Labs full of computers and electronic parts are here.
+ece|medium|Circuits, code and a long list of labs.
+ece|medium|Soldering irons and keyboards live side by side here.
+ece|medium|Students here learn both hardware and software.
+ece|medium|Microprocessors and programming are studied in this building.
+ece|medium|Oscilloscopes and laptops share every table.
+ece|medium|A building where a lab report is never short.
+ece|hard|Where electrons and algorithms share the same corridor.
+ece|hard|Here a wire and a line of code mean the same thing: a connection.
+ece|hard|Both the hardware and the software come from the same department.
+ece|hard|A building that runs on voltage and logic.
+ece|hard|Ones and zeros are born here from current and code.
+ece|hard|The smartest machines of tomorrow begin as lab sheets here.
+
+admin|easy|Where the university's official papers are handled.
+admin|easy|Offices of the university's leaders are in this building.
+admin|easy|You come here for certificates and official notices.
+admin|easy|The main office building of the university.
+admin|easy|Important forms and letters are processed here.
+admin|easy|The registrar and other officers work in this building.
+admin|medium|Every certificate and notice begins its journey here.
+admin|medium|Files, stamps and long queues are common here.
+admin|medium|Students come here with applications and leave with patience.
+admin|medium|The place where decisions about the whole campus are made.
+admin|medium|A signature here can change a student's semester.
+admin|medium|The busiest office hours on campus happen here.
+admin|hard|The desk where a student's fate is stamped and signed.
+admin|hard|Where paper moves slower than people.
+admin|hard|A building that runs on signatures and tea.
+admin|hard|A single stamp here is worth many words.
+admin|hard|Rules are written here and sometimes bent here.
+admin|hard|Forms enter in the morning and leave in the afternoon, approved or not.
+
+health|easy|Where sick students get checked by a doctor.
+health|easy|Go here when you have a fever.
+health|easy|Doctors and nurses work in this complex.
+health|easy|You can get medicine here if you feel unwell.
+health|easy|A place with a stethoscope and a prescription pad.
+health|easy|Students visit this complex for a health checkup.
+health|medium|The first stop for fevers, cuts and headaches.
+health|medium|A waiting bench, a doctor and a small pharmacy.
+health|medium|Students with sore throats queue up here before exams.
+health|medium|A white coat is always on duty in this building.
+health|medium|When an injury happens on campus, people run here.
+health|medium|Campus first aid begins at this door.
+health|hard|Where a white coat and a prescription pad wait for you.
+health|hard|The place where pain gets a name and a tablet.
+health|hard|Healing starts here, but only if you remember to come.
+health|hard|A building that students visit unwillingly and leave grateful.
+health|hard|Thermometers outnumber textbooks inside.
+health|hard|Where a cough turns into a diagnosis.
+
+gym|easy|A place for exercise and indoor sports.
+gym|easy|Students come here to work out.
+gym|easy|Find the building with weights and mats.
+gym|easy|A hall where sports and fitness are practised.
+gym|easy|Indoor games and exercise happen in this building.
+gym|easy|The place to build muscles on campus.
+gym|medium|Weights, mats and sweaty evenings.
+gym|medium|After class, students come here to burn energy.
+gym|medium|Badminton, table tennis or push-ups, it all happens here.
+gym|medium|Sports shoes are the dress code in this building.
+gym|medium|A quiet morning here is followed by a very loud evening.
+gym|medium|Dumbbells are more popular than textbooks here.
+gym|hard|Where muscles are built after a long day of brain work.
+gym|hard|The only place on campus where heavy things are lifted on purpose.
+gym|hard|Here the reward for effort is pain tomorrow.
+gym|hard|A building where sweat is a sign of respect.
+gym|hard|Brains rest here while the body takes the exam.
+gym|hard|Where students trade a lecture for a lift.
+
+shaheed_minar|easy|A monument that remembers the language movement.
+shaheed_minar|easy|The memorial for the language martyrs.
+shaheed_minar|easy|Flowers are placed here on 21st February.
+shaheed_minar|easy|Find the monument of the language movement.
+shaheed_minar|easy|A memorial with pillars on campus.
+shaheed_minar|easy|The place where students honour the martyrs.
+shaheed_minar|medium|Flowers are laid here every February.
+shaheed_minar|medium|Students walk here barefoot in the early morning of a special day.
+shaheed_minar|medium|Black badges and red flowers gather here.
+shaheed_minar|medium|A monument that is silent but says a lot.
+shaheed_minar|medium|Songs of the language movement are sung at this spot.
+shaheed_minar|medium|A memorial for those who gave their lives for Bangla.
+shaheed_minar|hard|Bare feet and a sunrise procession on the twenty-first.
+shaheed_minar|hard|Here a mother tongue is remembered with flowers.
+shaheed_minar|hard|A place where the heart walks slower than the feet.
+shaheed_minar|hard|Stone columns that stand for a language.
+shaheed_minar|hard|The date on the calendar makes this place the busiest.
+shaheed_minar|hard|Every February this monument is covered with colour.
+
+mosque|easy|A place of prayer on campus.
+mosque|easy|Students come here to pray together.
+mosque|easy|The call to prayer comes from this building.
+mosque|easy|Shoes are left outside before entering.
+mosque|easy|A peaceful house of worship on campus.
+mosque|easy|Friday prayers gather a big crowd here.
+mosque|medium|A calm place where the day is measured in prayers.
+mosque|medium|On Fridays this place fills up and spills outside.
+mosque|medium|Lines of students stand shoulder to shoulder here.
+mosque|medium|Its dome and minaret are easy to spot from afar.
+mosque|medium|The quietest corner of campus when the call ends.
+mosque|medium|Dawn, noon, afternoon, sunset and night all start here.
+mosque|hard|Five times a day, a call from here is heard across campus.
+mosque|hard|You take off your shoes to enter, and take off your worries too.
+mosque|hard|Where a single voice calls everyone, and everyone answers.
+mosque|hard|A clock that never uses numbers, only calls.
+mosque|hard|Where rich and poor stand in the same line.
+mosque|hard|Silence here is not empty, it is full of prayers.
+
+cafeteria|easy|Where students go to eat and drink tea.
+cafeteria|easy|Snacks, tea and lunch are sold here.
+cafeteria|easy|Students meet their friends here to eat.
+cafeteria|easy|Find the place that smells of tea and fried snacks.
+cafeteria|easy|A place to eat on campus between classes.
+cafeteria|easy|The cafeteria mostly used by students.
+cafeteria|medium|Tea, snacks and the loudest conversations on campus.
+cafeteria|medium|Between classes, this place is full to the brim.
+cafeteria|medium|A shared table and a shared plate of snacks.
+cafeteria|medium|Group projects are planned here over a cup of tea.
+cafeteria|medium|Lunch hour turns this place into a market.
+cafeteria|medium|Students pay here with pocket money and borrowed coins.
+cafeteria|hard|Empty stomachs, full tables and the best gossip in town.
+cafeteria|hard|Where a cup of tea lasts longer than a lecture.
+cafeteria|hard|The real classroom of campus life, with no syllabus.
+cafeteria|hard|Friendships begin here with a simple question: who is paying?
+cafeteria|hard|Where the menu is short and the conversation is long.
+cafeteria|hard|A building that is judged by its tea.
+
+staff_canteen|easy|A canteen mostly used by university staff.
+staff_canteen|easy|Teachers and employees eat lunch here.
+staff_canteen|easy|Find the canteen meant for the staff.
+staff_canteen|easy|A smaller eating place than the main cafeteria.
+staff_canteen|easy|Tea and meals for the university's employees.
+staff_canteen|easy|The staff have their meals at this canteen.
+staff_canteen|medium|Lunch for teachers and employees, away from the student crowd.
+staff_canteen|medium|A calmer table than the cafeteria down the road.
+staff_canteen|medium|Professors discuss research here over tea.
+staff_canteen|medium|Fewer students and more ID cards on lanyards.
+staff_canteen|medium|Office hours pause here for a lunch break.
+staff_canteen|medium|A canteen where the conversation is about files and papers.
+staff_canteen|hard|A quieter table where the university's grown-ups eat.
+staff_canteen|hard|Where teachers become ordinary people with a cup of tea.
+staff_canteen|hard|The staff's break from the world of grades.
+staff_canteen|hard|A canteen with no queue for exam results.
+staff_canteen|hard|Here the people who check your answers check the menu.
+staff_canteen|hard|A lunch break where nobody mentions homework.
+
+eme|easy|The building of electrical and mechanical engineering.
+eme|easy|Students of EME have classes and labs here.
+eme|easy|Find the building for electrical and mechanical studies.
+eme|easy|Machines and electrical equipment are studied here.
+eme|easy|The EME department works in this building.
+eme|easy|Labs with motors and engines are found here.
+eme|medium|Machines, motors and heavy equipment.
+eme|medium|A building where something is always spinning.
+eme|medium|Students here study both power and motion.
+eme|medium|Gears and generators are common sights inside.
+eme|medium|Thermodynamics and electric machines are taught here.
+eme|medium|Heavy lab equipment is pushed through these corridors.
+eme|hard|Where power and motion are both studied.
+eme|hard|A building where both a spark and a gear matter.
+eme|hard|Rotating parts and flowing current work as a team here.
+eme|hard|Here energy changes costume from heat to motion to light.
+eme|hard|The machines are quiet in the books and loud in the labs.
+eme|hard|Where a motor is both a lesson and a noise.
+
+civil|easy|The building of the civil engineering department.
+civil|easy|Civil engineering students have classes here.
+civil|easy|Find the building for roads, bridges and buildings.
+civil|easy|The civil engineering department works in this building.
+civil|easy|Surveying and concrete labs are located here.
+civil|easy|A building for those who want to construct things.
+civil|medium|Bridges, concrete and structures are studied here.
+civil|medium|Students here learn how to make buildings stand.
+civil|medium|Soil, steel and water are the subjects of this building.
+civil|medium|Surveying tools often come out of this building.
+civil|medium|A place for future road and bridge makers.
+civil|medium|Beam and column calculations happen here.
+civil|hard|Future builders of roads and bridges practice their calculations here.
+civil|hard|Where students learn why things do not fall down.
+civil|hard|The department that shapes how the country looks.
+civil|hard|Concrete ideas are poured here.
+civil|hard|A building built to teach the art of building.
+civil|hard|Every road and bridge you cross starts with people from here.
+
+architecture|easy|The building of the architecture department.
+architecture|easy|Architecture students study in this building.
+architecture|easy|Models and drawings are made here.
+architecture|easy|Find the department of designing buildings.
+architecture|easy|Students draw and design houses in this building.
+architecture|easy|The architecture department is located here.
+architecture|medium|Sketches, models and sleepless design nights.
+architecture|medium|Drawing boards and paper models cover every desk.
+architecture|medium|Students carry long tubes with drawings in them.
+architecture|medium|Late-night lights stay on in the studios here.
+architecture|medium|Foam boards and glue are everywhere in this building.
+architecture|medium|A place where cities begin as small paper models.
+architecture|hard|Where students draw tomorrow's buildings on paper today.
+architecture|hard|A building where every desk is a tiny city.
+architecture|hard|Here imagination gets a ruler and a pencil.
+architecture|hard|Studios where space is shaped before bricks are laid.
+architecture|hard|Dreams here are scaled down to one to one hundred.
+architecture|hard|Cutting, pasting and dreaming are all homework here.
