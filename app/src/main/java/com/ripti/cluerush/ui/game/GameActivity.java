@@ -708,7 +708,8 @@ public class GameActivity extends BaseActivity {
 
         if (difficulty.showsHeat()) {
             double distance = LocationScanner.distanceTo(round.getLocation(), lat, lng);
-            HeatLevel heat = HeatLevel.forDistance(distance);
+            HeatLevel heat = HeatLevel.forDistance(distance,
+                    round.getLocation().getRadiusMeters());
             if (heat != currentHeat) {
                 currentHeat = heat;
                 applyHeat(heat);
