@@ -64,12 +64,19 @@ public class ProfileActivity extends BaseActivity {
     }
 
     private void bindStats(UserProfile profile) {
-        binding.levelText.setText(getString(R.string.level_label, profile.getLevel()));
+        int[] titles = {R.string.title_rookie, R.string.title_explorer,
+                R.string.title_hunter, R.string.title_master};
+        binding.levelText.setText(getString(R.string.level_with_title, profile.getLevel(),
+                getString(titles[profile.getTitleIndex()])));
         binding.xpText.setText(getString(R.string.xp_progress,
-                profile.getXpInLevel(), UserProfile.XP_PER_LEVEL));
+                profile.getXpInLevel(), profile.getXpSpan()));
+        binding.levelProgress.setMax(profile.getXpSpan());
         binding.levelProgress.setProgressCompat(profile.getXpInLevel(), true);
         binding.winsValue.setText(String.valueOf(profile.getTotalWins()));
         binding.matchesValue.setText(String.valueOf(profile.getMatchesPlayed()));
+        binding.ratingValue.setText(String.valueOf(profile.getRating()));
+        binding.winRateValue.setText(getString(R.string.win_rate_value,
+                profile.getWinRatePercent()));
     }
 
     private void confirmLogout() {

@@ -265,6 +265,30 @@
     <string name="forfeit_message">You will forfeit and your opponent wins.</string>
     <string name="leave_waiting_title">Leave now?</string>
     <string name="leave_waiting_message">Your score is saved, but you will not see the result of this match.</string>
+    <string name="leaderboard_title">Leaderboard</string>
+    <string name="lb_tab_rating">Rating</string>
+    <string name="lb_tab_level">Level</string>
+    <string name="lb_tab_score">Best score</string>
+    <string name="lb_level_short">Lv %1$d</string>
+    <string name="lb_xp_value">%1$d XP</string>
+    <string name="lb_you_suffix">%1$s (You)</string>
+    <string name="lb_empty">No players here yet. Be the first.</string>
+    <string name="lb_error">Couldn\'t load the leaderboard. Check your connection and try again.</string>
+    <string name="lb_guest_note">Sign up to appear on the leaderboard.</string>
+    <string name="lb_unranked_rating">Win a match to get your first rating.</string>
+    <string name="lb_unranked_level">Finish a game to earn XP and join the board.</string>
+    <string name="lb_unranked_score">Finish a game on this arena to set a score.</string>
+    <string name="lb_my_position">Your position: #%1$d · %2$s</string>
+    <string name="stat_rating">Rating</string>
+    <string name="stat_win_rate">Win rate</string>
+    <string name="win_rate_value">%1$d%%</string>
+    <string name="level_with_title">Level %1$d · %2$s</string>
+    <string name="title_rookie">Rookie</string>
+    <string name="title_explorer">Explorer</string>
+    <string name="title_hunter">Hunter</string>
+    <string name="title_master">Master</string>
+    <string name="stats_gain_solo">+%1$d XP</string>
+    <string name="stats_gain_match">+%1$d XP · Rating %2$+d</string>
 
 
 </resources>

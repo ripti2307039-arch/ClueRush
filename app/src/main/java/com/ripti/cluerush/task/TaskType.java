@@ -35,7 +35,7 @@ public enum TaskType {
     public int timeLimitSeconds(Difficulty difficulty) {
         switch (this) {
             case SUDOKU:
-                return byLevel(difficulty, 120, 180, 240);
+                return byLevel(difficulty, 90, 130, 170);
             case WORD_SCRAMBLE:
                 return byLevel(difficulty, 75, 100, 130);
             case MEMORY:
@@ -51,7 +51,7 @@ public enum TaskType {
             case PATTERN_LOCK:
                 return byLevel(difficulty, 60, 75, 90);
             case CODE_BREAKER:
-                return byLevel(difficulty, 90, 120, 150);
+                return byLevel(difficulty, 120, 150, 180);
             case LIGHTS_OUT:
                 return byLevel(difficulty, 60, 90, 150);
             default:

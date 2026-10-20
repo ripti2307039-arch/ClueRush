@@ -37,6 +37,9 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.ripti.cluerush.data.StatsRepository;
+import com.ripti.cluerush.game.StatsRules;
+import com.ripti.cluerush.util.UserDisplay;
 import com.ripti.cluerush.R;
 import com.ripti.cluerush.data.ArenaCatalog;
 import com.ripti.cluerush.data.MatchLiveRepository;
@@ -595,6 +598,10 @@ public class GameActivity extends BaseActivity {
                 result.getOpponentName(), opponentScore);
         String body = deciderLine(result) + "\n" + rankLine(session.getRank()) + "\n"
                 + buildFinalSummary(null, result);
+        String gain = saveMatchStats(result);
+        if (!gain.isEmpty()) {
+            body = body + "\n" + gain;
+        }
         showResult(getString(titleRes), subtitle, body, R.string.action_back_home);
     }
 
@@ -1172,8 +1179,36 @@ public class GameActivity extends BaseActivity {
                 ? getString(R.string.score_new_best)
                 : getString(R.string.score_best, previousBest);
 
+        String gain = saveSoloStats(score);
+        String summary = buildFinalSummary(bestLine, null);
         showResult(getString(R.string.game_finished_title), rankLine(session.getRank()),
-                buildFinalSummary(bestLine, null), R.string.action_back_home);
+                gain.isEmpty() ? summary : summary + "\n" + gain, R.string.action_back_home);
+    }
+
+    private boolean statsSaved;
+
+    private String saveSoloStats(int score) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (statsSaved || user == null || user.isAnonymous()) {
+            return "";
+        }
+        statsSaved = true;
+        new StatsRepository().recordSolo(user.getUid(), UserDisplay.displayName(this, user),
+                arena.getId(), difficulty.getKey(), score);
+        return getString(R.string.stats_gain_solo, StatsRules.soloXp(score));
+    }
+
+    private String saveMatchStats(MatchResult result) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (statsSaved || user == null || user.isAnonymous()) {
+            return "";
+        }
+        statsSaved = true;
+        new StatsRepository().recordMatch(user.getUid(), UserDisplay.displayName(this, user),
+                arena.getId(), difficulty.getKey(), result.getMyScore(), result.getOutcome());
+        return getString(R.string.stats_gain_match,
+                StatsRules.matchXp(result.getMyScore(), result.getOutcome()),
+                StatsRules.ratingDelta(result.getOutcome()));
     }
 
     private void showResult(String title, String subtitle, String body,

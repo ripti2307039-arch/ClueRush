@@ -27,6 +27,9 @@ public class UserRepository {
             profile.put("level", 1);
             profile.put("totalWins", 0);
             profile.put("matchesPlayed", 0);
+            profile.put("draws", 0);
+            profile.put("rating", 0);
+            profile.put("soloGames", 0);
 
             FirebaseDatabase.getInstance()
                     .getReference("users")
@@ -62,9 +65,11 @@ public class UserRepository {
     private UserProfile parse(DataSnapshot snapshot) {
         return new UserProfile(
                 readLong(snapshot, "xp", 0),
-                readLong(snapshot, "level", 1),
                 readLong(snapshot, "totalWins", 0),
-                readLong(snapshot, "matchesPlayed", 0));
+                readLong(snapshot, "matchesPlayed", 0),
+                readLong(snapshot, "draws", 0),
+                readLong(snapshot, "rating", 0),
+                readLong(snapshot, "soloGames", 0));
     }
 
     private long readLong(DataSnapshot snapshot, String key, long fallback) {

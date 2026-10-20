@@ -1,5 +1,5 @@
 package com.ripti.cluerush;
-
+import com.ripti.cluerush.ui.leaderboard.LeaderboardActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -86,7 +86,8 @@ public class MainActivity extends BaseActivity {
                         R.string.action_create, this::createMatch);
             }
         });
-        binding.joinButton.setOnClickListener(v -> showJoinDialog());
+        binding.leaderboardButton.setOnClickListener(v ->
+                startActivity(new Intent(this, LeaderboardActivity.class)));
         binding.practiceButton.setOnClickListener(v -> {
             if (selectedArena != null) {
                 showDifficultyDialog(

@@ -1,27 +1,40 @@
 package com.ripti.cluerush.model;
 
+import com.ripti.cluerush.game.StatsRules;
+
 public class UserProfile {
 
-    public static final int XP_PER_LEVEL = 100;
-
     private final long xp;
-    private final long level;
     private final long totalWins;
     private final long matchesPlayed;
+    private final long draws;
+    private final long rating;
+    private final long soloGames;
 
-    public UserProfile(long xp, long level, long totalWins, long matchesPlayed) {
-        this.xp = xp;
-        this.level = Math.max(1, level);
+    public UserProfile(long xp, long totalWins, long matchesPlayed, long draws, long rating,
+                       long soloGames) {
+        this.xp = Math.max(0L, xp);
         this.totalWins = totalWins;
         this.matchesPlayed = matchesPlayed;
+        this.draws = draws;
+        this.rating = Math.max(0L, rating);
+        this.soloGames = soloGames;
     }
 
     public static UserProfile empty() {
-        return new UserProfile(0, 1, 0, 0);
+        return new UserProfile(0, 0, 0, 0, 0, 0);
     }
 
-    public long getLevel() {
-        return level;
+    public long getXp() {
+        return xp;
+    }
+
+    public int getLevel() {
+        return StatsRules.levelForXp(xp);
+    }
+
+    public int getTitleIndex() {
+        return StatsRules.titleIndex(getLevel());
     }
 
     public long getTotalWins() {
@@ -32,7 +45,30 @@ public class UserProfile {
         return matchesPlayed;
     }
 
+    public long getDraws() {
+        return draws;
+    }
+
+    public long getRating() {
+        return rating;
+    }
+
+    public long getSoloGames() {
+        return soloGames;
+    }
+
     public int getXpInLevel() {
-        return (int) (xp % XP_PER_LEVEL);
+        return (int) StatsRules.xpInLevel(xp);
+    }
+
+    public int getXpSpan() {
+        return (int) StatsRules.xpSpan(xp);
+    }
+
+    public int getWinRatePercent() {
+        if (matchesPlayed <= 0) {
+            return 0;
+        }
+        return (int) Math.round(100.0 * totalWins / matchesPlayed);
     }
 }
