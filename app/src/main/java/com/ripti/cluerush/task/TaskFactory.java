@@ -18,7 +18,6 @@ import java.util.Set;
 public final class TaskFactory {
 
     private static final String TAG = "TaskFactory";
-    private static final String QUIZ_FILE = "tasks/quiz.txt";
     private static final String WORDS_FILE = "tasks/words.txt";
     private static final String ODD_FILE = "tasks/odd.txt";
     private static final int GENERATION_GUARD = 300;
@@ -38,8 +37,6 @@ public final class TaskFactory {
         Random random = new Random(spec.getSeed());
         Difficulty difficulty = spec.getDifficulty();
         switch (spec.getType()) {
-            case QUIZ:
-                return createQuiz(context, difficulty, random, avoidRepeats);
             case SUDOKU:
                 return createSudoku(context, difficulty, random);
             case WORD_SCRAMBLE:
@@ -54,32 +51,17 @@ public final class TaskFactory {
                 return createSequence(context, difficulty, random);
             case ODD_ONE_OUT:
                 return createOdd(context, difficulty, random, avoidRepeats);
+            case PATTERN_LOCK:
+                return createPattern(context, difficulty, random);
+            case CODE_BREAKER:
+                return createCode(context, difficulty, random);
+            case LIGHTS_OUT:
+                return createLights(context, difficulty, random);
+            case COLOR_CLASH:
+                return createClash(context, difficulty, random);
             default:
                 return null;
         }
-    }
-
-    private static BaseTaskView createQuiz(Context context, Difficulty difficulty,
-                                           Random random, boolean avoidRepeats) {
-        int count = byLevel(difficulty, 3, 4, 5);
-        int pass = byLevel(difficulty, 2, 3, 4);
-        int generatedCount = count / 2;
-
-        List<TaskAssets.LevelRow> rows = TaskAssets.pick(context, "quiz",
-                TaskAssets.load(context, QUIZ_FILE, 3), difficulty,
-                count - generatedCount, random, avoidRepeats);
-        List<QuizTaskView.Question> questions = new ArrayList<>();
-        Set<String> keys = new HashSet<>();
-        for (TaskAssets.LevelRow row : rows) {
-            addUnique(questions, keys, bankQuestion(row, random));
-        }
-        fill(questions, keys, count, () -> QuizGenerator.generate(difficulty, random));
-        if (questions.isEmpty()) {
-            Log.e(TAG, "No quiz questions available");
-            return null;
-        }
-        Collections.shuffle(questions, random);
-        return new QuizTaskView(context, questions, Math.min(pass, questions.size()));
     }
 
     private static BaseTaskView createSequence(Context context, Difficulty difficulty,
@@ -171,6 +153,38 @@ public final class TaskFactory {
         return new SlidingTaskView(context, size, moves, random);
     }
 
+    private static BaseTaskView createPattern(Context context, Difficulty difficulty,
+                                              Random random) {
+        int columns = difficulty == Difficulty.HARD ? 4 : 3;
+        int length = byLevel(difficulty, 4, 6, 8);
+        int cellDp = columns == 4 ? 46 : 56;
+        return new PatternLockTaskView(context, columns, length, cellDp, random);
+    }
+
+    private static BaseTaskView createCode(Context context, Difficulty difficulty,
+                                           Random random) {
+        int length = difficulty == Difficulty.EASY ? 3 : 4;
+        int attempts = byLevel(difficulty, 8, 8, 7);
+        return new CodeBreakerTaskView(context, length, attempts, random);
+    }
+
+    private static BaseTaskView createLights(Context context, Difficulty difficulty,
+                                             Random random) {
+        int size = byLevel(difficulty, 3, 4, 5);
+        int cellDp = byLevel(difficulty, 64, 52, 42);
+        int presses = byLevel(difficulty, 3, 5, 8);
+        return new LightsOutTaskView(context, size, cellDp, presses, random);
+    }
+
+    private static BaseTaskView createClash(Context context, Difficulty difficulty,
+                                            Random random) {
+        int rounds = byLevel(difficulty, 6, 8, 10);
+        int colors = byLevel(difficulty, 3, 4, 5);
+        int allowed = byLevel(difficulty, 2, 2, 3);
+        int wordRule = byLevel(difficulty, 0, 25, 40);
+        return new ColorClashTaskView(context, rounds, colors, allowed, wordRule, random);
+    }
+
     private static BaseTaskView createMath(Context context, Difficulty difficulty,
                                            Random random) {
         int count = byLevel(difficulty, 5, 6, 8);
@@ -184,14 +198,6 @@ public final class TaskFactory {
             }
         }
         return new MathTaskView(context, problems);
-    }
-
-    private static QuizTaskView.Question bankQuestion(TaskAssets.LevelRow row, Random random) {
-        int end = Math.min(row.columns.length, 5);
-        List<String> options = new ArrayList<>(Arrays.asList(row.columns).subList(1, end));
-        String correct = options.get(0);
-        Collections.shuffle(options, random);
-        return new QuizTaskView.Question(row.columns[0], options, options.indexOf(correct));
     }
 
     private static void addUnique(List<QuizTaskView.Question> questions, Set<String> keys,
