@@ -1,101 +1,121 @@
 # location_id|level|clue
 
 lighthouse|easy|A tall tower that guides ships at night.
-lighthouse|easy|A big light shines from the top of this building.
-lighthouse|easy|Find the tower that warns sailors about the rocks.
-lighthouse|medium|A tall tower that guides ships at night.
-lighthouse|medium|Its light turns round and round while the sea sleeps.
+lighthouse|easy|A big light shines from the top of this tower.
+lighthouse|easy|Find the tower beside the harbor entrance.
 lighthouse|medium|Sailors look for this tower when the sky turns dark.
+lighthouse|medium|Its light turns round and round while the sea sleeps.
+lighthouse|medium|It stands where the dock meets the open water.
 lighthouse|hard|A star that was built by hand and stands on land.
 lighthouse|hard|It speaks to ships only with light.
 lighthouse|hard|The keeper never sleeps so that strangers can arrive safely.
 
-harbor|easy|Where boats rest and fishermen sell their catch.
-harbor|easy|Find the place where ships tie their ropes.
-harbor|easy|Boats and nets are found along this dock.
-harbor|medium|Ropes, nets and the smell of fresh fish.
-harbor|medium|The island meets the sea traders here.
-harbor|medium|Every journey from the island begins at this place.
-harbor|hard|A parking lot where the cars are boats.
-harbor|hard|Wood and water meet to say hello and goodbye.
-harbor|hard|Anchors rest here, and so do stories of the sea.
+airship_hangar|easy|A giant shed where flying ships are kept.
+airship_hangar|easy|Find the place with huge airships parked inside.
+airship_hangar|easy|Water towers and trucks stand around this big shed.
+airship_hangar|medium|Balloons as long as buildings rest under this roof.
+airship_hangar|medium|It sits at the top of the island, inside a fenced yard.
+airship_hangar|medium|Trucks and towers guard the home of the flying ships.
+airship_hangar|hard|A garage built for things that float on air.
+airship_hangar|hard|Giants that sleep with their noses in the sky live here.
+airship_hangar|hard|Where the island keeps its clouds on a leash.
 
-cave|easy|A dark hollow in the rocks where pirates once hid.
-cave|easy|Find the hole in the rock that goes deep inside.
-cave|easy|You need a torch to explore this place.
-cave|medium|Echoes answer every shout in this place.
-cave|medium|Bats and shadows are the only residents here.
-cave|medium|A stone mouth that never closes.
-cave|hard|The island keeps its secrets in its stomach.
-cave|hard|Darkness has a home here, and treasure may too.
-cave|hard|A mouth in the rock that only whispers back.
+plaza|easy|The paved square in the middle of the island.
+plaza|easy|Find the big stone square with a marking in the center.
+plaza|easy|All the roads of the island meet around this place.
+plaza|medium|A square with a mysterious label at its heart.
+plaza|medium|Trucks and little huts surround this open stone floor.
+plaza|medium|The center of the map is also the center of the action.
+plaza|hard|Every path on the island starts and ends here.
+plaza|hard|A stone floor that has been walked on by every visitor.
+plaza|hard|The heart of the island is flat, wide and made of stone.
 
-waterfall|easy|Fresh water falls from a high cliff here.
-waterfall|easy|Find the place where a stream jumps off the rock.
-waterfall|easy|You can hear the splash before you see it.
-waterfall|medium|A white curtain of water hangs from the cliff.
-waterfall|medium|Mist and rainbows float around this place.
-waterfall|medium|The sound of rushing water leads the way here.
-waterfall|hard|A river that decided to fly for a moment.
-waterfall|hard|Gravity is the only artist of this white painting.
-waterfall|hard|A rain that falls only from one place.
+harbor_cranes|easy|Tall machines that lift heavy boxes from ships.
+harbor_cranes|easy|Find the cranes beside the water.
+harbor_cranes|easy|Big metal arms load and unload cargo here.
+harbor_cranes|medium|Metal arms swing boxes from the dock to the ship.
+harbor_cranes|medium|Warehouses and cranes stand next to the water on the south side.
+harbor_cranes|medium|The loudest machines of the harbor work here.
+harbor_cranes|hard|Giants with one arm and endless patience.
+harbor_cranes|hard|They lift ships' bellies empty, one box at a time.
+harbor_cranes|hard|Steel necks bend here all day over the dock.
 
-fort|easy|Old stone walls built to protect the island.
-fort|easy|Find the old building with thick walls.
-fort|easy|Soldiers once guarded the island from this place.
-fort|medium|Cannons and stone towers watch the horizon.
-fort|medium|The island's oldest defence stands here.
-fort|medium|Thick walls tell stories of old battles.
-fort|hard|A stone guard that never left his post.
-fort|hard|It was built to say no to enemies.
-fort|hard|The walls are silent now, but they remember every siege.
+volcano|easy|A mountain that glows with hot red rivers.
+volcano|easy|Find the mountain that smokes and burns.
+volcano|easy|Lava flows down the side of this mountain.
+volcano|medium|Smoke rises from this peak and red streams run below it.
+volcano|medium|Snow lies to the north of this fiery mountain.
+volcano|medium|Miners and machines work at the foot of this slope.
+volcano|hard|A mountain with a fever that never breaks.
+volcano|hard|Ice lives next door and the neighbour is on fire.
+volcano|hard|The earth's heat finds a window here.
 
-market|easy|A busy place where islanders trade fruit and fish.
-market|easy|Find the place where people buy and sell.
-market|easy|Baskets of fruit and fish are sold here.
-market|medium|Bargaining voices fill the air here every morning.
-market|medium|Coconuts, spices and fresh catch are on display.
-market|medium|The busiest corner of the island at noon.
-market|hard|Where coins change hands faster than rumours.
-market|hard|The loudest place on a quiet island.
-market|hard|Everything has a price here, even a smile, if you bargain well.
+twin_domes|easy|Two glass half-balls where plants grow under cover.
+twin_domes|easy|Find the pair of round glass buildings.
+twin_domes|easy|Greenery grows safely inside these see-through domes.
+twin_domes|medium|Two round roofs sit side by side near the plaza.
+twin_domes|medium|Glass roofs let the sun in but keep the weather out.
+twin_domes|medium|A pair of green bubbles sits north of the main square.
+twin_domes|hard|Two glass eggs that are hatching gardens.
+twin_domes|hard|A pair of transparent hats on a green head.
+twin_domes|hard|Plants live in a pocket of weather here.
 
-beach|easy|Soft sand and waves on the southern shore.
-beach|easy|Find the sandy place beside the sea.
-beach|easy|Shells and footprints are found here.
-beach|medium|The tide writes and erases its messages on this shore.
-beach|medium|Sunset looks best from this stretch of sand.
-beach|medium|Crabs and seagulls are the only crowd here.
-beach|hard|A page of sand where the sea writes and erases.
-beach|hard|The border where land gives up and water begins.
-beach|hard|Footprints disappear here as soon as you make them.
+refinery|easy|Pipes and chimneys puff smoke near this entrance.
+refinery|easy|Find the gate of the factory with tall chimneys.
+refinery|easy|Oil and gas are processed in the big plant here.
+refinery|medium|Pipes twist like metal snakes behind this entrance.
+refinery|medium|Smoke and steam rise from the east side of the island.
+refinery|medium|The most industrial corner of the map starts here.
+refinery|hard|A forest of pipes where trees would be.
+refinery|hard|The island breathes out smoke through these chimneys.
+refinery|hard|Raw black liquid enters here and leaves as fuel.
 
-treehouse|easy|A home built high among the branches.
-treehouse|easy|Find the house that is not on the ground.
-treehouse|easy|You climb a ladder to reach this home.
-treehouse|medium|Leaves are its walls and branches are its floor.
-treehouse|medium|Birds are the nearest neighbours of this home.
-treehouse|medium|A rope ladder is the front door here.
-treehouse|hard|A house that grew up with the tree.
-treehouse|hard|Whoever lives here sees the island from above.
-treehouse|hard|A home where the roof is a canopy and the floor is a trunk.
+airstrip|easy|A long flat strip where planes take off and land.
+airstrip|easy|Find the runway in the north-east.
+airstrip|easy|A small airport building stands beside the runway.
+airstrip|medium|Planes cross each other's path on these two long roads.
+airstrip|medium|A river bends around this place on its west side.
+airstrip|medium|Wind and engines are the only sounds here.
+airstrip|hard|A road for vehicles that do not like roads.
+airstrip|hard|Where wheels leave the ground, and sometimes return.
+airstrip|hard|The longest straight line on the island.
 
-ruins|easy|Broken pillars of a forgotten temple.
-ruins|easy|Find the place of old broken stones.
-ruins|easy|An ancient building that has fallen apart.
-ruins|medium|Moss covers the stones of a lost civilisation.
-ruins|medium|Pillars stand here but the roof is long gone.
-ruins|medium|Archaeologists would love to dig around this place.
-ruins|hard|History lies in pieces here, waiting to be put together.
-ruins|hard|A building that is more memory than stone.
-ruins|hard|Time has been the only visitor for centuries.
+fish_farm|easy|Blue square pools where fish are raised.
+fish_farm|easy|Find the square ponds in the north-east corner.
+fish_farm|easy|Fish swim in these man-made pools.
+fish_farm|medium|A grid of blue pools stands beside the green fields.
+fish_farm|medium|Fishermen here never need a boat.
+fish_farm|medium|Water here is divided neatly into squares.
+fish_farm|hard|A chessboard made of water.
+fish_farm|hard|The fish here live in apartments, not oceans.
+fish_farm|hard|Where the sea has been invited to dinner in small boxes.
 
-campfire|easy|Travellers gather here to share stories at night.
-campfire|easy|Find the place with ash, logs and stones in a circle.
-campfire|easy|A warm place when the night is cold.
-campfire|medium|Sparks fly up and stories fly around this circle.
-campfire|medium|Roasted fish and songs are shared here.
-campfire|medium|A ring of stones holds the island's warmest spot.
-campfire|hard|A tiny sun that visitors build for themselves.
-campfire|hard|Where smoke carries stories to the stars.
-campfire|hard|Light and warmth gather strangers into friends.
+oasis|easy|A small pond with palm trees in the sand.
+oasis|easy|Find the green spot in the desert.
+oasis|easy|Water and palm trees sit in the middle of dry sand.
+oasis|medium|Camels would love this spot on a hot day.
+oasis|medium|Huts and palms gather around a little lake in the dunes.
+oasis|medium|The wind farm and solar panels are not far from here.
+oasis|hard|A blue coin dropped in a golden desert.
+oasis|hard|Life gathers around a tiny lake in the dry east.
+oasis|hard|The desert's secret drink.
+
+jungle_temple|easy|Old stone ruins hidden among the tall trees.
+jungle_temple|easy|Find the ancient building in the forest.
+jungle_temple|easy|Moss covers these old walls in the north-west.
+jungle_temple|medium|Tall pine trees guard a forgotten stone gate.
+jungle_temple|medium|A deep rocky cave opens next to these ruins.
+jungle_temple|medium|Nature is slowly taking this building back.
+jungle_temple|hard|A temple that the forest swallowed slowly.
+jungle_temple|hard|Time sits on these stones like moss.
+jungle_temple|hard|Whoever built this left, but the trees stayed.
+
+palm_grove|easy|A shady patch of palm trees below the plaza.
+palm_grove|easy|Find the green trees south of the central square.
+palm_grove|easy|Palm trees grow close together here.
+palm_grove|medium|Coconut trees give shade near the main square.
+palm_grove|medium|A leafy corner between the plaza and the harbor.
+palm_grove|medium|Green fans wave in the breeze south of the plaza.
+palm_grove|hard|A crowd of trees with their hands in the air.
+palm_grove|hard|A small jungle in the shadow of the stone square.
+palm_grove|hard|Where the heat is softened by green umbrellas.

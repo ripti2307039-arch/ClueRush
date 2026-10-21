@@ -218,7 +218,7 @@ public class GameActivity extends BaseActivity {
 
         boolean island = IslandSpace.isIsland(arena);
         if (island) {
-            player.setWalkMask(IslandSpace.walkMask(this));
+           // player.setWalkMask(IslandSpace.walkMask(this));
         }
 
         if (island) {
