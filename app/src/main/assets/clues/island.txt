@@ -1,0 +1,101 @@
+# location_id|level|clue
+
+lighthouse|easy|A tall tower that guides ships at night.
+lighthouse|easy|A big light shines from the top of this building.
+lighthouse|easy|Find the tower that warns sailors about the rocks.
+lighthouse|medium|A tall tower that guides ships at night.
+lighthouse|medium|Its light turns round and round while the sea sleeps.
+lighthouse|medium|Sailors look for this tower when the sky turns dark.
+lighthouse|hard|A star that was built by hand and stands on land.
+lighthouse|hard|It speaks to ships only with light.
+lighthouse|hard|The keeper never sleeps so that strangers can arrive safely.
+
+harbor|easy|Where boats rest and fishermen sell their catch.
+harbor|easy|Find the place where ships tie their ropes.
+harbor|easy|Boats and nets are found along this dock.
+harbor|medium|Ropes, nets and the smell of fresh fish.
+harbor|medium|The island meets the sea traders here.
+harbor|medium|Every journey from the island begins at this place.
+harbor|hard|A parking lot where the cars are boats.
+harbor|hard|Wood and water meet to say hello and goodbye.
+harbor|hard|Anchors rest here, and so do stories of the sea.
+
+cave|easy|A dark hollow in the rocks where pirates once hid.
+cave|easy|Find the hole in the rock that goes deep inside.
+cave|easy|You need a torch to explore this place.
+cave|medium|Echoes answer every shout in this place.
+cave|medium|Bats and shadows are the only residents here.
+cave|medium|A stone mouth that never closes.
+cave|hard|The island keeps its secrets in its stomach.
+cave|hard|Darkness has a home here, and treasure may too.
+cave|hard|A mouth in the rock that only whispers back.
+
+waterfall|easy|Fresh water falls from a high cliff here.
+waterfall|easy|Find the place where a stream jumps off the rock.
+waterfall|easy|You can hear the splash before you see it.
+waterfall|medium|A white curtain of water hangs from the cliff.
+waterfall|medium|Mist and rainbows float around this place.
+waterfall|medium|The sound of rushing water leads the way here.
+waterfall|hard|A river that decided to fly for a moment.
+waterfall|hard|Gravity is the only artist of this white painting.
+waterfall|hard|A rain that falls only from one place.
+
+fort|easy|Old stone walls built to protect the island.
+fort|easy|Find the old building with thick walls.
+fort|easy|Soldiers once guarded the island from this place.
+fort|medium|Cannons and stone towers watch the horizon.
+fort|medium|The island's oldest defence stands here.
+fort|medium|Thick walls tell stories of old battles.
+fort|hard|A stone guard that never left his post.
+fort|hard|It was built to say no to enemies.
+fort|hard|The walls are silent now, but they remember every siege.
+
+market|easy|A busy place where islanders trade fruit and fish.
+market|easy|Find the place where people buy and sell.
+market|easy|Baskets of fruit and fish are sold here.
+market|medium|Bargaining voices fill the air here every morning.
+market|medium|Coconuts, spices and fresh catch are on display.
+market|medium|The busiest corner of the island at noon.
+market|hard|Where coins change hands faster than rumours.
+market|hard|The loudest place on a quiet island.
+market|hard|Everything has a price here, even a smile, if you bargain well.
+
+beach|easy|Soft sand and waves on the southern shore.
+beach|easy|Find the sandy place beside the sea.
+beach|easy|Shells and footprints are found here.
+beach|medium|The tide writes and erases its messages on this shore.
+beach|medium|Sunset looks best from this stretch of sand.
+beach|medium|Crabs and seagulls are the only crowd here.
+beach|hard|A page of sand where the sea writes and erases.
+beach|hard|The border where land gives up and water begins.
+beach|hard|Footprints disappear here as soon as you make them.
+
+treehouse|easy|A home built high among the branches.
+treehouse|easy|Find the house that is not on the ground.
+treehouse|easy|You climb a ladder to reach this home.
+treehouse|medium|Leaves are its walls and branches are its floor.
+treehouse|medium|Birds are the nearest neighbours of this home.
+treehouse|medium|A rope ladder is the front door here.
+treehouse|hard|A house that grew up with the tree.
+treehouse|hard|Whoever lives here sees the island from above.
+treehouse|hard|A home where the roof is a canopy and the floor is a trunk.
+
+ruins|easy|Broken pillars of a forgotten temple.
+ruins|easy|Find the place of old broken stones.
+ruins|easy|An ancient building that has fallen apart.
+ruins|medium|Moss covers the stones of a lost civilisation.
+ruins|medium|Pillars stand here but the roof is long gone.
+ruins|medium|Archaeologists would love to dig around this place.
+ruins|hard|History lies in pieces here, waiting to be put together.
+ruins|hard|A building that is more memory than stone.
+ruins|hard|Time has been the only visitor for centuries.
+
+campfire|easy|Travellers gather here to share stories at night.
+campfire|easy|Find the place with ash, logs and stones in a circle.
+campfire|easy|A warm place when the night is cold.
+campfire|medium|Sparks fly up and stories fly around this circle.
+campfire|medium|Roasted fish and songs are shared here.
+campfire|medium|A ring of stones holds the island's warmest spot.
+campfire|hard|A tiny sun that visitors build for themselves.
+campfire|hard|Where smoke carries stories to the stars.
+campfire|hard|Light and warmth gather strangers into friends.

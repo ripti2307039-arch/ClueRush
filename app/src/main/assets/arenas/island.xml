@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<arena
+    id="island"
+    order="4"
+    name="Treasure Island"
+    subtitle="Find the hidden places of the island"
+    colorStart="#0EA5E9"
+    colorEnd="#10B981"
+    centerLat="0.000000"
+    centerLng="0.000000"
+    zoom="18"
+    north="0.004492"
+    south="-0.004492"
+    east="0.004492"
+    west="-0.004492">
+
+    <location id="lighthouse" name="Old Lighthouse" lat="0.003144" lng="-0.002695" radius="25">
+        <clue>A tall tower that guides ships at night.</clue>
+    </location>
+    <location id="harbor" name="Fishing Harbor" lat="-0.002246" lng="0.002695" radius="25">
+        <clue>Where boats rest and fishermen sell their catch.</clue>
+    </location>
+    <location id="cave" name="Hidden Cave" lat="-0.001797" lng="-0.003144" radius="25">
+        <clue>A dark hollow in the rocks where pirates once hid.</clue>
+    </location>
+    <location id="waterfall" name="Silver Waterfall" lat="0.002695" lng="0.001347" radius="25">
+        <clue>Fresh water falls from a high cliff here.</clue>
+    </location>
+    <location id="fort" name="Ancient Fort" lat="0.000898" lng="0.000000" radius="25">
+        <clue>Old stone walls built to protect the island.</clue>
+    </location>
+    <location id="market" name="Village Market" lat="-0.000449" lng="0.001797" radius="25">
+        <clue>A busy place where islanders trade fruit and fish.</clue>
+    </location>
+    <location id="beach" name="Golden Beach" lat="-0.003144" lng="-0.001347" radius="25">
+        <clue>Soft sand and waves on the southern shore.</clue>
+    </location>
+    <location id="treehouse" name="Giant Treehouse" lat="0.001347" lng="-0.001797" radius="25">
+        <clue>A home built high among the branches.</clue>
+    </location>
+    <location id="ruins" name="Lost Ruins" lat="0.001797" lng="0.003413" radius="25">
+        <clue>Broken pillars of a forgotten temple.</clue>
+    </location>
+    <location id="campfire" name="Campfire Circle" lat="-0.001617" lng="0.000449" radius="25">
+        <clue>Travellers gather here to share stories at night.</clue>
+    </location>
+</arena>
