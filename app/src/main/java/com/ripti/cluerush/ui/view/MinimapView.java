@@ -1,8 +1,10 @@
 package com.ripti.cluerush.ui.view;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
@@ -37,8 +39,10 @@ public class MinimapView extends View {
     private final RectF panelRect = new RectF();
     private final RectF borderRect = new RectF();
     private final RectF areaRect = new RectF();
+    private final Path clipPath = new Path();
 
     private GeoBounds bounds;
+    private Bitmap backdrop;
     private List<MapMarker> markers = Collections.emptyList();
     private double playerLat = Double.NaN;
     private double playerLng = Double.NaN;
@@ -103,6 +107,11 @@ public class MinimapView extends View {
         invalidate();
     }
 
+    public void setBackdrop(@Nullable Bitmap bitmap) {
+        backdrop = bitmap;
+        invalidate();
+    }
+
     public void setMarkers(List<MapMarker> newMarkers) {
         markers = new ArrayList<>(newMarkers);
         invalidate();
@@ -118,6 +127,7 @@ public class MinimapView extends View {
         visionMeters = meters;
         invalidate();
     }
+
     public void setOpponent(double latitude, double longitude, boolean visible) {
         opponentLat = latitude;
         opponentLng = longitude;
@@ -162,6 +172,14 @@ public class MinimapView extends View {
 
         areaRect.set(left, top, left + mapW, top + mapH);
         canvas.drawRoundRect(areaRect, 6f * density, 6f * density, areaPaint);
+        if (backdrop != null) {
+            clipPath.reset();
+            clipPath.addRoundRect(areaRect, 6f * density, 6f * density, Path.Direction.CW);
+            canvas.save();
+            canvas.clipPath(clipPath);
+            canvas.drawBitmap(backdrop, null, areaRect, null);
+            canvas.restore();
+        }
         for (int i = 1; i <= 2; i++) {
             float x = left + mapW * i / 3f;
             float y = top + mapH * i / 3f;

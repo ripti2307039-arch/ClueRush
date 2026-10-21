@@ -12,7 +12,7 @@ import org.osmdroid.views.overlay.MapEventsOverlay;
 
 import java.util.List;
 
-public class OverviewMap {
+public class OverviewMap implements OverviewMapView {
 
     public interface OnPickListener {
         void onPick(double latitude, double longitude);
@@ -60,6 +60,7 @@ public class OverviewMap {
         mapView.getOverlays().add(overlay);
     }
 
+    @Override
     public void setBounds(GeoBounds bounds) {
         fitBox = new BoundingBox(bounds.getNorth(), bounds.getEast(),
                 bounds.getSouth(), bounds.getWest());
@@ -68,7 +69,7 @@ public class OverviewMap {
                 padded.getNorth(), padded.getEast(), padded.getSouth(), padded.getWest()));
     }
 
-
+    @Override
     public void fit() {
         if (fitBox == null) {
             return;
@@ -77,47 +78,57 @@ public class OverviewMap {
         mapView.post(() -> mapView.zoomToBoundingBox(fitBox, false, border));
     }
 
+    @Override
     public void setMarkers(List<MapMarker> markers) {
         overlay.setMarkers(markers);
         mapView.invalidate();
     }
 
+    @Override
     public void setPlayer(double latitude, double longitude) {
         overlay.setPlayer(latitude, longitude);
         mapView.invalidate();
     }
 
+    @Override
     public void setRevealAll(boolean reveal) {
         overlay.setRevealAll(reveal);
         mapView.invalidate();
     }
 
+    @Override
     public void setPickEnabled(boolean enabled) {
         pickEnabled = enabled;
     }
 
+    @Override
     public void setPickListener(OnPickListener listener) {
         pickListener = listener;
     }
 
+    @Override
     public void setPicked(double latitude, double longitude) {
         overlay.setPicked(new GeoPoint(latitude, longitude));
         mapView.invalidate();
     }
 
+    @Override
     public void clearPicked() {
         overlay.setPicked(null);
         mapView.invalidate();
     }
 
+    @Override
     public void onResume() {
         mapView.onResume();
     }
 
+    @Override
     public void onPause() {
         mapView.onPause();
     }
 
+    @Override
     public void onDestroy() {
         mapView.onDetach();
     }

@@ -12,6 +12,7 @@ public class PlayerController {
     private static final float FACING_THRESHOLD = 0.08f;
 
     private final GeoBounds bounds;
+    private WalkMask walkMask;
     private double latitude;
     private double longitude;
     private double speedMetersPerSecond = DEFAULT_SPEED_MPS;
@@ -26,6 +27,10 @@ public class PlayerController {
         this.bounds = bounds;
         this.latitude = bounds.clampLatitude(latitude);
         this.longitude = bounds.clampLongitude(longitude);
+    }
+
+    public void setWalkMask(WalkMask walkMask) {
+        this.walkMask = walkMask;
     }
 
     public void setInput(float x, float y) {
@@ -64,6 +69,17 @@ public class PlayerController {
                 latitude + GeoMath.metersToLatitudeDegrees(metersNorth));
         double newLongitude = bounds.clampLongitude(
                 longitude + GeoMath.metersToLongitudeDegrees(metersEast, latitude));
+
+        if (walkMask != null && !walkMask.isWalkable(newLatitude, newLongitude)) {
+            if (walkMask.isWalkable(newLatitude, longitude)) {
+                newLongitude = longitude;
+            } else if (walkMask.isWalkable(latitude, newLongitude)) {
+                newLatitude = latitude;
+            } else {
+                newLatitude = latitude;
+                newLongitude = longitude;
+            }
+        }
 
         boolean changed = newLatitude != latitude || newLongitude != longitude;
         latitude = newLatitude;

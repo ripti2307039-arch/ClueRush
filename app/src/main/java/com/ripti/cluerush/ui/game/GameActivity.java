@@ -57,9 +57,13 @@ import com.ripti.cluerush.game.RoundGenerator;
 import com.ripti.cluerush.game.RoundScore;
 import com.ripti.cluerush.game.ScoreRules;
 import com.ripti.cluerush.map.GameMap;
+import com.ripti.cluerush.map.ImageGameMap;
+import com.ripti.cluerush.map.ImageOverviewMap;
+import com.ripti.cluerush.map.IslandSpace;
 import com.ripti.cluerush.map.MapMarker;
 import com.ripti.cluerush.map.OsmGameMap;
 import com.ripti.cluerush.map.OverviewMap;
+import com.ripti.cluerush.map.OverviewMapView;
 import com.ripti.cluerush.model.Arena;
 import com.ripti.cluerush.model.CampusLocation;
 import com.ripti.cluerush.model.Difficulty;
@@ -118,7 +122,7 @@ public class GameActivity extends BaseActivity {
     private Random random;
     private ActivityGameBinding binding;
     private GameMap gameMap;
-    private OverviewMap overviewMap;
+    private OverviewMapView overviewMap;
     private TaskOverlayView taskOverlay;
     private TextView countdownText;
     private PlayerController player;
@@ -212,7 +216,21 @@ public class GameActivity extends BaseActivity {
         player = new PlayerController(arena.getCenterLatitude(), arena.getCenterLongitude(),
                 arena.getBounds());
 
-        gameMap = new OsmGameMap(binding.mapView);
+        boolean island = IslandSpace.isIsland(arena);
+        if (island) {
+            player.setWalkMask(IslandSpace.walkMask(this));
+        }
+
+        if (island) {
+            binding.mapView.setVisibility(View.GONE);
+            binding.imageMapView.setVisibility(View.VISIBLE);
+            gameMap = new ImageGameMap(binding.imageMapView, IslandSpace.mapBitmap(this));
+            binding.minimapView.setBackdrop(IslandSpace.mapBitmap(this));
+            binding.attributionText.setVisibility(View.GONE);
+            binding.mapAttribution.setVisibility(View.GONE);
+        } else {
+            gameMap = new OsmGameMap(binding.mapView);
+        }
         gameMap.setBounds(arena.getBounds());
         gameMap.setNightStyle(isNightMode());
         gameMap.setZoom(baseZoom);
@@ -225,7 +243,14 @@ public class GameActivity extends BaseActivity {
         binding.minimapView.setPlayer(player.getLatitude(), player.getLongitude());
         binding.minimapView.setOnClickListener(v -> openMap());
 
-        overviewMap = new OverviewMap(binding.overviewMapView);
+        if (island) {
+            binding.overviewMapView.setVisibility(View.GONE);
+            binding.overviewImageView.setVisibility(View.VISIBLE);
+            overviewMap = new ImageOverviewMap(binding.overviewImageView,
+                    IslandSpace.mapBitmap(this));
+        } else {
+            overviewMap = new OverviewMap(binding.overviewMapView);
+        }
         overviewMap.setBounds(arena.getBounds());
         overviewMap.setPickListener(this::onMapPicked);
         binding.mapTitle.setText(arena.getName());
