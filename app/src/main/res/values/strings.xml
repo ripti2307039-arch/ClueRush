@@ -289,6 +289,9 @@
     <string name="title_master">Master</string>
     <string name="stats_gain_solo">+%1$d XP</string>
     <string name="stats_gain_match">+%1$d XP · Rating %2$+d</string>
+    <string name="home_hero_tag">1 VS 1</string>
+    <string name="home_hero_title">Challenge a friend</string>
+    <string name="home_hero_body">Create a room, share the code and race across campus.</string>
 
 
 </resources>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
@@ -11,6 +12,7 @@
         android:orientation="vertical"
         android:padding="@dimen/space_lg">
 
+        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,30 +36,41 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
                     android:text="@string/home_subtitle"
                     android:textAppearance="@style/TextAppearance.ClueRush.BodySecondary" />
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/avatarButton"
-                android:layout_width="@dimen/avatar_small"
-                android:layout_height="@dimen/avatar_small"
-                android:background="@drawable/bg_avatar"
-                android:clickable="true"
-                android:contentDescription="@string/cd_open_profile"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackgroundBorderless"
-                android:gravity="center"
-                android:textAppearance="@style/TextAppearance.ClueRush.Title"
-                android:textColor="@color/white" />
+            <FrameLayout
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="@dimen/space_md"
+                android:background="@drawable/bg_avatar_ring"
+                android:padding="4dp">
+
+                <TextView
+                    android:id="@+id/avatarButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_avatar"
+                    android:clickable="true"
+                    android:contentDescription="@string/cd_open_profile"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:gravity="center"
+                    android:textAppearance="@style/TextAppearance.ClueRush.Title"
+                    android:textColor="@color/white" />
+            </FrameLayout>
         </LinearLayout>
 
+        <!-- Arenas -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_xl"
             android:text="@string/section_arenas"
-            android:textAppearance="@style/TextAppearance.ClueRush.Title" />
+            android:textAppearance="@style/TextAppearance.ClueRush.Title"
+            android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/arenaList"
@@ -67,39 +80,113 @@
             android:clipToPadding="false"
             android:nestedScrollingEnabled="false" />
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:minHeight="@dimen/space_lg" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/createMatchButton"
+        <!-- Hero: create match -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_lg"
-            android:text="@string/create_match" />
+            android:layout_marginTop="@dimen/space_xl"
+            android:background="@drawable/bg_hero_card"
+            android:orientation="vertical"
+            android:padding="@dimen/space_lg">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/joinButton"
-            style="@style/Widget.ClueRush.Button.Gold"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.2"
+                android:text="@string/home_hero_tag"
+                android:textAppearance="@style/TextAppearance.ClueRush.Caption"
+                android:textColor="#B3FFFFFF"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xs"
+                android:text="@string/home_hero_title"
+                android:textAppearance="@style/TextAppearance.ClueRush.Headline"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xs"
+                android:text="@string/home_hero_body"
+                android:textAppearance="@style/TextAppearance.ClueRush.Body"
+                android:textColor="#CCFFFFFF" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/createMatchButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_lg"
+                android:text="@string/create_match"
+                android:textColor="@color/navy_950"
+                app:backgroundTint="@color/white"
+                app:icon="@drawable/ic_action_add"
+                app:iconGravity="textStart"
+                app:iconTint="@color/navy_950" />
+        </LinearLayout>
+
+        <!-- Join + Practice -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_md"
-            android:text="@string/join_with_code" />
+            android:orientation="horizontal">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/practiceButton"
-            style="@style/Widget.ClueRush.Button.Outlined"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_md"
-            android:text="@string/practice_mode" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/joinButton"
+                style="@style/Widget.ClueRush.Button.Gold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/space_sm"
+                android:layout_weight="1"
+                android:minHeight="112dp"
+                android:paddingStart="@dimen/space_md"
+                android:paddingTop="@dimen/space_md"
+                android:paddingEnd="@dimen/space_md"
+                android:paddingBottom="@dimen/space_md"
+                android:text="@string/join_with_code"
+                android:textAlignment="center"
+                app:cornerRadius="@dimen/radius_card"
+                app:icon="@drawable/ic_action_key"
+                app:iconGravity="top"
+                app:iconPadding="@dimen/space_sm"
+                app:iconSize="28dp"
+                app:iconTint="@color/navy_950" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/practiceButton"
+                style="@style/Widget.ClueRush.Button.Outlined"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/space_sm"
+                android:layout_weight="1"
+                android:minHeight="112dp"
+                android:paddingStart="@dimen/space_md"
+                android:paddingTop="@dimen/space_md"
+                android:paddingEnd="@dimen/space_md"
+                android:paddingBottom="@dimen/space_md"
+                android:text="@string/practice_mode"
+                android:textAlignment="center"
+                app:cornerRadius="@dimen/radius_card"
+                app:icon="@drawable/ic_action_play"
+                app:iconGravity="top"
+                app:iconPadding="@dimen/space_sm"
+                app:iconSize="28dp"
+                app:iconTint="@color/mint" />
+        </LinearLayout>
+
+        <!-- Leaderboard -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/leaderboardButton"
             style="@style/Widget.ClueRush.Button.Outlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_md"
-            android:text="@string/leaderboard_title" />
+            android:text="@string/leaderboard_title"
+            app:icon="@drawable/ic_action_trophy"
+            app:iconGravity="textStart"
+            app:iconTint="@color/treasure_gold" />
     </LinearLayout>
 </ScrollView>
