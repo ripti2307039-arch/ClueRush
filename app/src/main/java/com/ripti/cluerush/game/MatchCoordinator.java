@@ -398,7 +398,7 @@ public final class MatchCoordinator {
                           PlayerState opp) {
         boolean known = opp != null && opp.isFinished();
         conclude(new MatchResult(outcome, decider, currentScore(),
-                known ? opp.getFinalScore() : -1,
+                known ? opp.getFinalScore() : MatchResult.UNKNOWN_SCORE,
                 opp != null ? opp.getName() : lastName,
                 known ? opp.roundPointsArray() : null));
     }

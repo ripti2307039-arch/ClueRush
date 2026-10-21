@@ -7,6 +7,7 @@ public final class MatchResult {
         LOSS,
         DRAW
     }
+    public static final int UNKNOWN_SCORE = Integer.MIN_VALUE;
 
     public enum Decider {
         SCORE,
@@ -54,7 +55,7 @@ public final class MatchResult {
     }
 
     public boolean isOpponentScoreKnown() {
-        return opponentScore >= 0;
+        return opponentScore != UNKNOWN_SCORE;
     }
 
     public String getOpponentName() {

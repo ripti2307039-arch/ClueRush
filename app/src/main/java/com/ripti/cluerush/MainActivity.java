@@ -86,6 +86,7 @@ public class MainActivity extends BaseActivity {
                         R.string.action_create, this::createMatch);
             }
         });
+        binding.joinButton.setOnClickListener(v -> showJoinDialog());
         binding.leaderboardButton.setOnClickListener(v ->
                 startActivity(new Intent(this, LeaderboardActivity.class)));
         binding.practiceButton.setOnClickListener(v -> {

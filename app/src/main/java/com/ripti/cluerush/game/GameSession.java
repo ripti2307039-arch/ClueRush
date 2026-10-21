@@ -153,7 +153,7 @@ public class GameSession {
     }
 
     public int getTotalScore() {
-        return Math.max(0, getEarnedPoints() - getPenaltyPoints())
+        return getEarnedPoints() - getPenaltyPoints()
                 + getPerfectBonus() + finishBonus;
     }
 

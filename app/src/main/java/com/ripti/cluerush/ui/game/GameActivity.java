@@ -331,6 +331,9 @@ public class GameActivity extends BaseActivity {
     protected void onDestroy() {
         handler.removeCallbacksAndMessages(null);
         if (coordinator != null) {
+            if (!resultShown && !runEnded) {
+                saveForfeitStats();
+            }
             coordinator.forfeitMine();
             coordinator.stop();
         }
@@ -411,6 +414,8 @@ public class GameActivity extends BaseActivity {
     private void renderScoreText() {
         if (!isMatch()) {
             binding.scoreText.setText(getString(R.string.score_hud, displayedScore));
+            binding.scoreText.setTextColor(displayedScore < 0
+                    ? LOSS_COLOR : ContextCompat.getColor(this, R.color.treasure_gold));
             return;
         }
         int seconds = Math.max(0, lastShownSeconds);
@@ -1173,30 +1178,29 @@ public class GameActivity extends BaseActivity {
         animateScoreTo(session.getTotalScore());
 
         int score = session.getTotalScore();
-        int previousBest = BestScoreStore.get(this, arena.getId(), difficulty);
-        boolean newBest = BestScoreStore.submit(this, arena.getId(), difficulty, score);
+
+        int previousBest = BestScoreStore.get(
+                this, arena.getId(), difficulty
+        );
+
+        boolean newBest = BestScoreStore.submit(
+                this, arena.getId(), difficulty, score
+        );
+
         String bestLine = newBest
                 ? getString(R.string.score_new_best)
                 : getString(R.string.score_best, previousBest);
 
-        String gain = saveSoloStats(score);
         String summary = buildFinalSummary(bestLine, null);
-        showResult(getString(R.string.game_finished_title), rankLine(session.getRank()),
-                gain.isEmpty() ? summary : summary + "\n" + gain, R.string.action_back_home);
+        showResult(
+                getString(R.string.game_finished_title),
+                rankLine(session.getRank()),
+                summary,
+                R.string.action_back_home
+        );
     }
 
     private boolean statsSaved;
-
-    private String saveSoloStats(int score) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (statsSaved || user == null || user.isAnonymous()) {
-            return "";
-        }
-        statsSaved = true;
-        new StatsRepository().recordSolo(user.getUid(), UserDisplay.displayName(this, user),
-                arena.getId(), difficulty.getKey(), score);
-        return getString(R.string.stats_gain_solo, StatsRules.soloXp(score));
-    }
 
     private String saveMatchStats(MatchResult result) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -1209,6 +1213,16 @@ public class GameActivity extends BaseActivity {
         return getString(R.string.stats_gain_match,
                 StatsRules.matchXp(result.getMyScore(), result.getOutcome()),
                 StatsRules.ratingDelta(result.getOutcome()));
+    }
+
+    private void saveForfeitStats() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (statsSaved || user == null || user.isAnonymous()) {
+            return;
+        }
+        statsSaved = true;
+        new StatsRepository().recordMatch(user.getUid(), UserDisplay.displayName(this, user),
+                arena.getId(), difficulty.getKey(), 0, MatchResult.Outcome.LOSS);
     }
 
     private void showResult(String title, String subtitle, String body,
