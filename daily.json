@@ -1,0 +1,22 @@
+{
+  "challenges": {
+    "2026-10-22": {
+      "arena": "kuet",
+      "difficulty": "hard",
+      "seed": 20261022,
+      "title": "Test Today"
+    },
+    "2026-10-23": {
+      "arena": "ku",
+      "difficulty": "medium",
+      "seed": 20261023,
+      "title": "Friday Special"
+    },
+    "2026-10-24": {
+      "arena": "kuet",
+      "difficulty": "hard",
+      "seed": 20261024,
+      "title": "Weekend Rush"
+    }
+  }
+}
