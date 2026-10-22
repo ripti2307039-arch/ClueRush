@@ -1,12 +1,18 @@
 package com.ripti.cluerush;
-import com.ripti.cluerush.ui.leaderboard.LeaderboardActivity;
+
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -23,6 +29,7 @@ import com.ripti.cluerush.ui.BaseActivity;
 import com.ripti.cluerush.ui.auth.LoginActivity;
 import com.ripti.cluerush.ui.game.GameActivity;
 import com.ripti.cluerush.ui.home.ArenaAdapter;
+import com.ripti.cluerush.ui.leaderboard.LeaderboardActivity;
 import com.ripti.cluerush.ui.lobby.LobbyActivity;
 import com.ripti.cluerush.ui.profile.ProfileActivity;
 import com.ripti.cluerush.util.EntranceAnimator;
@@ -40,6 +47,11 @@ public class MainActivity extends BaseActivity {
     }
 
     private final MatchRepository matchRepository = new MatchRepository();
+
+    // Android 13+ e notification dekhate runtime permission lage
+    private final ActivityResultLauncher<String> notificationPermission =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(),
+                    granted -> { });
 
     private ActivityMainBinding binding;
     private Arena selectedArena;
@@ -100,6 +112,8 @@ public class MainActivity extends BaseActivity {
         if (savedInstanceState == null) {
             EntranceAnimator.play(binding.contentColumn);
         }
+
+        askNotificationPermission();
     }
 
     @Override
@@ -107,6 +121,14 @@ public class MainActivity extends BaseActivity {
         super.onStart();
         if (FirebaseAuth.getInstance().getCurrentUser() == null && binding != null) {
             openLogin();
+        }
+    }
+
+    private void askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
         }
     }
 

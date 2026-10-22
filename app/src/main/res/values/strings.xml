@@ -321,6 +321,13 @@
     <string name="history_clear_title">Clear history?</string>
     <string name="history_clear_message">All your saved matches on this device will be deleted.</string>
     <string name="history_clear_confirm">Clear</string>
+    <string name="channel_match_name">Match in progress</string>
+    <string name="channel_match_desc">Shown while a 1v1 match is running</string>
+    <string name="channel_result_name">Match results</string>
+    <string name="channel_result_desc">Tells you the outcome when a match ends</string>
+    <string name="notif_match_title">Match in progress</string>
+    <string name="notif_match_text">%1$s · tap to return to the game</string>
+    <string name="notif_action_open">Open game</string>
 
 
 </resources>

@@ -80,6 +80,7 @@ import com.ripti.cluerush.util.MapConfig;
 import com.ripti.cluerush.util.ServerClock;
 import com.ripti.cluerush.data.MatchHistoryRepository;
 import com.ripti.cluerush.model.MatchHistoryItem;
+import com.ripti.cluerush.service.MatchService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -314,6 +315,7 @@ public class GameActivity extends BaseActivity {
             coordinator.start();
             coordinator.publishPosition(player.getLatitude(), player.getLongitude());
             beginMatchCountdown();
+            MatchService.start(this, arena.getName(), matchEndAt);
         }
     }
 
@@ -356,6 +358,7 @@ public class GameActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
+        MatchService.stop(this);
         handler.removeCallbacksAndMessages(null);
         if (coordinator != null) {
             if (!resultShown && !runEnded) {
@@ -637,6 +640,7 @@ public class GameActivity extends BaseActivity {
         if (!gain.isEmpty()) {
             body = body + "\n" + gain;
         }
+        MatchService.finish(this, getString(titleRes), subtitle);
         showResult(getString(titleRes), subtitle, body, R.string.action_back_home);
     }
 
