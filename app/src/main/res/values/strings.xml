@@ -328,6 +328,9 @@
     <string name="notif_match_title">Match in progress</string>
     <string name="notif_match_text">%1$s · tap to return to the game</string>
     <string name="notif_action_open">Open game</string>
+    <string name="net_lost">Connection lost. Reconnect or you may forfeit the match.</string>
+    <string name="net_back">Back online</string>
+    <string name="battery_low_warning">Battery is low. Plug in to avoid losing the match.</string>
 
 
 </resources>

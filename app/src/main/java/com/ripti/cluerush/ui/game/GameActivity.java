@@ -81,6 +81,7 @@ import com.ripti.cluerush.util.ServerClock;
 import com.ripti.cluerush.data.MatchHistoryRepository;
 import com.ripti.cluerush.model.MatchHistoryItem;
 import com.ripti.cluerush.service.MatchService;
+import com.ripti.cluerush.receiver.MatchStatusReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -134,6 +135,7 @@ public class GameActivity extends BaseActivity {
     private Arena arena;
     private Difficulty difficulty;
     private MatchCoordinator coordinator;
+    private MatchStatusReceiver statusReceiver;
     private MatchCoordinator.Opponent opponent;
     private MatchCoordinator.Reason forceReason;
     private String matchCode;
@@ -317,6 +319,37 @@ public class GameActivity extends BaseActivity {
             beginMatchCountdown();
             MatchService.start(this, arena.getName(), matchEndAt);
         }
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (isMatch() && !resultShown) {
+            if (statusReceiver == null) {
+                statusReceiver = new MatchStatusReceiver(this, new MatchStatusReceiver.Listener() {
+                    @Override
+                    public void onNetworkChanged(boolean online) {
+                        Toast.makeText(GameActivity.this,
+                                online ? R.string.net_back : R.string.net_lost,
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onBatteryLow() {
+                        Toast.makeText(GameActivity.this, R.string.battery_low_warning,
+                                Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+            statusReceiver.register(this);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        if (statusReceiver != null) {
+            statusReceiver.unregister(this);
+        }
+        super.onStop();
     }
 
     @Override
