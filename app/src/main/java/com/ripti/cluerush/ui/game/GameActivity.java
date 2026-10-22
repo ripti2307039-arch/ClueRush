@@ -78,6 +78,8 @@ import com.ripti.cluerush.ui.BaseActivity;
 import com.ripti.cluerush.util.GeoMath;
 import com.ripti.cluerush.util.MapConfig;
 import com.ripti.cluerush.util.ServerClock;
+import com.ripti.cluerush.data.MatchHistoryRepository;
+import com.ripti.cluerush.model.MatchHistoryItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -628,6 +630,9 @@ public class GameActivity extends BaseActivity {
                 result.getOpponentName(), opponentScore);
         String body = deciderLine(result) + "\n" + rankLine(session.getRank()) + "\n"
                 + buildFinalSummary(null, result);
+        saveHistory(result.getOutcome(), result.getMyScore(),
+                result.isOpponentScoreKnown() ? result.getOpponentScore() : null,
+                result.getOpponentName(), result.getDecider().name());
         String gain = saveMatchStats(result);
         if (!gain.isEmpty()) {
             body = body + "\n" + gain;
@@ -1226,6 +1231,20 @@ public class GameActivity extends BaseActivity {
     }
 
     private boolean statsSaved;
+    private boolean historySaved;
+
+    private void saveHistory(MatchResult.Outcome outcome, int myScore,
+                             @Nullable Integer opponentScore, String opponentName,
+                             String decider) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (historySaved || user == null) {
+            return;
+        }
+        historySaved = true;
+        new MatchHistoryRepository(this).insert(MatchHistoryItem.create(
+                user.getUid(), arena.getId(), arena.getName(), difficulty.getKey(),
+                myScore, opponentScore, opponentName, outcome.name(), decider));
+    }
 
     private String saveMatchStats(MatchResult result) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -1241,6 +1260,12 @@ public class GameActivity extends BaseActivity {
     }
 
     private void saveForfeitStats() {
+        if (isMatch()) {
+            saveHistory(MatchResult.Outcome.LOSS, session.getTotalScore(), null,
+                    opponent == null ? getString(R.string.match_opponent_fallback)
+                            : opponent.name,
+                    "FORFEIT_ME");
+        }
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (statsSaved || user == null || user.isAnonymous()) {
             return;

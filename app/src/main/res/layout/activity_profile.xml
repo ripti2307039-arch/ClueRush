@@ -234,6 +234,13 @@
                         android:textAppearance="@style/TextAppearance.ClueRush.Caption" />
                 </LinearLayout>
             </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/historyButton"
+                style="@style/Widget.ClueRush.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_lg"
+                android:text="@string/history_open" />
 
             <!-- Logout (subtle) -->
             <com.google.android.material.button.MaterialButton

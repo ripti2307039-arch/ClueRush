@@ -58,6 +58,15 @@
             android:exported="false"
             android:screenOrientation="sensorLandscape" />
 
+        <activity
+            android:name=".ui.history.HistoryActivity"
+            android:exported="false" />
+
+        <provider
+            android:name=".data.db.MatchHistoryProvider"
+            android:authorities="com.ripti.cluerush.provider"
+            android:exported="false" />
+
     </application>
 
 </manifest>

@@ -16,6 +16,7 @@ import com.ripti.cluerush.ui.BaseActivity;
 import com.ripti.cluerush.ui.auth.LoginActivity;
 import com.ripti.cluerush.util.EntranceAnimator;
 import com.ripti.cluerush.util.UserDisplay;
+import com.ripti.cluerush.ui.history.HistoryActivity;
 
 public class ProfileActivity extends BaseActivity {
 
@@ -48,6 +49,8 @@ public class ProfileActivity extends BaseActivity {
 
         binding.backButton.setOnClickListener(v -> finish());
         binding.logoutButton.setOnClickListener(v -> confirmLogout());
+        binding.historyButton.setOnClickListener(v ->
+                startActivity(new Intent(this, HistoryActivity.class)));
 
         bindStats(UserProfile.empty());
         if (!guest) {
