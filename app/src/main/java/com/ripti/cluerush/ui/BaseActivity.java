@@ -4,6 +4,7 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -22,14 +23,57 @@ import com.ripti.cluerush.ui.view.NeonMapBackgroundView;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
+    private static final String LIFECYCLE_TAG = "Lifecycle";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        logLifecycle("onCreate");
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         installBackground();
         installSystemBarAppearance();
     }
 
+    // Lifecycle callbacks: Logcat e tag:Lifecycle diye filter korle dekha jabe
+    @Override
+    protected void onStart() {
+        super.onStart();
+        logLifecycle("onStart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        logLifecycle("onResume");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        logLifecycle("onPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        logLifecycle("onStop");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        logLifecycle("onRestart");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        logLifecycle("onDestroy");
+    }
+
+    private void logLifecycle(String event) {
+        Log.d(LIFECYCLE_TAG, getClass().getSimpleName() + " -> " + event);
+    }
 
     @Override
     public void setContentView(@LayoutRes int layoutResId) {
@@ -63,7 +107,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         controller.setAppearanceLightStatusBars(!isNight);
         controller.setAppearanceLightNavigationBars(!isNight);
     }
-
 
     protected void applyInsets(View root) {
         final int baseLeft = root.getPaddingLeft();

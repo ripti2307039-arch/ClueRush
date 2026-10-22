@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.ripti.cluerush.data.ArenaCatalog;
 import com.ripti.cluerush.data.MatchRepository;
+import com.ripti.cluerush.data.TipRepository;
 import com.ripti.cluerush.databinding.ActivityMainBinding;
 import com.ripti.cluerush.databinding.DialogJoinCodeBinding;
 import com.ripti.cluerush.model.Arena;
@@ -47,6 +48,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private final MatchRepository matchRepository = new MatchRepository();
+    private final TipRepository tipRepository = new TipRepository();
 
     // Android 13+ e notification dekhate runtime permission lage
     private final ActivityResultLauncher<String> notificationPermission =
@@ -108,11 +110,13 @@ public class MainActivity extends BaseActivity {
                         R.string.action_start, this::openGame);
             }
         });
+        binding.tipCard.setOnClickListener(v -> loadTip());
 
         if (savedInstanceState == null) {
             EntranceAnimator.play(binding.contentColumn);
         }
 
+        loadTip();
         askNotificationPermission();
     }
 
@@ -122,6 +126,20 @@ public class MainActivity extends BaseActivity {
         if (FirebaseAuth.getInstance().getCurrentUser() == null && binding != null) {
             openLogin();
         }
+    }
+
+    private void loadTip() {
+        binding.tipText.setText(R.string.tip_loading);
+        binding.tipAuthor.setText("");
+        tipRepository.load(this, (quote, author, online) -> {
+            if (isFinishing() || isDestroyed()) {
+                return;
+            }
+            binding.tipText.setText(quote);
+            binding.tipAuthor.setText(online
+                    ? getString(R.string.tip_author, author)
+                    : getString(R.string.tip_offline));
+        });
     }
 
     private void askNotificationPermission() {

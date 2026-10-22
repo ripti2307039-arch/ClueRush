@@ -331,6 +331,16 @@
     <string name="net_lost">Connection lost. Reconnect or you may forfeit the match.</string>
     <string name="net_back">Back online</string>
     <string name="battery_low_warning">Battery is low. Plug in to avoid losing the match.</string>
+    <string name="tip_label">TIP OF THE DAY</string>
+    <string name="tip_loading">Loading…</string>
+    <string name="tip_offline">Offline tip · tap to retry</string>
+    <string name="tip_author">— %1$s · tap for another</string>
+    <string-array name="fallback_tips">
+        <item>Read the clue carefully before you start moving.</item>
+        <item>A calm start beats a fast wrong guess.</item>
+        <item>Practice mode is the best way to learn an arena.</item>
+        <item>Check your connection before starting a 1v1 match.</item>
+    </string-array>
 
 
 </resources>

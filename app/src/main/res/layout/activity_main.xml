@@ -62,6 +62,42 @@
                     android:textColor="@color/white" />
             </FrameLayout>
         </LinearLayout>
+        <!-- Tip of the day (HTTP + JSON) -->
+        <LinearLayout
+            android:id="@+id/tipCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_lg"
+            android:background="@drawable/bg_glass_card"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:padding="@dimen/space_md">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.2"
+                android:text="@string/tip_label"
+                android:textAppearance="@style/TextAppearance.ClueRush.Caption"
+                android:textColor="@color/cr_accent_text"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tipText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xs"
+                android:text="@string/tip_loading"
+                android:textAppearance="@style/TextAppearance.ClueRush.Body" />
+
+            <TextView
+                android:id="@+id/tipAuthor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_xs"
+                android:textAppearance="@style/TextAppearance.ClueRush.BodySecondary" />
+        </LinearLayout>
 
         <!-- Arenas -->
         <TextView
