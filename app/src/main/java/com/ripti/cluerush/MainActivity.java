@@ -20,10 +20,12 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.ripti.cluerush.data.ArenaCatalog;
+import com.ripti.cluerush.data.DailyChallenge;
+import com.ripti.cluerush.data.DailyRepository;
 import com.ripti.cluerush.data.MatchRepository;
-import com.ripti.cluerush.data.TipRepository;
 import com.ripti.cluerush.databinding.ActivityMainBinding;
 import com.ripti.cluerush.databinding.DialogJoinCodeBinding;
+import com.ripti.cluerush.game.DailyScoreStore;
 import com.ripti.cluerush.model.Arena;
 import com.ripti.cluerush.model.Difficulty;
 import com.ripti.cluerush.ui.BaseActivity;
@@ -37,6 +39,7 @@ import com.ripti.cluerush.util.EntranceAnimator;
 import com.ripti.cluerush.util.NetworkUtils;
 import com.ripti.cluerush.util.UserDisplay;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends BaseActivity {
@@ -48,7 +51,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private final MatchRepository matchRepository = new MatchRepository();
-    private final TipRepository tipRepository = new TipRepository();
+    private final DailyRepository dailyRepository = new DailyRepository();
 
     // Android 13+ e notification dekhate runtime permission lage
     private final ActivityResultLauncher<String> notificationPermission =
@@ -57,6 +60,9 @@ public class MainActivity extends BaseActivity {
 
     private ActivityMainBinding binding;
     private Arena selectedArena;
+    private List<Arena> allArenas = new ArrayList<>();
+    private DailyChallenge dailyChallenge;
+    private boolean dailyLoading;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,10 +87,12 @@ public class MainActivity extends BaseActivity {
         List<Arena> arenas = ArenaCatalog.getAll(this);
         if (arenas.isEmpty()) {
             binding.arenaList.setVisibility(View.GONE);
+            binding.dailyCard.setVisibility(View.GONE);
             binding.createMatchButton.setEnabled(false);
             binding.practiceButton.setEnabled(false);
             showMessage(getString(R.string.error_no_arenas));
         } else {
+            allArenas = arenas;
             selectedArena = arenas.get(0);
             ArenaAdapter adapter = new ArenaAdapter(arenas, arena -> selectedArena = arena);
             binding.arenaList.setLayoutManager(
@@ -110,13 +118,12 @@ public class MainActivity extends BaseActivity {
                         R.string.action_start, this::openGame);
             }
         });
-        binding.tipCard.setOnClickListener(v -> loadTip());
+        binding.dailyPlayButton.setOnClickListener(v -> openDaily());
 
         if (savedInstanceState == null) {
             EntranceAnimator.play(binding.contentColumn);
         }
 
-        loadTip();
         askNotificationPermission();
     }
 
@@ -125,21 +132,92 @@ public class MainActivity extends BaseActivity {
         super.onStart();
         if (FirebaseAuth.getInstance().getCurrentUser() == null && binding != null) {
             openLogin();
+            return;
+        }
+        if (binding == null || allArenas.isEmpty()) {
+            return;
+        }
+        // Prothom bar, ba raat 12 ta par hoye gele notun din er challenge load hobe
+        if (dailyChallenge == null || !dailyChallenge.date.equals(DailyChallenge.todayKey())) {
+            loadDaily();
+        } else {
+            renderDailyScore();
         }
     }
 
-    private void loadTip() {
-        binding.tipText.setText(R.string.tip_loading);
-        binding.tipAuthor.setText("");
-        tipRepository.load(this, (quote, author, online) -> {
+    private void loadDaily() {
+        if (dailyLoading) {
+            return;
+        }
+        dailyLoading = true;
+        binding.dailyPlayButton.setEnabled(false);
+        binding.dailyTitle.setText(R.string.daily_loading);
+        binding.dailyMeta.setText("");
+        binding.dailyScore.setText("");
+        dailyRepository.load(allArenas, challenge -> {
+            dailyLoading = false;
             if (isFinishing() || isDestroyed()) {
                 return;
             }
-            binding.tipText.setText(quote);
-            binding.tipAuthor.setText(online
-                    ? getString(R.string.tip_author, author)
-                    : getString(R.string.tip_offline));
+            dailyChallenge = challenge;
+            renderDaily();
         });
+    }
+
+    private void renderDaily() {
+        Arena arena = findArena(dailyChallenge.arenaId);
+        String arenaName = arena == null ? dailyChallenge.arenaId : arena.getName();
+        binding.dailyTitle.setText(getString(R.string.daily_title_format,
+                arenaName, difficultyLabel(dailyChallenge.difficulty)));
+        String source = getString(dailyChallenge.fromServer
+                ? R.string.daily_source_online : R.string.daily_source_offline);
+        binding.dailyMeta.setText(dailyChallenge.title.isEmpty()
+                ? source : dailyChallenge.title + " · " + source);
+        renderDailyScore();
+        binding.dailyPlayButton.setEnabled(arena != null);
+    }
+
+    private void renderDailyScore() {
+        if (dailyChallenge == null) {
+            return;
+        }
+        Integer score = DailyScoreStore.get(this, dailyChallenge.date);
+        binding.dailyScore.setText(score == null
+                ? getString(R.string.daily_score_none)
+                : getString(R.string.daily_score_value, score));
+    }
+
+    @Nullable
+    private Arena findArena(String id) {
+        for (Arena arena : allArenas) {
+            if (arena.getId().equals(id)) {
+                return arena;
+            }
+        }
+        return null;
+    }
+
+    private String difficultyLabel(Difficulty difficulty) {
+        switch (difficulty) {
+            case MEDIUM:
+                return getString(R.string.difficulty_medium_short);
+            case HARD:
+                return getString(R.string.difficulty_hard_short);
+            default:
+                return getString(R.string.difficulty_easy_short);
+        }
+    }
+
+    private void openDaily() {
+        if (dailyChallenge == null) {
+            return;
+        }
+        Intent intent = new Intent(this, GameActivity.class);
+        intent.putExtra(GameActivity.EXTRA_ARENA_ID, dailyChallenge.arenaId);
+        intent.putExtra(GameActivity.EXTRA_DIFFICULTY, dailyChallenge.difficulty.getKey());
+        intent.putExtra(GameActivity.EXTRA_SEED, dailyChallenge.seed);
+        intent.putExtra(GameActivity.EXTRA_DAILY_DATE, dailyChallenge.date);
+        startActivity(intent);
     }
 
     private void askNotificationPermission() {

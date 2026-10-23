@@ -82,6 +82,7 @@ import com.ripti.cluerush.data.MatchHistoryRepository;
 import com.ripti.cluerush.model.MatchHistoryItem;
 import com.ripti.cluerush.service.MatchService;
 import com.ripti.cluerush.receiver.MatchStatusReceiver;
+import com.ripti.cluerush.game.DailyScoreStore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,6 +99,7 @@ public class GameActivity extends BaseActivity {
     public static final String EXTRA_IS_HOST = "extra_is_host";
     public static final String EXTRA_START_AT = "extra_start_at";
     public static final String EXTRA_DURATION = "extra_duration";
+    public static final String EXTRA_DAILY_DATE = "extra_daily_date";
 
     private static final String PICK_TAG = "MapPick";
     private static final String TASK_TAG = "GameTask";
@@ -139,6 +141,7 @@ public class GameActivity extends BaseActivity {
     private MatchCoordinator.Opponent opponent;
     private MatchCoordinator.Reason forceReason;
     private String matchCode;
+    private String dailyDate;
     private boolean matchHost;
     private long matchStartAt;
     private long matchEndAt;
@@ -179,6 +182,7 @@ public class GameActivity extends BaseActivity {
 
         difficulty = Difficulty.fromKey(getIntent().getStringExtra(EXTRA_DIFFICULTY));
         matchCode = getIntent().getStringExtra(EXTRA_MATCH_CODE);
+        dailyDate = getIntent().getStringExtra(EXTRA_DAILY_DATE);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (isMatch() && user == null) {
             finish();
@@ -198,7 +202,7 @@ public class GameActivity extends BaseActivity {
         random = new Random(seed);
         int rounds = Math.min(MAX_ROUNDS, TaskType.values().length);
         session = new GameSession(
-                RoundGenerator.generate(this, arena, rounds, difficulty, random, !isMatch()),
+                RoundGenerator.generate(this, arena, rounds, difficulty, random, avoidRepeats()),
                 difficulty);
         configureWindow();
         MapConfig.init(this);
@@ -422,6 +426,12 @@ public class GameActivity extends BaseActivity {
 
     private boolean isMatch() {
         return matchCode != null;
+    }
+    private boolean isDaily() {
+        return dailyDate != null;
+    }
+    private boolean avoidRepeats() {
+        return !isMatch() && !isDaily();
     }
 
     private void beginMatchCountdown() {
@@ -977,7 +987,7 @@ public class GameActivity extends BaseActivity {
         stopPulse();
         publishProgress(true);
 
-        BaseTaskView view = TaskFactory.create(this, round.getTask(), !isMatch());
+        BaseTaskView view = TaskFactory.create(this, round.getTask(),avoidRepeats());
         if (view == null) {
             Log.e(TASK_TAG, "Task content missing for " + round.getTask().getType()
                     + ", skipping the task");
@@ -1245,18 +1255,20 @@ public class GameActivity extends BaseActivity {
         animateScoreTo(session.getTotalScore());
 
         int score = session.getTotalScore();
-
-        int previousBest = BestScoreStore.get(
-                this, arena.getId(), difficulty
-        );
-
-        boolean newBest = BestScoreStore.submit(
-                this, arena.getId(), difficulty, score
-        );
-
-        String bestLine = newBest
-                ? getString(R.string.score_new_best)
-                : getString(R.string.score_best, previousBest);
+        String bestLine;
+        if (isDaily()) {
+            Integer previousDaily = DailyScoreStore.get(this, dailyDate);
+            boolean newDailyBest = DailyScoreStore.submit(this, dailyDate, score);
+            bestLine = newDailyBest
+                    ? getString(R.string.daily_new_best)
+                    : getString(R.string.daily_best, previousDaily == null ? 0 : previousDaily);
+        } else {
+            int previousBest = BestScoreStore.get(this, arena.getId(), difficulty);
+            boolean newBest = BestScoreStore.submit(this, arena.getId(), difficulty, score);
+            bestLine = newBest
+                    ? getString(R.string.score_new_best)
+                    : getString(R.string.score_best, previousBest);
+        }
 
         String summary = buildFinalSummary(bestLine, null);
         showResult(
