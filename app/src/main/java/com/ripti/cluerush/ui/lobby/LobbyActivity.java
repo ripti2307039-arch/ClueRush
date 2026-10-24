@@ -26,6 +26,7 @@ import com.ripti.cluerush.model.Match;
 import com.ripti.cluerush.ui.BaseActivity;
 import com.ripti.cluerush.ui.game.GameActivity;
 import com.ripti.cluerush.util.EntranceAnimator;
+import com.ripti.cluerush.util.LobbyMusic;
 import com.ripti.cluerush.util.ServerClock;
 
 public class LobbyActivity extends BaseActivity {
@@ -38,6 +39,7 @@ public class LobbyActivity extends BaseActivity {
     private final MatchRepository repository = new MatchRepository();
 
     private ActivityLobbyBinding binding;
+    private LobbyMusic music;
     private PlayerAdapter adapter;
     private MatchRepository.ListenerHandle handle;
     private Match currentMatch;
@@ -64,6 +66,8 @@ public class LobbyActivity extends BaseActivity {
         binding = ActivityLobbyBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         applyInsets(binding.getRoot());
+
+        music = new LobbyMusic(this);
 
         binding.codeText.setText(code);
 
@@ -96,6 +100,7 @@ public class LobbyActivity extends BaseActivity {
         if (binding == null) {
             return;
         }
+        music.start();
         handle = repository.observeMatch(code, new MatchRepository.MatchListener() {
             @Override
             public void onMatchChanged(Match match) {
@@ -111,11 +116,22 @@ public class LobbyActivity extends BaseActivity {
 
     @Override
     protected void onStop() {
+        if (music != null) {
+            music.pause();
+        }
         if (handle != null) {
             handle.remove();
             handle = null;
         }
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (music != null) {
+            music.release();
+        }
+        super.onDestroy();
     }
 
     private boolean isStarted(Match match) {

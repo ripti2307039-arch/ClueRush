@@ -75,6 +75,7 @@ import com.ripti.cluerush.task.TaskFactory;
 import com.ripti.cluerush.task.TaskOverlayView;
 import com.ripti.cluerush.task.TaskType;
 import com.ripti.cluerush.ui.BaseActivity;
+import com.ripti.cluerush.util.GameMusic;
 import com.ripti.cluerush.util.GeoMath;
 import com.ripti.cluerush.util.MapConfig;
 import com.ripti.cluerush.util.ServerClock;
@@ -168,6 +169,8 @@ public class GameActivity extends BaseActivity {
     private CampusLocation zoneLocation;
     private ObjectAnimator pulseAnimator;
     private ValueAnimator scoreAnimator;
+    private GameMusic music;
+    private boolean musicStopped;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -213,6 +216,7 @@ public class GameActivity extends BaseActivity {
         applyInsets(binding.mapUiLayer);
 
         taskOverlay = new TaskOverlayView(this);
+        music = new GameMusic(this);
         ViewGroup root = (ViewGroup) binding.getRoot();
         root.addView(taskOverlay, root.indexOfChild(binding.resultOverlay),
                 new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -227,7 +231,7 @@ public class GameActivity extends BaseActivity {
 
         boolean island = IslandSpace.isIsland(arena);
         if (island) {
-           // player.setWalkMask(IslandSpace.walkMask(this));
+            // player.setWalkMask(IslandSpace.walkMask(this));
         }
 
         if (island) {
@@ -363,6 +367,9 @@ public class GameActivity extends BaseActivity {
             return;
         }
         hideSystemBars();
+        if (music != null && !musicStopped) {
+            music.start();
+        }
         gameMap.onResume();
         if (mapOpen) {
             overviewMap.onResume();
@@ -378,6 +385,9 @@ public class GameActivity extends BaseActivity {
 
     @Override
     protected void onPause() {
+        if (music != null) {
+            music.pause();
+        }
         if (gameLoop != null) {
             gameLoop.stop();
             binding.joystick.reset();
@@ -395,6 +405,9 @@ public class GameActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
+        if (music != null) {
+            music.release();
+        }
         MatchService.stop(this);
         handler.removeCallbacksAndMessages(null);
         if (coordinator != null) {
@@ -591,6 +604,7 @@ public class GameActivity extends BaseActivity {
             return;
         }
         runEnded = true;
+        stopMusic();
         lockInput();
         stopPulse();
         gameMap.hideZone();
@@ -645,6 +659,7 @@ public class GameActivity extends BaseActivity {
         }
         resultShown = true;
         runEnded = true;
+        stopMusic();
         finishedState = true;
         lockInput();
         stopPulse();
@@ -1248,7 +1263,15 @@ public class GameActivity extends BaseActivity {
         finish();
     }
 
+    private void stopMusic() {
+        musicStopped = true;
+        if (music != null) {
+            music.pause();
+        }
+    }
+
     private void showFinished() {
+        stopMusic();
         finishedState = true;
         gameMap.hideZone();
         publishMarkers();
