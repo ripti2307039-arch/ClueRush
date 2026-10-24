@@ -16,6 +16,7 @@ public class ImageOverviewMap implements OverviewMapView {
         view.setInteractive(true);
         view.setDrawPlayer(true);
         view.setFogEnabled(false);
+        view.setShowAllPins(true);
     }
 
     @Override

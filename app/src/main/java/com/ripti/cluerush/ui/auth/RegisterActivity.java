@@ -1,4 +1,3 @@
-
 package com.ripti.cluerush.ui.auth;
 
 import android.content.Intent;
@@ -12,7 +11,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
-import com.ripti.cluerush.MainActivity;
 import com.ripti.cluerush.R;
 import com.ripti.cluerush.data.UserRepository;
 import com.ripti.cluerush.databinding.ActivityRegisterBinding;
@@ -140,7 +138,7 @@ public class RegisterActivity extends BaseActivity {
                                     user.getUid(),
                                     name,
                                     email,
-                                    this::openHome
+                                    () -> openLogin(email)
                             ));
                 });
     }
@@ -168,8 +166,13 @@ public class RegisterActivity extends BaseActivity {
         return text == null ? "" : text.toString().trim();
     }
 
-    private void openHome() {
-        Intent intent = new Intent(this, MainActivity.class);
+    private void openLogin(String email) {
+
+        auth.signOut();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra(LoginActivity.EXTRA_EMAIL, email);
+        intent.putExtra(LoginActivity.EXTRA_REGISTERED, true);
 
         intent.addFlags(
                 Intent.FLAG_ACTIVITY_NEW_TASK

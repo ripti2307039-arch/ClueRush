@@ -17,6 +17,9 @@ import com.ripti.cluerush.util.EntranceAnimator;
 
 public class LoginActivity extends BaseActivity {
 
+    public static final String EXTRA_EMAIL = "extra_email";
+    public static final String EXTRA_REGISTERED = "extra_registered";
+
     private ActivityLoginBinding binding;
     private FirebaseAuth auth;
 
@@ -41,8 +44,16 @@ public class LoginActivity extends BaseActivity {
         binding.registerLink.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class)));
 
+        String prefillEmail = getIntent().getStringExtra(EXTRA_EMAIL);
+        if (prefillEmail != null) {
+            binding.emailInput.setText(prefillEmail);
+        }
+
         if (savedInstanceState == null) {
             EntranceAnimator.play(binding.contentColumn);
+            if (getIntent().getBooleanExtra(EXTRA_REGISTERED, false)) {
+                showError("Account created! Please log in.");
+            }
         }
     }
 

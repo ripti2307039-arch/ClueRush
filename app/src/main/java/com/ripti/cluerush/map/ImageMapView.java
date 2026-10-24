@@ -81,6 +81,7 @@ public class ImageMapView extends View {
     private double pickY = Double.NaN;
     private boolean fogEnabled;
     private boolean revealAll;
+    private boolean showAllPins;
     private boolean drawPlayer;
     private boolean interactive;
     private boolean pickEnabled;
@@ -166,6 +167,11 @@ public class ImageMapView extends View {
 
     public void setRevealAll(boolean value) {
         revealAll = value;
+        invalidate();
+    }
+
+    public void setShowAllPins(boolean value) {
+        showAllPins = value;
         invalidate();
     }
 
@@ -421,7 +427,7 @@ public class ImageMapView extends View {
             double my = IslandSpace.yMeters(marker.getLatitude());
             boolean known = marker.isDiscovered() || marker.isCompleted();
             boolean near = playerKnown && Math.hypot(mx - playerX, my - playerY) <= visionMeters;
-            if (!revealAll && !known && !near) {
+            if (!revealAll && !showAllPins && !known && !near) {
                 continue;
             }
             float x = sx(mx);
