@@ -1,5 +1,6 @@
 package com.ripti.cluerush.ui.view;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -52,6 +53,15 @@ public class MinimapView extends View {
     private double opponentLng = Double.NaN;
     private boolean opponentVisible;
 
+    private static final int TRAIL_MAX_POINTS = 70;
+    private static final double TRAIL_MIN_STEP_DEGREES = 0.000006;
+    private final Paint trailPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint opponentRingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final List<double[]> opponentTrail = new ArrayList<>();
+    private boolean spectate;
+    private float pulse;
+    private ValueAnimator pulseAnimator;
+
     public MinimapView(Context context) {
         this(context, null);
     }
@@ -100,6 +110,15 @@ public class MinimapView extends View {
         playerStrokePaint.setStyle(Paint.Style.STROKE);
         playerStrokePaint.setStrokeWidth(2f * density);
         playerStrokePaint.setColor(ContextCompat.getColor(context, R.color.rush_blue));
+
+        trailPaint.setStyle(Paint.Style.STROKE);
+        trailPaint.setStrokeCap(Paint.Cap.ROUND);
+        trailPaint.setStrokeWidth(2f * density);
+        trailPaint.setColor(ContextCompat.getColor(context, R.color.alert_red));
+
+        opponentRingPaint.setStyle(Paint.Style.STROKE);
+        opponentRingPaint.setStrokeWidth(1.5f * density);
+        opponentRingPaint.setColor(ContextCompat.getColor(context, R.color.alert_red));
     }
 
     public void setBounds(GeoBounds newBounds) {
@@ -132,7 +151,81 @@ public class MinimapView extends View {
         opponentLat = latitude;
         opponentLng = longitude;
         opponentVisible = visible;
+        if (spectate && visible && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
+            addTrailPoint(latitude, longitude);
+        }
+        updatePulse();
         invalidate();
+    }
+
+    /**
+     * Spectator mode: bigger opponent marker with a pulsing ring and a fading trail. Used on
+     * the waiting screen after the player has finished. The in-game minimap keeps this off.
+     */
+    public void setSpectate(boolean enabled) {
+        spectate = enabled;
+        if (!enabled) {
+            opponentTrail.clear();
+        }
+        updatePulse();
+        invalidate();
+    }
+
+    public void clearOpponentTrail() {
+        opponentTrail.clear();
+        invalidate();
+    }
+
+    private void addTrailPoint(double latitude, double longitude) {
+        if (!opponentTrail.isEmpty()) {
+            double[] last = opponentTrail.get(opponentTrail.size() - 1);
+            double dLat = Math.abs(last[0] - latitude);
+            double dLng = Math.abs(last[1] - longitude);
+            if (dLat < TRAIL_MIN_STEP_DEGREES && dLng < TRAIL_MIN_STEP_DEGREES) {
+                return;
+            }
+        }
+        opponentTrail.add(new double[] {latitude, longitude});
+        while (opponentTrail.size() > TRAIL_MAX_POINTS) {
+            opponentTrail.remove(0);
+        }
+    }
+
+    private void updatePulse() {
+        boolean needed = spectate && opponentVisible && isAttachedToWindow();
+        if (needed) {
+            if (pulseAnimator == null) {
+                pulseAnimator = ValueAnimator.ofFloat(0f, 1f);
+                pulseAnimator.setDuration(1100L);
+                pulseAnimator.setRepeatCount(ValueAnimator.INFINITE);
+                pulseAnimator.addUpdateListener(animation -> {
+                    pulse = (float) animation.getAnimatedValue();
+                    invalidate();
+                });
+            }
+            if (!pulseAnimator.isRunning()) {
+                pulseAnimator.start();
+            }
+        } else if (pulseAnimator != null) {
+            pulseAnimator.cancel();
+            pulseAnimator = null;
+            pulse = 0f;
+        }
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        updatePulse();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        if (pulseAnimator != null) {
+            pulseAnimator.cancel();
+            pulseAnimator = null;
+        }
+        super.onDetachedFromWindow();
     }
 
     @Override
@@ -151,6 +244,29 @@ public class MinimapView extends View {
         float half = density / 2f;
         borderRect.set(half, half, w - half, h - half);
         canvas.drawRoundRect(borderRect, corner, corner, borderPaint);
+    }
+
+    private void drawTrail(Canvas canvas, float left, float top, double west, double north,
+                           double cosLat, float scale, float mapW, float mapH) {
+        int count = opponentTrail.size();
+        if (count < 2) {
+            return;
+        }
+        float prevX = 0f;
+        float prevY = 0f;
+        for (int i = 0; i < count; i++) {
+            double[] point = opponentTrail.get(i);
+            float x = left + (float) ((point[1] - west) * cosLat * scale);
+            float y = top + (float) ((north - point[0]) * scale);
+            x = Math.max(left, Math.min(left + mapW, x));
+            y = Math.max(top, Math.min(top + mapH, y));
+            if (i > 0) {
+                trailPaint.setAlpha(30 + (int) (200f * i / count));
+                canvas.drawLine(prevX, prevY, x, y, trailPaint);
+            }
+            prevX = x;
+            prevY = y;
+        }
     }
 
     private void drawArena(Canvas canvas, float w, float h) {
@@ -201,8 +317,18 @@ public class MinimapView extends View {
             float oy = top + (float) ((north - opponentLat) * scale);
             ox = Math.max(left, Math.min(left + mapW, ox));
             oy = Math.max(top, Math.min(top + mapH, oy));
-            opponentPaint.setColor(ContextCompat.getColor(getContext(), R.color.heat_hot));
-            canvas.drawCircle(ox, oy, 4f * density, opponentPaint);
+            if (spectate) {
+                drawTrail(canvas, left, top, west, north, cosLat, scale, mapW, mapH);
+                float ringRadius = (6f + 12f * pulse) * density;
+                opponentRingPaint.setAlpha((int) (200 * (1f - pulse)));
+                canvas.drawCircle(ox, oy, ringRadius, opponentRingPaint);
+                opponentPaint.setColor(ContextCompat.getColor(getContext(), R.color.alert_red));
+                canvas.drawCircle(ox, oy, 5.5f * density, opponentPaint);
+                canvas.drawCircle(ox, oy, 5.5f * density, ringPaint);
+            } else {
+                opponentPaint.setColor(ContextCompat.getColor(getContext(), R.color.heat_hot));
+                canvas.drawCircle(ox, oy, 4f * density, opponentPaint);
+            }
         }
 
         if (!Double.isNaN(playerLat) && !Double.isNaN(playerLng)) {

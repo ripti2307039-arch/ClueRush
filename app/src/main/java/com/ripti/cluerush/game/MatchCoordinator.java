@@ -26,17 +26,19 @@ public final class MatchCoordinator {
         public final String name;
         public final int rounds;
         public final String phase;
+        public final int score;
         public final boolean hasPosition;
         public final double latitude;
         public final double longitude;
         public final int countdownSeconds;
         public final int offlineSeconds;
 
-        Opponent(String name, int rounds, String phase, boolean hasPosition, double latitude,
-                 double longitude, int countdownSeconds, int offlineSeconds) {
+        Opponent(String name, int rounds, String phase, int score, boolean hasPosition,
+                 double latitude, double longitude, int countdownSeconds, int offlineSeconds) {
             this.name = name;
             this.rounds = rounds;
             this.phase = phase;
+            this.score = score;
             this.hasPosition = hasPosition;
             this.latitude = latitude;
             this.longitude = longitude;
@@ -360,7 +362,8 @@ public final class MatchCoordinator {
         }
         int offline = offlineSince > 0L ? (int) ((now - offlineSince) / 1000L) : -1;
         listener.onOpponent(new Opponent(opp.getName(), opp.getRounds(), opp.getPhase(),
-                opp.hasPosition(), opp.getLatitude(), opp.getLongitude(), countdown, offline));
+                opp.getScore(), opp.hasPosition(), opp.getLatitude(), opp.getLongitude(),
+                countdown, offline));
     }
 
     private static int secondsUntil(long deadline, long now) {

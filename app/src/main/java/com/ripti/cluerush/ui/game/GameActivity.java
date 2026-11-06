@@ -51,6 +51,7 @@ import com.ripti.cluerush.game.HeatLevel;
 import com.ripti.cluerush.game.LocationScanner;
 import com.ripti.cluerush.game.MatchCoordinator;
 import com.ripti.cluerush.game.MatchResult;
+import com.ripti.cluerush.game.MatchRules;
 import com.ripti.cluerush.game.PlayerController;
 import com.ripti.cluerush.game.Rank;
 import com.ripti.cluerush.game.RoundGenerator;
@@ -105,6 +106,7 @@ public class GameActivity extends BaseActivity {
     private static final String PICK_TAG = "MapPick";
     private static final String TASK_TAG = "GameTask";
     private static final boolean OPPONENT_ALWAYS_ON_MINIMAP = false;
+    private static final int WAIT_URGENT_SECONDS = 10;
     private static final int MAX_ROUNDS = 5;
     private static final int MATCH_LOW_SECONDS = 60;
     private static final int URGENT_SECONDS = 10;
@@ -149,6 +151,8 @@ public class GameActivity extends BaseActivity {
     private int lastShownSeconds;
     private boolean runEnded;
     private boolean resultShown;
+    private int waitCountdownMax;
+    private ObjectAnimator liveBlink;
     private boolean forcedEnd;
     private double baseZoom;
     private float zoomOffset;
@@ -255,6 +259,12 @@ public class GameActivity extends BaseActivity {
         binding.minimapView.setVisionMeters(VISION_RADIUS_METERS);
         binding.minimapView.setPlayer(player.getLatitude(), player.getLongitude());
         binding.minimapView.setOnClickListener(v -> openMap());
+
+        binding.spectateMap.setBounds(arena.getBounds());
+        binding.spectateMap.setSpectate(true);
+        if (island) {
+            binding.spectateMap.setBackdrop(IslandSpace.mapBitmap(this));
+        }
 
         if (island) {
             binding.overviewMapView.setVisibility(View.GONE);
@@ -420,6 +430,10 @@ public class GameActivity extends BaseActivity {
         if (scoreAnimator != null) {
             scoreAnimator.cancel();
         }
+        if (liveBlink != null) {
+            liveBlink.cancel();
+            liveBlink = null;
+        }
         if (gameMap != null) {
             gameMap.onDestroy();
         }
@@ -531,7 +545,7 @@ public class GameActivity extends BaseActivity {
         renderOpponent();
         updateOpponentMarkers();
         if (runEnded) {
-            binding.resultBody.setText(buildWaitingBody());
+            renderWaitingPanel();
         }
     }
 
@@ -627,30 +641,111 @@ public class GameActivity extends BaseActivity {
 
     private void showWaiting() {
         boolean timeOut = forcedEnd && forceReason != MatchCoordinator.Reason.CLINCH;
+        binding.waitingPanel.setVisibility(View.VISIBLE);
+        binding.spectateMap.setPlayer(player.getLatitude(), player.getLongitude());
+        startLiveBlink();
+        renderWaitingPanel();
         showResult(getString(timeOut ? R.string.match_time_up : R.string.match_waiting_title),
                 rankLine(session.getRank()), buildWaitingBody(), R.string.action_leave);
     }
 
     private String buildWaitingBody() {
-        StringBuilder text = new StringBuilder();
-        String name = opponent == null
-                ? getString(R.string.match_opponent_fallback) : opponent.name;
-        text.append(getString(R.string.match_waiting_for, name));
-        if (opponent != null) {
-            if (opponent.offlineSeconds >= 0) {
-                appendLine(text, getString(R.string.opp_status_offline, name,
-                        opponent.offlineSeconds));
-            } else if (opponent.countdownSeconds >= 0) {
-                appendLine(text, getString(R.string.match_waiting_clock, name,
-                        formatClock(opponent.countdownSeconds)));
+        return buildFinalSummary(null, null);
+    }
+
+    private void renderWaitingPanel() {
+        if (binding.waitingPanel.getVisibility() != View.VISIBLE) {
+            return;
+        }
+        MatchCoordinator.Opponent info = opponent;
+        int total = Math.max(1, session.getTotal());
+        int mine = session.getTotalScore();
+        String name = info == null || info.name.isEmpty()
+                ? getString(R.string.match_opponent_fallback) : info.name;
+
+        binding.raceTrack.setTotal(total);
+        binding.raceTrack.setMe(getString(R.string.wait_you), session.getRoundsPlayed(), mine);
+
+        if (info == null) {
+            binding.countdownRing.setState(1f, "--", "", false, false);
+            binding.waitingPhase.setText("");
+            binding.waitingCaption.setText(getString(R.string.wait_caption_waiting, name));
+            return;
+        }
+
+        boolean solving = PlayerState.PHASE_SOLVING.equals(info.phase);
+        boolean exploring = PlayerState.PHASE_EXPLORING.equals(info.phase);
+        boolean offline = info.offlineSeconds >= 0;
+        int rounds = Math.max(0, Math.min(total, info.rounds));
+
+        binding.raceTrack.setOpponent(name, rounds, info.score, solving);
+
+        if (info.hasPosition) {
+            binding.spectateMap.setOpponent(info.latitude, info.longitude, true);
+        }
+
+        if (info.countdownSeconds > waitCountdownMax) {
+            waitCountdownMax = info.countdownSeconds;
+        }
+        if (offline) {
+            binding.countdownRing.setState(0f, getString(R.string.wait_ring_offline), "",
+                    false, true);
+        } else if (info.countdownSeconds >= 0) {
+            float fraction = waitCountdownMax <= 0
+                    ? 0f : info.countdownSeconds / (float) waitCountdownMax;
+            boolean urgent = info.countdownSeconds > 0
+                    && info.countdownSeconds <= WAIT_URGENT_SECONDS;
+            binding.countdownRing.setState(fraction, formatClock(info.countdownSeconds),
+                    getString(R.string.wait_ring_label), urgent, false);
+        } else {
+            binding.countdownRing.setState(1f, "--", "", false, false);
+        }
+
+        int phaseRes = solving ? R.string.wait_phase_solving
+                : exploring ? R.string.wait_phase_exploring : R.string.wait_phase_unknown;
+        binding.waitingPhase.setText(getString(phaseRes, name));
+
+        String caption;
+        if (offline) {
+            caption = getString(R.string.wait_caption_offline, name, info.offlineSeconds);
+        } else if (info.countdownSeconds == 0) {
+            caption = getString(R.string.wait_caption_settling);
+        } else {
+            int potential = MatchRules.potential(difficulty, total, rounds, info.score);
+            if (potential < mine) {
+                caption = getString(R.string.wait_caption_safe, name);
+            } else if (info.score > mine) {
+                caption = getString(R.string.wait_caption_ahead, name, info.score - mine);
+            } else if (info.score == mine) {
+                caption = getString(R.string.wait_caption_tied, name);
             } else {
-                appendLine(text, getString(R.string.match_waiting_progress, name,
-                        Math.min(opponent.rounds + 1, session.getTotal()), session.getTotal()));
+                caption = getString(R.string.wait_caption_needs, name,
+                        mine - info.score + 1);
+            }
+            if (total - rounds == 1) {
+                caption = getString(R.string.wait_caption_last_round, caption);
             }
         }
-        text.append("\n");
-        text.append(buildFinalSummary(null, null));
-        return text.toString();
+        binding.waitingCaption.setText(caption);
+    }
+
+    private void startLiveBlink() {
+        if (liveBlink != null) {
+            return;
+        }
+        liveBlink = ObjectAnimator.ofFloat(binding.spectateBadge, View.ALPHA, 1f, 0.25f);
+        liveBlink.setDuration(700L);
+        liveBlink.setRepeatCount(ValueAnimator.INFINITE);
+        liveBlink.setRepeatMode(ValueAnimator.REVERSE);
+        liveBlink.start();
+    }
+
+    private void stopLiveBlink() {
+        if (liveBlink != null) {
+            liveBlink.cancel();
+            liveBlink = null;
+        }
+        binding.spectateBadge.setAlpha(1f);
     }
 
     private void handleMatchResult(MatchResult result) {
@@ -659,6 +754,8 @@ public class GameActivity extends BaseActivity {
         }
         resultShown = true;
         runEnded = true;
+        binding.waitingPanel.setVisibility(View.GONE);
+        stopLiveBlink();
         stopMusic();
         finishedState = true;
         lockInput();
@@ -799,6 +896,7 @@ public class GameActivity extends BaseActivity {
         }
         gameMap.setMarkers(markers);
         binding.minimapView.setMarkers(markers);
+        binding.spectateMap.setMarkers(markers);
         overviewMap.setMarkers(markers);
     }
 

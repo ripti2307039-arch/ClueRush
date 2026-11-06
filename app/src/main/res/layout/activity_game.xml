@@ -380,6 +380,83 @@
                         android:layout_marginTop="@dimen/space_xs"
                         android:textAppearance="@style/TextAppearance.ClueRush.Title"
                         android:textColor="@color/treasure_gold" />
+                    <LinearLayout
+                        android:id="@+id/waitingPanel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_sm"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <FrameLayout
+                                android:layout_width="190dp"
+                                android:layout_height="136dp">
+
+                                <com.ripti.cluerush.ui.view.MinimapView
+                                    android:id="@+id/spectateMap"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent" />
+
+                                <TextView
+                                    android:id="@+id/spectateBadge"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="top|start"
+                                    android:layout_margin="@dimen/space_sm"
+                                    android:text="@string/wait_live"
+                                    android:textColor="@color/alert_red"
+                                    android:textSize="@dimen/text_micro"
+                                    android:textStyle="bold" />
+                            </FrameLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/space_md"
+                                android:gravity="center_horizontal"
+                                android:orientation="vertical">
+
+                                <com.ripti.cluerush.ui.view.CountdownRingView
+                                    android:id="@+id/countdownRing"
+                                    android:layout_width="104dp"
+                                    android:layout_height="104dp" />
+
+                                <TextView
+                                    android:id="@+id/waitingPhase"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/space_xs"
+                                    android:gravity="center"
+                                    android:maxWidth="132dp"
+                                    android:textColor="@color/hud_text_secondary"
+                                    android:textSize="@dimen/text_caption" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <com.ripti.cluerush.ui.view.RaceTrackView
+                            android:id="@+id/raceTrack"
+                            android:layout_width="match_parent"
+                            android:layout_height="68dp"
+                            android:layout_marginTop="@dimen/space_sm" />
+
+                        <TextView
+                            android:id="@+id/waitingCaption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="@dimen/space_xs"
+                            android:gravity="center"
+                            android:maxWidth="@dimen/result_body_max_width"
+                            android:textColor="@color/treasure_gold"
+                            android:textSize="@dimen/text_caption"
+                            android:textStyle="bold" />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/resultBody"
