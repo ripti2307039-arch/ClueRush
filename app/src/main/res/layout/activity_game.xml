@@ -124,13 +124,35 @@
             android:layout_marginTop="@dimen/hud_margin_small"
             android:orientation="horizontal">
 
-            <ImageButton
-                android:id="@+id/panelToggle"
-                android:layout_width="@dimen/panel_toggle_width"
-                android:layout_height="@dimen/panel_toggle_height"
-                android:background="@drawable/bg_hud_tab"
-                android:contentDescription="@string/cd_toggle_clue_panel"
-                android:src="@drawable/ic_chevron_right" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/panelToggle"
+                    android:layout_width="@dimen/panel_toggle_width"
+                    android:layout_height="@dimen/panel_toggle_height"
+                    android:background="@drawable/bg_hud_tab"
+                    android:contentDescription="@string/cd_toggle_clue_panel"
+                    android:src="@drawable/ic_chevron_right" />
+
+                <TextView
+                    android:id="@+id/captureCounter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
+                    android:background="@drawable/bg_hud_pill"
+                    android:paddingStart="@dimen/space_sm"
+                    android:paddingTop="@dimen/space_xs"
+                    android:paddingEnd="@dimen/space_sm"
+                    android:paddingBottom="@dimen/space_xs"
+                    android:textAppearance="@style/TextAppearance.ClueRush.Caption"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/clueCard"
@@ -155,6 +177,21 @@
                     android:textAppearance="@style/TextAppearance.ClueRush.Body"
                     android:textColor="@color/white"
                     android:textSize="14sp" />
+
+                <ScrollView
+                    android:id="@+id/captureClueScroll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_xs"
+                    android:fadeScrollbars="false"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:id="@+id/captureClueList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </ScrollView>
 
                 <TextView
                     android:id="@+id/heatChip"

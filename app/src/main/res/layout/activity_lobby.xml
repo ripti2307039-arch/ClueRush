@@ -121,6 +121,16 @@
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.ClueRush.BodySecondary" />
 
+        <TextView
+            android:id="@+id/voiceHintText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_sm"
+            android:gravity="center"
+            android:text="@string/lobby_voice_hint"
+            android:textAppearance="@style/TextAppearance.ClueRush.BodySecondary"
+            android:visibility="gone" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/readyButton"
             style="@style/Widget.ClueRush.Button.Gold"

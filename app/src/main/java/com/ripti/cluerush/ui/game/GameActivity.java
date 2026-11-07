@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +48,8 @@ import com.ripti.cluerush.R;
 import com.ripti.cluerush.data.ArenaCatalog;
 import com.ripti.cluerush.data.CaptureRepository;
 import com.ripti.cluerush.data.MatchLiveRepository;
+import com.ripti.cluerush.data.MatchRepository;
+import com.ripti.cluerush.data.TeamRepository;
 import com.ripti.cluerush.databinding.ActivityGameBinding;
 import com.ripti.cluerush.game.BestScoreStore;
 import com.ripti.cluerush.game.GameLoop;
@@ -94,7 +97,10 @@ import com.ripti.cluerush.receiver.MatchStatusReceiver;
 import com.ripti.cluerush.game.DailyScoreStore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
@@ -135,6 +141,10 @@ public class GameActivity extends BaseActivity {
     private static final long SCORE_COUNT_MS = 600L;
     private static final long COUNTDOWN_TICK_MS = 100L;
     private static final int LOSS_COLOR = 0xFFFF6B6B;
+    private static final int TEAM_BLUE = 0xFF36A3FF;
+    private static final int TEAM_RED = 0xFFFF4D6D;
+    private static final long DIRECTION_REFRESH_MS = 2000L;
+    private static final int LONG_CLUE_CHARS = 42;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable hideHint = this::dismissHint;
@@ -200,6 +210,16 @@ public class GameActivity extends BaseActivity {
     private String captureTaskLocationId;
     private int myCaptureCount;
     private int myCapturePoints;
+    private int capturePenalty;
+    private String myUid;
+    private TeamRepository teamRepository;
+    private TeamRepository.ListenerHandle claimsHandle;
+    private MatchRepository matchRepository;
+    private MatchRepository.ListenerHandle matchHandle;
+    private final Map<String, String> claims = new HashMap<>();
+    private final Map<String, String> playerNames = new HashMap<>();
+    private final HashSet<String> expandedClues = new HashSet<>();
+    private final Runnable directionTick = this::onDirectionTick;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -481,6 +501,7 @@ public class GameActivity extends BaseActivity {
         if (captureController != null) {
             captureController.stop();
         }
+        stopTeamObservers();
         if (coordinator != null) {
             if (!resultShown && !runEnded) {
                 saveForfeitStats();
@@ -1236,6 +1257,65 @@ public class GameActivity extends BaseActivity {
             }
         });
         captureController.start();
+        startTeamObservers(uid);
+    }
+
+    private void startTeamObservers(String uid) {
+        myUid = uid;
+        teamRepository = new TeamRepository();
+        claimsHandle = teamRepository.observeClaims(matchCode, myTeam,
+                new TeamRepository.ClaimsListener() {
+                    @Override
+                    public void onClaimsChanged(Map<String, String> updated) {
+                        if (isFinishing() || isDestroyed()) {
+                            return;
+                        }
+                        claims.clear();
+                        claims.putAll(updated);
+                        renderCapturePanel();
+                        scheduleDirectionRefresh();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        Log.e(TASK_TAG, "Claims unavailable: "
+                                + (error == null ? "?" : error.getMessage()));
+                    }
+                });
+        matchRepository = new MatchRepository();
+        matchHandle = matchRepository.observeMatch(matchCode,
+                new MatchRepository.MatchListener() {
+                    @Override
+                    public void onMatchChanged(Match match) {
+                        if (isFinishing() || isDestroyed()) {
+                            return;
+                        }
+                        playerNames.clear();
+                        for (com.ripti.cluerush.model.LobbyPlayer p : match.getPlayers()) {
+                            playerNames.put(p.getUid(), p.getName());
+                        }
+                        renderCapturePanel();
+                    }
+
+                    @Override
+                    public void onMatchRemoved() {
+                        // Match teardown is handled in a later phase.
+                    }
+                });
+    }
+
+    private void stopTeamObservers() {
+        if (teamRepository != null && myUid != null && claims.containsKey(myUid)) {
+            teamRepository.release(matchCode, myTeam, myUid);
+        }
+        if (claimsHandle != null) {
+            claimsHandle.remove();
+            claimsHandle = null;
+        }
+        if (matchHandle != null) {
+            matchHandle.remove();
+            matchHandle = null;
+        }
     }
 
     private int countCaptured(boolean mine) {
@@ -1259,28 +1339,194 @@ public class GameActivity extends BaseActivity {
     }
 
     private void renderCapturePanel() {
+        if (captureSession == null) {
+            return;
+        }
+        int captured = captureSession.getCapturedCount();
         binding.clueIndexText.setText(getString(R.string.capture_panel_title,
-                captureSession.getCapturedCount(), CaptureSession.LOCATION_COUNT));
+                captured, CaptureSession.LOCATION_COUNT));
+        binding.captureCounter.setText(getString(R.string.capture_counter,
+                captured, CaptureSession.LOCATION_COUNT));
+        binding.captureCounter.setVisibility(View.VISIBLE);
+        binding.clueText.setVisibility(View.GONE);
+        binding.captureClueScroll.setVisibility(View.VISIBLE);
 
+        LinearLayout list = binding.captureClueList;
+        list.removeAllViews();
         List<Round> rounds = captureSession.getRounds();
-        StringBuilder free = new StringBuilder();
-        StringBuilder taken = new StringBuilder();
-        for (int i = 0; i < rounds.size(); i++) {
-            Round round = rounds.get(i);
-            CaptureSession.CaptureInfo info =
-                    captureSession.getCaptureInfo(round.getLocation().getId());
-            if (info == null) {
-                appendLine(free, getString(R.string.capture_clue_line, i + 1, round.getClue()));
-            } else {
-                appendLine(taken, getString(myTeam.equals(info.getTeam())
-                        ? R.string.capture_clue_mine : R.string.capture_clue_enemy, i + 1));
+        for (int pass = 0; pass < 2; pass++) {
+            for (int i = 0; i < rounds.size(); i++) {
+                Round round = rounds.get(i);
+                CaptureSession.CaptureInfo info =
+                        captureSession.getCaptureInfo(round.getLocation().getId());
+                if ((info == null) == (pass == 0)) {
+                    list.addView(buildClueRow(i, round, info));
+                }
             }
         }
-        StringBuilder all = new StringBuilder(free);
-        if (taken.length() > 0) {
-            appendLine(all, taken.toString());
+        capClueListHeight(list);
+    }
+
+    private void capClueListHeight(LinearLayout list) {
+        int width = getResources().getDimensionPixelSize(R.dimen.clue_panel_width)
+                - 2 * getResources().getDimensionPixelSize(R.dimen.space_md);
+        list.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        int max = Math.round(getResources().getDisplayMetrics().heightPixels * 0.5f);
+        ViewGroup.LayoutParams params = binding.captureClueScroll.getLayoutParams();
+        int target = Math.min(list.getMeasuredHeight(), max);
+        if (params.height != target) {
+            params.height = target;
+            binding.captureClueScroll.setLayoutParams(params);
         }
-        binding.clueText.setText(all.toString());
+    }
+
+    private int dpPx(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
+    }
+
+    private View buildClueRow(int index, Round round, CaptureSession.CaptureInfo info) {
+        final String id = round.getLocation().getId();
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.VERTICAL);
+        row.setPadding(0, dpPx(6), 0, dpPx(6));
+
+        if (info != null) {
+            boolean mine = myTeam.equals(info.getTeam());
+            TextView done = new TextView(this);
+            done.setText(getString(mine
+                    ? R.string.capture_clue_mine : R.string.capture_clue_enemy, index + 1));
+            done.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+            done.setTextColor(mine ? TEAM_BLUE : TEAM_RED);
+            row.setAlpha(0.55f);
+            row.addView(done);
+            return row;
+        }
+
+        boolean expanded = expandedClues.contains(id);
+        boolean longClue = round.getClue().length() > LONG_CLUE_CHARS;
+
+        LinearLayout top = new LinearLayout(this);
+        top.setOrientation(LinearLayout.HORIZONTAL);
+        TextView title = new TextView(this);
+        title.setText(getString(R.string.capture_clue_line, index + 1, round.getClue()));
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+        title.setTextColor(0xFFFFFFFF);
+        if (!expanded) {
+            title.setMaxLines(2);
+            title.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        }
+        top.addView(title, new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+
+        if (longClue) {
+            TextView more = new TextView(this);
+            more.setText(expanded ? R.string.capture_collapse : R.string.capture_expand);
+            more.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f);
+            more.setTextColor(ContextCompat.getColor(this, R.color.hud_text_secondary));
+            more.setPadding(dpPx(8), dpPx(2), 0, dpPx(6));
+            more.setOnClickListener(v -> {
+                if (!expandedClues.remove(id)) {
+                    expandedClues.add(id);
+                }
+                renderCapturePanel();
+            });
+            top.addView(more);
+        }
+        row.addView(top);
+
+        String myClaim = myUid == null ? null : claims.get(myUid);
+        boolean iAmGoing = id.equals(myClaim);
+
+        if (iAmGoing) {
+            LinearLayout line = new LinearLayout(this);
+            line.setOrientation(LinearLayout.HORIZONTAL);
+            TextView status = new TextView(this);
+            status.setText(directionText(round));
+            status.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f);
+            status.setTextColor(ContextCompat.getColor(this, R.color.treasure_gold));
+            line.addView(status, new LinearLayout.LayoutParams(0,
+                    ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+            TextView release = new TextView(this);
+            release.setText(R.string.capture_release);
+            release.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f);
+            release.setTextColor(0xFFFFFFFF);
+            release.setTypeface(Typeface.DEFAULT_BOLD);
+            release.setPadding(dpPx(10), dpPx(4), dpPx(4), dpPx(4));
+            release.setOnClickListener(v -> releaseMyClaim());
+            line.addView(release);
+            row.addView(line);
+        }
+
+        for (Map.Entry<String, String> entry : claims.entrySet()) {
+            if (id.equals(entry.getValue()) && !entry.getKey().equals(myUid)) {
+                TextView mate = new TextView(this);
+                mate.setText(getString(R.string.capture_going_mate,
+                        nameOf(entry.getKey())));
+                mate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f);
+                mate.setTextColor(TEAM_BLUE);
+                row.addView(mate);
+            }
+        }
+
+        row.setOnClickListener(v -> onClueTapped(id));
+        return row;
+    }
+
+    private String nameOf(String uid) {
+        String name = playerNames.get(uid);
+        return name == null || name.trim().isEmpty()
+                ? getString(R.string.capture_teammate_fallback) : name;
+    }
+
+    private String directionText(Round round) {
+        CampusLocation target = round.getLocation();
+        double dy = target.getLatitude() - player.getLatitude();
+        double dx = (target.getLongitude() - player.getLongitude())
+                * Math.cos(Math.toRadians(player.getLatitude()));
+        double angle = Math.toDegrees(Math.atan2(dx, dy));
+        int slot = (int) Math.round(((angle % 360.0) + 360.0) % 360.0 / 45.0) % 8;
+        String[] compass = getResources().getStringArray(R.array.capture_compass);
+        return getString(R.string.capture_going_toward, compass[slot]);
+    }
+
+    private void onClueTapped(String id) {
+        if (runEnded || myUid == null || teamRepository == null
+                || captureSession.isCaptured(id)) {
+            return;
+        }
+        if (id.equals(claims.get(myUid))) {
+            return;
+        }
+        for (Map.Entry<String, String> entry : claims.entrySet()) {
+            if (id.equals(entry.getValue()) && !entry.getKey().equals(myUid)) {
+                showHint(getString(R.string.capture_claim_conflict,
+                        nameOf(entry.getKey())));
+                break;
+            }
+        }
+        teamRepository.claim(matchCode, myTeam, myUid, id);
+    }
+
+    private void releaseMyClaim() {
+        if (teamRepository != null && myUid != null) {
+            teamRepository.release(matchCode, myTeam, myUid);
+        }
+    }
+
+    private void scheduleDirectionRefresh() {
+        handler.removeCallbacks(directionTick);
+        if (myUid != null && claims.containsKey(myUid) && !runEnded) {
+            handler.postDelayed(directionTick, DIRECTION_REFRESH_MS);
+        }
+    }
+
+    private void onDirectionTick() {
+        if (runEnded || captureSession == null) {
+            return;
+        }
+        renderCapturePanel();
+        scheduleDirectionRefresh();
     }
 
     private void publishCaptureMarkers() {
@@ -1308,6 +1554,10 @@ public class GameActivity extends BaseActivity {
         if (captureSession == null || isFinishing() || isDestroyed()) {
             return;
         }
+        String myClaim = myUid == null ? null : claims.get(myUid);
+        if (myClaim != null && captureSession.isCaptured(myClaim)) {
+            releaseMyClaim();
+        }
         renderCapturePanel();
         publishMarkers();
         renderScoreText();
@@ -1334,7 +1584,15 @@ public class GameActivity extends BaseActivity {
         String id = insideLocation.getId();
         Round round = captureSession.getRoundByLocationId(id);
         if (round == null) {
-            showHint(getString(R.string.capture_not_target));
+            long now = SystemClock.uptimeMillis();
+            if (now - lastWrongAt < WRONG_COOLDOWN_MS) {
+                return;
+            }
+            lastWrongAt = now;
+            capturePenalty += ScoreRules.WRONG_PLACE_PENALTY;
+            shakeActionButton();
+            showHint(getString(R.string.capture_wrong_place, insideLocation.getName(),
+                    ScoreRules.WRONG_PLACE_PENALTY));
             return;
         }
         if (captureSession.isCaptured(id)) {
@@ -1386,7 +1644,9 @@ public class GameActivity extends BaseActivity {
         int limit = round.getTask().getType().timeLimitSeconds(difficulty);
         RoundScore score = ScoreRules.score(difficulty, true, mistakes, secondsLeft, limit,
                 ScoreRules.findParSeconds(difficulty), 0);
-        captureController.submitCorrectAnswer(id, score.getTotal());
+        int points = Math.max(0, score.getTotal() - capturePenalty);
+        capturePenalty = 0;
+        captureController.submitCorrectAnswer(id, points);
     }
 
     private void onMyCapture(CaptureRepository.CaptureRecord record) {
@@ -1452,6 +1712,8 @@ public class GameActivity extends BaseActivity {
             taskOverlay.cancel();
         }
         captureTaskLocationId = null;
+        releaseMyClaim();
+        handler.removeCallbacks(directionTick);
         lockInput();
         stopPulse();
         stopMusic();

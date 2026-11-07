@@ -372,6 +372,8 @@ public class LobbyActivity extends BaseActivity {
         );
 
         binding.difficultyText.setText(difficultyLabel(match.getDifficulty()));
+        binding.voiceHintText.setVisibility(
+                match.isTeamCaptureMode() ? View.VISIBLE : View.GONE);
 
         boolean iAmReady = match.isReady(uid);
 
@@ -416,17 +418,27 @@ public class LobbyActivity extends BaseActivity {
         if (startClicked) {
             binding.statusText.setText(R.string.lobby_status_starting);
         } else if (!roomFull) {
-            binding.statusText.setText(R.string.lobby_status_waiting_opponent);
+            if (match.isTeamCaptureMode()) {
+                binding.statusText.setText(getString(
+                        R.string.lobby_status_team_waiting_players,
+                        match.getPlayers().size(), match.getMaxPlayers()));
+            } else {
+                binding.statusText.setText(R.string.lobby_status_waiting_opponent);
+            }
         } else if (!balanced) {
             binding.statusText.setText(R.string.lobby_teams_unbalanced);
         } else if (allReady) {
-            binding.statusText.setText(
-                    host
-                            ? R.string.lobby_status_all_ready
-                            : R.string.lobby_status_waiting_host
-            );
+            if (host) {
+                binding.statusText.setText(match.isTeamCaptureMode()
+                        ? R.string.lobby_status_team_all_ready
+                        : R.string.lobby_status_all_ready);
+            } else {
+                binding.statusText.setText(R.string.lobby_status_waiting_host);
+            }
         } else {
-            binding.statusText.setText(R.string.lobby_status_waiting_ready);
+            binding.statusText.setText(match.isTeamCaptureMode()
+                    ? R.string.lobby_status_team_waiting_ready
+                    : R.string.lobby_status_waiting_ready);
         }
     }
 
@@ -458,6 +470,15 @@ public class LobbyActivity extends BaseActivity {
                 || startClicked
                 || !currentMatch.isTeamCaptureMode()
                 || currentMatch.isReady(uid)) {
+            return;
+        }
+
+        if (teamCount(currentMatch, targetTeam) >= TEAM_SLOTS) {
+            Snackbar.make(
+                    binding.getRoot(),
+                    R.string.lobby_target_team_full,
+                    Snackbar.LENGTH_SHORT
+            ).show();
             return;
         }
 

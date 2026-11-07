@@ -370,14 +370,38 @@
     <string name="lobby_unready_to_switch">Un-ready to switch team</string>
     <string name="lobby_teams_unbalanced">Teams must be 2 vs 2. Switch teams to balance.</string>
     <string name="lobby_team_full_switch">Your team is full. Switch to the other team first.</string>
+    <string name="lobby_voice_hint">Join a voice call (WhatsApp/Discord) with your teammate for best results.</string>
+    <string name="lobby_status_team_waiting_players">Waiting for players… %1$d/%2$d</string>
+    <string name="lobby_status_team_waiting_ready">Waiting for everyone to be ready</string>
+    <string name="lobby_status_team_all_ready">Everyone is ready</string>
+    <string name="lobby_target_team_full">That team is full.</string>
     <string name="lobby_switch_failed">Could not switch team. Try again.</string>
     <!-- Team capture mode (2v2) -->
+    <string name="capture_counter">%1$d/%2$d</string>
+    <string name="capture_going_you">You are going</string>
+    <string name="capture_going_toward">You are going · toward %1$s</string>
+    <string name="capture_going_mate">%1$s is going</string>
+    <string name="capture_release">Release</string>
+    <string name="capture_expand">More</string>
+    <string name="capture_collapse">Less</string>
+    <string name="capture_claim_conflict">%1$s is already going there.</string>
+    <string name="capture_teammate_fallback">Your teammate</string>
+    <string-array name="capture_compass">
+        <item>N</item>
+        <item>NE</item>
+        <item>E</item>
+        <item>SE</item>
+        <item>S</item>
+        <item>SW</item>
+        <item>W</item>
+        <item>NW</item>
+    </string-array>
     <string name="capture_hud">Us %1$d · Enemy %2$d · %3$s</string>
     <string name="capture_panel_title">CAPTURED %1$d OF %2$d</string>
     <string name="capture_clue_line">%1$d. %2$s</string>
     <string name="capture_clue_mine">%1$d. ✓ Captured by your team</string>
     <string name="capture_clue_enemy">%1$d. ✗ Captured by the enemy</string>
-    <string name="capture_not_target">This place is not part of this match.</string>
+    <string name="capture_wrong_place">This is %1$s, not a place any of your clues describe. −%2$d points.</string>
     <string name="capture_already_taken">This location is already captured.</string>
     <string name="capture_cooldown">Wait %1$d s before trying here again.</string>
     <string name="capture_wrong_cooldown">Not solved. Wait %1$d s before trying again.</string>
