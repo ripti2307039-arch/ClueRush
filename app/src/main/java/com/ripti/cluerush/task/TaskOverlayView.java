@@ -1,5 +1,7 @@
 package com.ripti.cluerush.task;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.SystemClock;
@@ -35,6 +37,8 @@ public class TaskOverlayView extends FrameLayout {
     private final float density;
     private final TextView titleText;
     private final TextView timerText;
+    private final TextView rushText;
+    private ObjectAnimator rushPulse;
     private final TextView hintText;
     private final View barFill;
     private final FrameLayout container;
@@ -61,6 +65,15 @@ public class TaskOverlayView extends FrameLayout {
         LinearLayout root = new LinearLayout(context);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(dp(20), dp(12), dp(20), dp(12));
+
+        rushText = text(13, R.color.white);
+        rushText.setGravity(Gravity.CENTER);
+        rushText.setBackgroundColor(color(R.color.alert_red));
+        rushText.setPadding(dp(10), dp(6), dp(10), dp(6));
+        rushText.setVisibility(GONE);
+        LinearLayout.LayoutParams rushParams = new LinearLayout.LayoutParams(MATCH, WRAP);
+        rushParams.bottomMargin = dp(8);
+        root.addView(rushText, rushParams);
 
         LinearLayout header = new LinearLayout(context);
         header.setOrientation(LinearLayout.HORIZONTAL);
@@ -100,6 +113,36 @@ public class TaskOverlayView extends FrameLayout {
         root.addView(scroll, scrollParams);
 
         addView(root, new FrameLayout.LayoutParams(MATCH, MATCH));
+    }
+    public void showRush(CharSequence text, boolean urgent) {
+        rushText.setText(text);
+        if (rushText.getVisibility() != VISIBLE) {
+            rushText.setVisibility(VISIBLE);
+        }
+        if (urgent) {
+            if (rushPulse == null) {
+                rushPulse = ObjectAnimator.ofFloat(rushText, ALPHA, 1f, 0.55f);
+                rushPulse.setDuration(450L);
+                rushPulse.setRepeatMode(ValueAnimator.REVERSE);
+                rushPulse.setRepeatCount(ValueAnimator.INFINITE);
+                rushPulse.start();
+            }
+        } else {
+            stopRushPulse();
+        }
+    }
+
+    public void hideRush() {
+        stopRushPulse();
+        rushText.setVisibility(GONE);
+    }
+
+    private void stopRushPulse() {
+        if (rushPulse != null) {
+            rushPulse.cancel();
+            rushPulse = null;
+        }
+        rushText.setAlpha(1f);
     }
 
     public boolean isActive() {
@@ -252,6 +295,7 @@ public class TaskOverlayView extends FrameLayout {
     @Override
     protected void onDetachedFromWindow() {
         removeCallbacks(tick);
+        stopRushPulse();
         super.onDetachedFromWindow();
     }
 }

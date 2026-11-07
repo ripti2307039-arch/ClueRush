@@ -230,6 +230,12 @@
     <string name="match_go">GO!</string>
     <string name="match_time_up">Time\'s up!</string>
     <string name="score_hud_match">Score %1$d · %2$s</string>
+    <string name="score_hud_rush">Score %1$d · FINAL %2$s</string>
+    <string name="rush_alert_title">%1$s finished all tasks!</string>
+    <string name="rush_alert_body">Your real deadline is %1$s now, not the match clock. Hurry up!</string>
+    <string name="rush_strip">FINAL COUNTDOWN %1$s · %2$s already finished</string>
+    <string name="rush_hint_30">30 seconds left to finish!</string>
+    <string name="rush_hint_10">10 seconds! Finish now!</string>
     <string name="action_start_match">Start match</string>
     <string name="lobby_status_waiting_host">Waiting for the host to start…</string>
     <string name="start_need_ready">Both players must press Ready first.</string>

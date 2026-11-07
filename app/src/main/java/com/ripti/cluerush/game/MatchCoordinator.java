@@ -32,9 +32,11 @@ public final class MatchCoordinator {
         public final double longitude;
         public final int countdownSeconds;
         public final int offlineSeconds;
+        public final long deadlineLocal;
 
         Opponent(String name, int rounds, String phase, int score, boolean hasPosition,
-                 double latitude, double longitude, int countdownSeconds, int offlineSeconds) {
+                 double latitude, double longitude, int countdownSeconds, int offlineSeconds,
+                 long deadlineLocal) {
             this.name = name;
             this.rounds = rounds;
             this.phase = phase;
@@ -44,6 +46,7 @@ public final class MatchCoordinator {
             this.longitude = longitude;
             this.countdownSeconds = countdownSeconds;
             this.offlineSeconds = offlineSeconds;
+            this.deadlineLocal = deadlineLocal;
         }
     }
 
@@ -354,16 +357,18 @@ public final class MatchCoordinator {
 
     private void publishOpponent(PlayerState opp, long now) {
         int countdown = -1;
+        long deadline = -1L;
         if (opp.isFinished() && !mineTerminal && opp.getFinishedAt() > 0L) {
-            countdown = secondsUntil(countdownDeadline(ServerClock.toLocal(opp.getFinishedAt())),
-                    now);
+            deadline = countdownDeadline(ServerClock.toLocal(opp.getFinishedAt()));
+            countdown = secondsUntil(deadline, now);
         } else if (mineTerminal && !opp.isFinished()) {
-            countdown = secondsUntil(countdownDeadline(myFinishedLocal), now);
+            deadline = countdownDeadline(myFinishedLocal);
+            countdown = secondsUntil(deadline, now);
         }
         int offline = offlineSince > 0L ? (int) ((now - offlineSince) / 1000L) : -1;
         listener.onOpponent(new Opponent(opp.getName(), opp.getRounds(), opp.getPhase(),
                 opp.getScore(), opp.hasPosition(), opp.getLatitude(), opp.getLongitude(),
-                countdown, offline));
+                countdown, offline, deadline));
     }
 
     private static int secondsUntil(long deadline, long now) {

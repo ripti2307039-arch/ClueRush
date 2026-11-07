@@ -14,6 +14,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.os.SystemClock;
 import android.util.Log;
 import android.util.TypedValue;
@@ -76,6 +78,7 @@ import com.ripti.cluerush.task.TaskFactory;
 import com.ripti.cluerush.task.TaskOverlayView;
 import com.ripti.cluerush.task.TaskType;
 import com.ripti.cluerush.ui.BaseActivity;
+import com.ripti.cluerush.ui.view.RushAlertView;
 import com.ripti.cluerush.util.GameMusic;
 import com.ripti.cluerush.util.GeoMath;
 import com.ripti.cluerush.util.MapConfig;
@@ -110,6 +113,9 @@ public class GameActivity extends BaseActivity {
     private static final int MAX_ROUNDS = 5;
     private static final int MATCH_LOW_SECONDS = 60;
     private static final int URGENT_SECONDS = 10;
+    private static final long RUSH_TICK_MS = 250L;
+    private static final int RUSH_URGENT_SECONDS = 10;
+    private static final int RUSH_WARN_SECONDS = 30;
     private static final double VISION_RADIUS_METERS = 80.0;
     private static final float MAX_ZOOM_OUT = 0.35f;
     private static final float ZOOM_RESPONSE = 3f;
@@ -127,6 +133,7 @@ public class GameActivity extends BaseActivity {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable hideHint = this::dismissHint;
     private final Runnable countdownTick = this::onCountdownTick;
+    private final Runnable rushTick = this::onRushTick;
 
     private Random random;
     private ActivityGameBinding binding;
@@ -134,6 +141,11 @@ public class GameActivity extends BaseActivity {
     private OverviewMapView overviewMap;
     private TaskOverlayView taskOverlay;
     private TextView countdownText;
+    private RushAlertView rushAlert;
+    private long rushDeadline;
+    private boolean rushAnnounced;
+    private int rushLastSecond = -1;
+    private String rushName = "";
     private PlayerController player;
     private GameLoop gameLoop;
     private GameSession session;
@@ -226,6 +238,13 @@ public class GameActivity extends BaseActivity {
                 new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT));
         applyInsets(taskOverlay);
+
+        rushAlert = new RushAlertView(this);
+        FrameLayout.LayoutParams rushParams = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
+                Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+        rushParams.topMargin = Math.round(28 * getResources().getDisplayMetrics().density);
+        root.addView(rushAlert, root.indexOfChild(binding.resultOverlay), rushParams);
 
         renderScoreText();
 
@@ -519,9 +538,14 @@ public class GameActivity extends BaseActivity {
             return;
         }
         int seconds = Math.max(0, lastShownSeconds);
-        binding.scoreText.setText(getString(R.string.score_hud_match, displayedScore,
-                formatClock(seconds)));
-        binding.scoreText.setTextColor(seconds <= MATCH_LOW_SECONDS
+        boolean rush = rushDeadline > 0L && !runEnded;
+        if (rush) {
+            seconds = Math.min(seconds, secondsToRush());
+        }
+        binding.scoreText.setText(getString(
+                rush ? R.string.score_hud_rush : R.string.score_hud_match,
+                displayedScore, formatClock(seconds)));
+        binding.scoreText.setTextColor(rush || seconds <= MATCH_LOW_SECONDS
                 ? LOSS_COLOR : ContextCompat.getColor(this, R.color.treasure_gold));
     }
 
@@ -542,10 +566,87 @@ public class GameActivity extends BaseActivity {
             return;
         }
         opponent = info;
+        updateRush(info);
         renderOpponent();
         updateOpponentMarkers();
         if (runEnded) {
             renderWaitingPanel();
+        }
+    }
+
+    private void updateRush(MatchCoordinator.Opponent info) {
+        if (!isMatch() || runEnded || resultShown) {
+            clearRush();
+            return;
+        }
+        if (info.deadlineLocal <= 0L || !PlayerState.PHASE_FINISHED.equals(info.phase)) {
+            return;
+        }
+        rushDeadline = info.deadlineLocal;
+        rushName = info.name.isEmpty() ? getString(R.string.match_opponent_fallback) : info.name;
+        if (!rushAnnounced) {
+            rushAnnounced = true;
+            rushAlert.show(getString(R.string.rush_alert_title, rushName),
+                    getString(R.string.rush_alert_body, formatClock(secondsToRush())));
+            buzz(400L);
+            handler.removeCallbacks(rushTick);
+            handler.post(rushTick);
+        }
+    }
+
+    private void onRushTick() {
+        if (rushDeadline <= 0L || runEnded || resultShown) {
+            clearRush();
+            return;
+        }
+        int seconds = secondsToRush();
+        taskOverlay.showRush(getString(R.string.rush_strip, formatClock(seconds), rushName),
+                seconds <= RUSH_URGENT_SECONDS);
+        renderScoreText();
+        if (seconds != rushLastSecond) {
+            rushLastSecond = seconds;
+            if (seconds == RUSH_WARN_SECONDS) {
+                buzz(200L);
+                showHint(getString(R.string.rush_hint_30));
+            } else if (seconds == RUSH_URGENT_SECONDS) {
+                buzz(250L);
+                showHint(getString(R.string.rush_hint_10));
+            } else if (seconds > 0 && seconds < 5) {
+                buzz(60L);
+            }
+        }
+        handler.postDelayed(rushTick, RUSH_TICK_MS);
+    }
+
+    private int secondsToRush() {
+        return (int) Math.max(0L, (rushDeadline - System.currentTimeMillis() + 999L) / 1000L);
+    }
+
+    private void clearRush() {
+        handler.removeCallbacks(rushTick);
+        rushDeadline = 0L;
+        if (taskOverlay != null) {
+            taskOverlay.hideRush();
+        }
+        if (rushAlert != null) {
+            rushAlert.dismissNow();
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void buzz(long millis) {
+        try {
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (vibrator == null || !vibrator.hasVibrator()) {
+                return;
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(millis,
+                        VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                vibrator.vibrate(millis);
+            }
+        } catch (RuntimeException ignored) {
         }
     }
 
@@ -618,6 +719,7 @@ public class GameActivity extends BaseActivity {
             return;
         }
         runEnded = true;
+        clearRush();
         stopMusic();
         lockInput();
         stopPulse();
@@ -754,6 +856,7 @@ public class GameActivity extends BaseActivity {
         }
         resultShown = true;
         runEnded = true;
+        clearRush();
         binding.waitingPanel.setVisibility(View.GONE);
         stopLiveBlink();
         stopMusic();
