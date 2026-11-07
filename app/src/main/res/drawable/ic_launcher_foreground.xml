@@ -1,30 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <path android:pathData="M31,63.928c0,0 6.4,-11 12.1,-13.1c7.2,-2.6 26,-1.4 26,-1.4l38.1,38.1L107,108.928l-32,-1L31,63.928z">
-        <aapt:attr name="android:fillColor">
-            <gradient
-                android:endX="85.84757"
-                android:endY="92.4963"
-                android:startX="42.9492"
-                android:startY="49.59793"
-                android:type="linear">
-                <item
-                    android:color="#44000000"
-                    android:offset="0.0" />
-                <item
-                    android:color="#00000000"
-                    android:offset="1.0" />
-            </gradient>
-        </aapt:attr>
-    </path>
-    <path
-        android:fillColor="#FFFFFF"
-        android:fillType="nonZero"
-        android:pathData="M65.3,45.828l3.8,-6.6c0.2,-0.4 0.1,-0.9 -0.3,-1.1c-0.4,-0.2 -0.9,-0.1 -1.1,0.3l-3.9,6.7c-6.3,-2.8 -13.4,-2.8 -19.7,0l-3.9,-6.7c-0.2,-0.4 -0.7,-0.5 -1.1,-0.3C38.8,38.328 38.7,38.828 38.9,39.228l3.8,6.6C36.2,49.428 31.7,56.028 31,63.928h46C76.3,56.028 71.8,49.428 65.3,45.828zM43.4,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2c-0.3,-0.7 -0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C45.3,56.528 44.5,57.328 43.4,57.328L43.4,57.328zM64.6,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2s-0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C66.5,56.528 65.6,57.328 64.6,57.328L64.6,57.328z"
-        android:strokeWidth="1"
-        android:strokeColor="#00000000" />
+    android:viewportWidth="281.46"
+    android:viewportHeight="281.46">
+
+    <group android:translateX="40.73" android:translateY="40.73">
+
+        <!-- timer ring -->
+        <path
+            android:pathData="M14,100 a86,86 0 1,0 172,0 a86,86 0 1,0 -172,0Z"
+            android:strokeColor="#1AFFFFFF"
+            android:strokeWidth="5" />
+        <path
+            android:pathData="M100,14 A86,86 0 1,1 17.6,124.7"
+            android:strokeColor="#2EE6A6"
+            android:strokeWidth="5"
+            android:strokeLineCap="round" />
+
+        <!-- game scene, scaled 0.84 -->
+        <group
+            android:pivotX="100"
+            android:pivotY="94"
+            android:scaleX="0.84"
+            android:scaleY="0.84"
+            android:translateY="6">
+
+            <!-- treasure glow -->
+            <path android:pathData="M74,62 a62,62 0 1,0 124,0 a62,62 0 1,0 -124,0Z">
+                <aapt:attr name="android:fillColor">
+                    <gradient
+                        android:type="radial"
+                        android:centerX="136"
+                        android:centerY="62"
+                        android:gradientRadius="62"
+                        android:startColor="#73FFB703"
+                        android:endColor="#00FFB703" />
+                </aapt:attr>
+            </path>
+
+            <!-- heat rings: cold, warm, hot -->
+            <path
+                android:pathData="M88,92 a48,17 0 1,0 96,0 a48,17 0 1,0 -96,0Z"
+                android:strokeColor="#804D8DFF"
+                android:strokeWidth="2" />
+            <path
+                android:pathData="M103,92 a33,12 0 1,0 66,0 a33,12 0 1,0 -66,0Z"
+                android:strokeColor="#B3FFB703"
+                android:strokeWidth="2.5" />
+            <path
+                android:pathData="M118,92 a18,6.5 0 1,0 36,0 a18,6.5 0 1,0 -36,0Z"
+                android:strokeColor="#FF4D5A"
+                android:strokeWidth="3" />
+
+            <!-- footsteps -->
+            <group
+                android:rotation="55"
+                android:scaleX="0.78"
+                android:scaleY="0.78"
+                android:translateX="35"
+                android:translateY="146">
+                <path
+                    android:fillColor="#D6E4FF"
+                    android:fillAlpha="0.4"
+                    android:pathData="M-7.5,-1 C-9,-12 -5,-23 0,-23 C5.5,-23 9,-12 7.5,-1 C6.5,3.5 -6.5,3.5 -7.5,-1Z M-5.6,12.5 a5.6,6 0 1,0 11.2,0 a5.6,6 0 1,0 -11.2,0Z" />
+            </group>
+            <group
+                android:rotation="55"
+                android:scaleX="0.86"
+                android:scaleY="0.86"
+                android:translateX="67"
+                android:translateY="142">
+                <path
+                    android:fillColor="#D6E4FF"
+                    android:fillAlpha="0.6"
+                    android:pathData="M-7.5,-1 C-9,-12 -5,-23 0,-23 C5.5,-23 9,-12 7.5,-1 C6.5,3.5 -6.5,3.5 -7.5,-1Z M-5.6,12.5 a5.6,6 0 1,0 11.2,0 a5.6,6 0 1,0 -11.2,0Z" />
+            </group>
+            <group
+                android:rotation="55"
+                android:scaleX="0.94"
+                android:scaleY="0.94"
+                android:translateX="79"
+                android:translateY="113">
+                <path
+                    android:fillColor="#D6E4FF"
+                    android:fillAlpha="0.82"
+                    android:pathData="M-7.5,-1 C-9,-12 -5,-23 0,-23 C5.5,-23 9,-12 7.5,-1 C6.5,3.5 -6.5,3.5 -7.5,-1Z M-5.6,12.5 a5.6,6 0 1,0 11.2,0 a5.6,6 0 1,0 -11.2,0Z" />
+            </group>
+            <group
+                android:rotation="55"
+                android:scaleX="1"
+                android:scaleY="1"
+                android:translateX="106"
+                android:translateY="111">
+                <path
+                    android:fillColor="#D6E4FF"
+                    android:fillAlpha="1"
+                    android:pathData="M-7.5,-1 C-9,-12 -5,-23 0,-23 C5.5,-23 9,-12 7.5,-1 C6.5,3.5 -6.5,3.5 -7.5,-1Z M-5.6,12.5 a5.6,6 0 1,0 11.2,0 a5.6,6 0 1,0 -11.2,0Z" />
+            </group>
+
+            <!-- opponent (1v1) -->
+            <path
+                android:pathData="M62.0,62.0L65.0,61.5M69.9,60.6L72.8,60.1M77.8,59.3L80.7,58.7M85.6,57.9L88.6,57.4M93.5,56.5L96.5,56.0M101.4,55.1L104.4,54.6"
+                android:strokeColor="#FF4D5A"
+                android:strokeAlpha="0.7"
+                android:strokeWidth="2"
+                android:strokeLineCap="round" />
+            <path
+                android:pathData="M41,63 a11,11 0 1,0 22,0 a11,11 0 1,0 -22,0Z"
+                android:strokeColor="#8CFF4D5A"
+                android:strokeWidth="2" />
+            <path
+                android:fillColor="#FF4D5A"
+                android:pathData="M46.5,63 a5.5,5.5 0 1,0 11,0 a5.5,5.5 0 1,0 -11,0Z" />
+
+            <!-- clue pin -->
+            <path
+                android:pathData="M136,92 C121,75 111,65 111,52 A25,25 0 1,1 161,52 C161,65 151,75 136,92Z"
+                android:strokeColor="#FFF3C4"
+                android:strokeWidth="1.5">
+                <aapt:attr name="android:fillColor">
+                    <gradient
+                        android:type="linear"
+                        android:startX="111"
+                        android:startY="27"
+                        android:endX="161"
+                        android:endY="92"
+                        android:startColor="#FFE27A"
+                        android:endColor="#FF9F1C" />
+                </aapt:attr>
+            </path>
+            <path
+                android:fillColor="#0D1C52"
+                android:pathData="M120,52 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0Z" />
+            <path
+                android:pathData="M129.5,47.5 A6.8,6.8 0 1,1 138,54 C136.4,55 136,56 136,58.5"
+                android:strokeColor="#FFE27A"
+                android:strokeWidth="4.2"
+                android:strokeLineCap="round" />
+            <path
+                android:fillColor="#FFE27A"
+                android:pathData="M133.3,64.5 a2.7,2.7 0 1,0 5.4,0 a2.7,2.7 0 1,0 -5.4,0Z" />
+
+            <!-- sparkle -->
+            <path
+                android:fillColor="#FFFFFF"
+                android:pathData="M156,138 l2.6,7 7,2.6 -7,2.6 -2.6,7 -2.6,-7 -7,-2.6 7,-2.6z" />
+        </group>
+    </group>
 </vector>
