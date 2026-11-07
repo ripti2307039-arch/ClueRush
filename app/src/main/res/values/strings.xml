@@ -362,6 +362,15 @@
     <string name="daily_play">Play today\'s challenge</string>
     <string name="daily_new_best">New best for today!</string>
     <string name="daily_best">Today\'s best: %1$d</string>
+    <string name="lobby_team_a">TEAM A</string>
+    <string name="lobby_team_b">TEAM B</string>
+    <string name="lobby_team_count">%1$d/%2$d</string>
+    <string name="lobby_open_slot">Open slot</string>
+    <string name="lobby_switch_to_team">Switch to Team %1$s</string>
+    <string name="lobby_unready_to_switch">Un-ready to switch team</string>
+    <string name="lobby_teams_unbalanced">Teams must be 2 vs 2. Switch teams to balance.</string>
+    <string name="lobby_team_full_switch">Your team is full. Switch to the other team first.</string>
+    <string name="lobby_switch_failed">Could not switch team. Try again.</string>
 
 
 </resources>

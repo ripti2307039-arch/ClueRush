@@ -1,3 +1,4 @@
+
 package com.ripti.cluerush;
 
 import android.Manifest;
@@ -28,6 +29,7 @@ import com.ripti.cluerush.databinding.DialogJoinCodeBinding;
 import com.ripti.cluerush.game.DailyScoreStore;
 import com.ripti.cluerush.model.Arena;
 import com.ripti.cluerush.model.Difficulty;
+import com.ripti.cluerush.model.Match;
 import com.ripti.cluerush.ui.BaseActivity;
 import com.ripti.cluerush.ui.auth.LoginActivity;
 import com.ripti.cluerush.ui.game.GameActivity;
@@ -53,7 +55,6 @@ public class MainActivity extends BaseActivity {
     private final MatchRepository matchRepository = new MatchRepository();
     private final DailyRepository dailyRepository = new DailyRepository();
 
-    // Android 13+ e notification dekhate runtime permission lage
     private final ActivityResultLauncher<String> notificationPermission =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(),
                     granted -> { });
@@ -81,10 +82,12 @@ public class MainActivity extends BaseActivity {
         String name = UserDisplay.displayName(this, user);
         binding.greetingText.setText(getString(R.string.greeting_user, name));
         binding.avatarButton.setText(UserDisplay.initial(name));
+
         binding.avatarButton.setOnClickListener(v ->
                 startActivity(new Intent(this, ProfileActivity.class)));
 
         List<Arena> arenas = ArenaCatalog.getAll(this);
+
         if (arenas.isEmpty()) {
             binding.arenaList.setVisibility(View.GONE);
             binding.dailyCard.setVisibility(View.GONE);
@@ -94,30 +97,48 @@ public class MainActivity extends BaseActivity {
         } else {
             allArenas = arenas;
             selectedArena = arenas.get(0);
-            ArenaAdapter adapter = new ArenaAdapter(arenas, arena -> selectedArena = arena);
+
+            ArenaAdapter adapter = new ArenaAdapter(
+                    arenas,
+                    arena -> selectedArena = arena
+            );
+
             binding.arenaList.setLayoutManager(
-                    new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+                    new LinearLayoutManager(
+                            this,
+                            LinearLayoutManager.HORIZONTAL,
+                            false
+                    )
+            );
+
             binding.arenaList.setItemAnimator(null);
             binding.arenaList.setAdapter(adapter);
         }
 
         binding.createMatchButton.setOnClickListener(v -> {
             if (selectedArena != null) {
-                showDifficultyDialog(
-                        getString(R.string.create_dialog_title, selectedArena.getName()),
-                        R.string.action_create, this::createMatch);
+                showMatchModeDialog();
             }
         });
+
         binding.joinButton.setOnClickListener(v -> showJoinDialog());
+
         binding.leaderboardButton.setOnClickListener(v ->
                 startActivity(new Intent(this, LeaderboardActivity.class)));
+
         binding.practiceButton.setOnClickListener(v -> {
             if (selectedArena != null) {
                 showDifficultyDialog(
-                        getString(R.string.practice_dialog_title, selectedArena.getName()),
-                        R.string.action_start, this::openGame);
+                        getString(
+                                R.string.practice_dialog_title,
+                                selectedArena.getName()
+                        ),
+                        R.string.action_start,
+                        this::openGame
+                );
             }
         });
+
         binding.dailyPlayButton.setOnClickListener(v -> openDaily());
 
         if (savedInstanceState == null) {
@@ -130,15 +151,19 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (FirebaseAuth.getInstance().getCurrentUser() == null && binding != null) {
+
+        if (FirebaseAuth.getInstance().getCurrentUser() == null
+                && binding != null) {
             openLogin();
             return;
         }
+
         if (binding == null || allArenas.isEmpty()) {
             return;
         }
-        // Prothom bar, ba raat 12 ta par hoye gele notun din er challenge load hobe
-        if (dailyChallenge == null || !dailyChallenge.date.equals(DailyChallenge.todayKey())) {
+
+        if (dailyChallenge == null
+                || !dailyChallenge.date.equals(DailyChallenge.todayKey())) {
             loadDaily();
         } else {
             renderDailyScore();
@@ -149,16 +174,20 @@ public class MainActivity extends BaseActivity {
         if (dailyLoading) {
             return;
         }
+
         dailyLoading = true;
         binding.dailyPlayButton.setEnabled(false);
         binding.dailyTitle.setText(R.string.daily_loading);
         binding.dailyMeta.setText("");
         binding.dailyScore.setText("");
+
         dailyRepository.load(allArenas, challenge -> {
             dailyLoading = false;
+
             if (isFinishing() || isDestroyed()) {
                 return;
             }
+
             dailyChallenge = challenge;
             renderDaily();
         });
@@ -166,13 +195,31 @@ public class MainActivity extends BaseActivity {
 
     private void renderDaily() {
         Arena arena = findArena(dailyChallenge.arenaId);
-        String arenaName = arena == null ? dailyChallenge.arenaId : arena.getName();
-        binding.dailyTitle.setText(getString(R.string.daily_title_format,
-                arenaName, difficultyLabel(dailyChallenge.difficulty)));
-        String source = getString(dailyChallenge.fromServer
-                ? R.string.daily_source_online : R.string.daily_source_offline);
-        binding.dailyMeta.setText(dailyChallenge.title.isEmpty()
-                ? source : dailyChallenge.title + " · " + source);
+
+        String arenaName = arena == null
+                ? dailyChallenge.arenaId
+                : arena.getName();
+
+        binding.dailyTitle.setText(
+                getString(
+                        R.string.daily_title_format,
+                        arenaName,
+                        difficultyLabel(dailyChallenge.difficulty)
+                )
+        );
+
+        String source = getString(
+                dailyChallenge.fromServer
+                        ? R.string.daily_source_online
+                        : R.string.daily_source_offline
+        );
+
+        binding.dailyMeta.setText(
+                dailyChallenge.title.isEmpty()
+                        ? source
+                        : dailyChallenge.title + " · " + source
+        );
+
         renderDailyScore();
         binding.dailyPlayButton.setEnabled(arena != null);
     }
@@ -181,10 +228,14 @@ public class MainActivity extends BaseActivity {
         if (dailyChallenge == null) {
             return;
         }
+
         Integer score = DailyScoreStore.get(this, dailyChallenge.date);
-        binding.dailyScore.setText(score == null
-                ? getString(R.string.daily_score_none)
-                : getString(R.string.daily_score_value, score));
+
+        binding.dailyScore.setText(
+                score == null
+                        ? getString(R.string.daily_score_none)
+                        : getString(R.string.daily_score_value, score)
+        );
     }
 
     @Nullable
@@ -194,6 +245,7 @@ public class MainActivity extends BaseActivity {
                 return arena;
             }
         }
+
         return null;
     }
 
@@ -201,8 +253,10 @@ public class MainActivity extends BaseActivity {
         switch (difficulty) {
             case MEDIUM:
                 return getString(R.string.difficulty_medium_short);
+
             case HARD:
                 return getString(R.string.difficulty_hard_short);
+
             default:
                 return getString(R.string.difficulty_easy_short);
         }
@@ -212,59 +266,117 @@ public class MainActivity extends BaseActivity {
         if (dailyChallenge == null) {
             return;
         }
+
         Intent intent = new Intent(this, GameActivity.class);
         intent.putExtra(GameActivity.EXTRA_ARENA_ID, dailyChallenge.arenaId);
-        intent.putExtra(GameActivity.EXTRA_DIFFICULTY, dailyChallenge.difficulty.getKey());
+        intent.putExtra(
+                GameActivity.EXTRA_DIFFICULTY,
+                dailyChallenge.difficulty.getKey()
+        );
         intent.putExtra(GameActivity.EXTRA_SEED, dailyChallenge.seed);
         intent.putExtra(GameActivity.EXTRA_DAILY_DATE, dailyChallenge.date);
+
         startActivity(intent);
     }
 
     private void askNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED) {
-            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
+                && ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+        ) != PackageManager.PERMISSION_GRANTED) {
+            notificationPermission.launch(
+                    Manifest.permission.POST_NOTIFICATIONS
+            );
         }
     }
 
-    private void showDifficultyDialog(String title, @StringRes int positiveLabel,
-                                      DifficultyListener listener) {
+    private void showMatchModeDialog() {
+        String[] modes = {
+                "Classic 1v1",
+                "Team Capture 2v2"
+        };
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Select Game Mode")
+                .setItems(modes, (dialog, which) -> {
+                    if (which == 0) {
+                        showDifficultyDialog(
+                                getString(
+                                        R.string.create_dialog_title,
+                                        selectedArena.getName()
+                                ),
+                                R.string.action_create,
+                                difficulty -> createMatch(difficulty, false)
+                        );
+                    } else if (which == 1) {
+                        showDifficultyDialog(
+                                getString(
+                                        R.string.create_dialog_title,
+                                        selectedArena.getName()
+                                ),
+                                R.string.action_create,
+                                difficulty -> createMatch(difficulty, true)
+                        );
+                    }
+                })
+                .setNegativeButton(R.string.action_cancel, null)
+                .show();
+    }
+
+    private void showDifficultyDialog(
+            String title,
+            @StringRes int positiveLabel,
+            DifficultyListener listener
+    ) {
         String[] options = {
                 getString(R.string.difficulty_easy),
                 getString(R.string.difficulty_medium),
                 getString(R.string.difficulty_hard)
         };
+
         Difficulty[] values = Difficulty.values();
         int[] choice = {0};
+
         new MaterialAlertDialogBuilder(this)
                 .setTitle(title)
-                .setSingleChoiceItems(options, 0, (dialog, which) -> choice[0] = which)
+                .setSingleChoiceItems(
+                        options,
+                        0,
+                        (dialog, which) -> choice[0] = which
+                )
                 .setNegativeButton(R.string.action_cancel, null)
-                .setPositiveButton(positiveLabel, (dialog, which) ->
-                        listener.onChosen(values[choice[0]].getKey()))
+                .setPositiveButton(
+                        positiveLabel,
+                        (dialog, which) ->
+                                listener.onChosen(values[choice[0]].getKey())
+                )
                 .show();
     }
 
-    private void createMatch(String difficulty) {
+    private void createMatch(String difficulty, boolean teamCapture) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         if (user == null) {
             openLogin();
             return;
         }
+
         if (!NetworkUtils.isOnline(this)) {
             showMessage(getString(R.string.error_no_internet));
             return;
         }
 
         setBusy(true, true);
-        matchRepository.createMatch(user.getUid(), UserDisplay.displayName(this, user),
-                selectedArena.getId(), difficulty, new MatchRepository.CreateCallback() {
+
+        MatchRepository.CreateCallback callback =
+                new MatchRepository.CreateCallback() {
                     @Override
                     public void onCreated(String code) {
                         if (isFinishing() || isDestroyed()) {
                             return;
                         }
+
                         setBusy(false, true);
                         openLobby(code);
                     }
@@ -274,14 +386,39 @@ public class MainActivity extends BaseActivity {
                         if (isFinishing() || isDestroyed()) {
                             return;
                         }
+
                         setBusy(false, true);
                         showMessage(getString(messageRes));
                     }
-                });
+                };
+
+        String uid = user.getUid();
+        String name = UserDisplay.displayName(this, user);
+        String arenaId = selectedArena.getId();
+
+        if (teamCapture) {
+            matchRepository.createTeamCaptureMatch(
+                    uid,
+                    name,
+                    arenaId,
+                    difficulty,
+                    callback
+            );
+        } else {
+            matchRepository.createMatch(
+                    uid,
+                    name,
+                    arenaId,
+                    difficulty,
+                    callback
+            );
+        }
     }
 
     private void showJoinDialog() {
-        DialogJoinCodeBinding dialogBinding = DialogJoinCodeBinding.inflate(getLayoutInflater());
+        DialogJoinCodeBinding dialogBinding =
+                DialogJoinCodeBinding.inflate(getLayoutInflater());
+
         AlertDialog dialog = new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.join_with_code)
                 .setView(dialogBinding.getRoot())
@@ -290,38 +427,56 @@ public class MainActivity extends BaseActivity {
                 .create();
 
         dialog.setOnShowListener(d ->
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                    CharSequence raw = dialogBinding.codeInput.getText();
-                    String code = raw == null ? "" : raw.toString().trim().toUpperCase();
-                    if (!code.matches(CODE_PATTERN)) {
-                        dialogBinding.codeLayout.setError(getString(R.string.join_error));
-                        return;
-                    }
-                    dialog.dismiss();
-                    joinMatch(code);
-                }));
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                        .setOnClickListener(v -> {
+                            CharSequence raw =
+                                    dialogBinding.codeInput.getText();
+
+                            String code = raw == null
+                                    ? ""
+                                    : raw.toString().trim().toUpperCase();
+
+                            if (!code.matches(CODE_PATTERN)) {
+                                dialogBinding.codeLayout.setError(
+                                        getString(R.string.join_error)
+                                );
+                                return;
+                            }
+
+                            dialog.dismiss();
+                            joinMatch(code);
+                        })
+        );
+
         dialog.show();
     }
 
     private void joinMatch(String code) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         if (user == null) {
             openLogin();
             return;
         }
+
         if (!NetworkUtils.isOnline(this)) {
             showMessage(getString(R.string.error_no_internet));
             return;
         }
 
         setBusy(true, false);
-        matchRepository.joinMatch(user.getUid(), UserDisplay.displayName(this, user), code,
+
+        matchRepository.joinMatch(
+                user.getUid(),
+                UserDisplay.displayName(this, user),
+                code,
                 new MatchRepository.JoinCallback() {
                     @Override
                     public void onJoined() {
                         if (isFinishing() || isDestroyed()) {
                             return;
                         }
+
                         setBusy(false, false);
                         openLobby(code);
                     }
@@ -331,20 +486,27 @@ public class MainActivity extends BaseActivity {
                         if (isFinishing() || isDestroyed()) {
                             return;
                         }
+
                         setBusy(false, false);
                         showMessage(getString(messageRes));
                     }
-                });
+                }
+        );
     }
 
     private void setBusy(boolean busy, boolean fromCreate) {
         binding.createMatchButton.setEnabled(!busy);
         binding.joinButton.setEnabled(!busy);
         binding.practiceButton.setEnabled(!busy);
+
         if (fromCreate) {
-            binding.createMatchButton.setText(busy ? R.string.loading : R.string.create_match);
+            binding.createMatchButton.setText(
+                    busy ? R.string.loading : R.string.create_match
+            );
         } else {
-            binding.joinButton.setText(busy ? R.string.loading : R.string.join_with_code);
+            binding.joinButton.setText(
+                    busy ? R.string.loading : R.string.join_with_code
+            );
         }
     }
 
@@ -362,12 +524,19 @@ public class MainActivity extends BaseActivity {
     }
 
     private void showMessage(String message) {
-        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(
+                binding.getRoot(),
+                message,
+                Snackbar.LENGTH_LONG
+        ).show();
     }
 
     private void openLogin() {
         Intent intent = new Intent(this, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_CLEAR_TASK
+        );
         startActivity(intent);
     }
 }

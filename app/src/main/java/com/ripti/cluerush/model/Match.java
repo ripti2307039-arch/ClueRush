@@ -1,3 +1,4 @@
+
 package com.ripti.cluerush.model;
 
 import java.util.ArrayList;
@@ -16,7 +17,11 @@ public class Match {
     public static final String DIFFICULTY_MEDIUM = "medium";
     public static final String DIFFICULTY_HARD = "hard";
 
+    public static final String MODE_CLASSIC = "1v1";
+    public static final String MODE_TEAM_CAPTURE = "2v2_capture";
+
     public static final int DEFAULT_MAX_PLAYERS = 2;
+    public static final int TEAM_CAPTURE_MAX_PLAYERS = 4;
     public static final int DEFAULT_DURATION_SECONDS = 900;
 
     private final String code;
@@ -24,6 +29,7 @@ public class Match {
     private final String hostUid;
     private final String status;
     private final String difficulty;
+    private final String gameMode;
     private final int maxPlayers;
     private final int durationSeconds;
     private final long seed;
@@ -33,11 +39,19 @@ public class Match {
     public Match(String code, String arenaId, String hostUid, String status, String difficulty,
                  int maxPlayers, int durationSeconds, long seed, long startAt,
                  List<LobbyPlayer> players) {
+        this(code, arenaId, hostUid, status, difficulty, maxPlayers,
+                durationSeconds, seed, startAt, players, MODE_CLASSIC);
+    }
+
+    public Match(String code, String arenaId, String hostUid, String status, String difficulty,
+                 int maxPlayers, int durationSeconds, long seed, long startAt,
+                 List<LobbyPlayer> players, String gameMode) {
         this.code = code;
         this.arenaId = arenaId;
         this.hostUid = hostUid;
         this.status = status;
         this.difficulty = difficulty;
+        this.gameMode = gameMode == null ? MODE_CLASSIC : gameMode;
         this.maxPlayers = Math.max(1, maxPlayers);
         this.durationSeconds = durationSeconds;
         this.seed = seed;
@@ -73,6 +87,18 @@ public class Match {
 
     public String getDifficulty() {
         return difficulty;
+    }
+
+    public String getGameMode() {
+        return gameMode;
+    }
+
+    public boolean isTeamCaptureMode() {
+        return MODE_TEAM_CAPTURE.equals(gameMode);
+    }
+
+    public boolean isClassicMode() {
+        return MODE_CLASSIC.equals(gameMode);
     }
 
     public int getMaxPlayers() {
@@ -112,11 +138,13 @@ public class Match {
         if (players.size() < maxPlayers) {
             return false;
         }
+
         for (LobbyPlayer player : players) {
             if (!player.isReady()) {
                 return false;
             }
         }
+
         return true;
     }
 }
