@@ -39,15 +39,19 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
 import com.ripti.cluerush.data.StatsRepository;
 import com.ripti.cluerush.game.StatsRules;
 import com.ripti.cluerush.util.UserDisplay;
 import com.ripti.cluerush.R;
 import com.ripti.cluerush.data.ArenaCatalog;
+import com.ripti.cluerush.data.CaptureRepository;
 import com.ripti.cluerush.data.MatchLiveRepository;
 import com.ripti.cluerush.databinding.ActivityGameBinding;
 import com.ripti.cluerush.game.BestScoreStore;
 import com.ripti.cluerush.game.GameLoop;
+import com.ripti.cluerush.game.CaptureController;
+import com.ripti.cluerush.game.CaptureSession;
 import com.ripti.cluerush.game.GameSession;
 import com.ripti.cluerush.game.HeatLevel;
 import com.ripti.cluerush.game.LocationScanner;
@@ -105,6 +109,8 @@ public class GameActivity extends BaseActivity {
     public static final String EXTRA_START_AT = "extra_start_at";
     public static final String EXTRA_DURATION = "extra_duration";
     public static final String EXTRA_DAILY_DATE = "extra_daily_date";
+    public static final String EXTRA_GAME_MODE = "extra_game_mode";
+    public static final String EXTRA_TEAM = "extra_team";
 
     private static final String PICK_TAG = "MapPick";
     private static final String TASK_TAG = "GameTask";
@@ -187,6 +193,13 @@ public class GameActivity extends BaseActivity {
     private ValueAnimator scoreAnimator;
     private GameMusic music;
     private boolean musicStopped;
+    private boolean captureMode;
+    private String myTeam;
+    private CaptureSession captureSession;
+    private CaptureController captureController;
+    private String captureTaskLocationId;
+    private int myCaptureCount;
+    private int myCapturePoints;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -207,6 +220,14 @@ public class GameActivity extends BaseActivity {
             finish();
             return;
         }
+        captureMode = isMatch()
+                && Match.MODE_TEAM_CAPTURE.equals(getIntent().getStringExtra(EXTRA_GAME_MODE));
+        myTeam = getIntent().getStringExtra(EXTRA_TEAM);
+        if (captureMode && myTeam == null) {
+            Toast.makeText(this, R.string.error_generic, Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
         if (isMatch()) {
             ServerClock.start();
             matchHost = getIntent().getBooleanExtra(EXTRA_IS_HOST, false);
@@ -219,10 +240,23 @@ public class GameActivity extends BaseActivity {
 
         long seed = getIntent().getLongExtra(EXTRA_SEED, System.nanoTime());
         random = new Random(seed);
-        int rounds = Math.min(MAX_ROUNDS, TaskType.values().length);
-        session = new GameSession(
-                RoundGenerator.generate(this, arena, rounds, difficulty, random, avoidRepeats()),
-                difficulty);
+        if (captureMode) {
+            try {
+                captureSession = new CaptureSession(this, arena, difficulty, seed);
+            } catch (RuntimeException e) {
+                Log.e(TASK_TAG, "Could not build capture session", e);
+                Toast.makeText(this, R.string.error_arena_load, Toast.LENGTH_LONG).show();
+                finish();
+                return;
+            }
+            session = new GameSession(captureSession.getRounds(), difficulty);
+        } else {
+            int rounds = Math.min(MAX_ROUNDS, TaskType.values().length);
+            session = new GameSession(
+                    RoundGenerator.generate(this, arena, rounds, difficulty, random,
+                            avoidRepeats()),
+                    difficulty);
+        }
         configureWindow();
         MapConfig.init(this);
 
@@ -302,7 +336,8 @@ public class GameActivity extends BaseActivity {
         binding.debugCopyButton.setOnClickListener(v -> copyPick());
         setDebugTools(false);
 
-        binding.heatChip.setVisibility(difficulty.showsHeat() ? View.VISIBLE : View.GONE);
+        binding.heatChip.setVisibility(
+                difficulty.showsHeat() && !captureMode ? View.VISIBLE : View.GONE);
         binding.actionButton.setAlpha(INACTIVE_BUTTON_ALPHA);
 
         binding.joystick.setListener((x, y) -> {
@@ -326,7 +361,7 @@ public class GameActivity extends BaseActivity {
             }
         });
 
-        if (isMatch()) {
+        if (isMatch() && !captureMode) {
             coordinator = new MatchCoordinator(new MatchLiveRepository(), matchCode,
                     user.getUid(), matchHost, difficulty, session.getTotal(), matchEndAt,
                     new MatchCoordinator.Listener() {
@@ -351,8 +386,12 @@ public class GameActivity extends BaseActivity {
         showRound();
 
         if (isMatch()) {
-            coordinator.start();
-            coordinator.publishPosition(player.getLatitude(), player.getLongitude());
+            if (captureMode) {
+                startCapture(user.getUid());
+            } else {
+                coordinator.start();
+                coordinator.publishPosition(player.getLatitude(), player.getLongitude());
+            }
             beginMatchCountdown();
             MatchService.start(this, arena.getName(), matchEndAt);
         }
@@ -439,6 +478,9 @@ public class GameActivity extends BaseActivity {
         }
         MatchService.stop(this);
         handler.removeCallbacksAndMessages(null);
+        if (captureController != null) {
+            captureController.stop();
+        }
         if (coordinator != null) {
             if (!resultShown && !runEnded) {
                 saveForfeitStats();
@@ -528,9 +570,20 @@ public class GameActivity extends BaseActivity {
             lastShownSeconds = seconds;
             renderScoreText();
         }
+        if (captureMode && seconds <= 0 && !runEnded) {
+            endCapture(true);
+        }
     }
 
     private void renderScoreText() {
+        if (captureMode && captureSession != null) {
+            int secondsLeft = Math.max(0, lastShownSeconds);
+            binding.scoreText.setText(getString(R.string.capture_hud,
+                    countCaptured(true), countCaptured(false), formatClock(secondsLeft)));
+            binding.scoreText.setTextColor(secondsLeft <= MATCH_LOW_SECONDS
+                    ? LOSS_COLOR : ContextCompat.getColor(this, R.color.treasure_gold));
+            return;
+        }
         if (!isMatch()) {
             binding.scoreText.setText(getString(R.string.score_hud, displayedScore));
             binding.scoreText.setTextColor(displayedScore < 0
@@ -976,6 +1029,12 @@ public class GameActivity extends BaseActivity {
         if (round == null) {
             return;
         }
+        if (captureMode) {
+            renderCapturePanel();
+            publishMarkers();
+            updateProximity();
+            return;
+        }
         currentHeat = null;
         roundSeconds = 0.0;
         binding.clueIndexText.setText(getString(R.string.clue_index,
@@ -987,6 +1046,10 @@ public class GameActivity extends BaseActivity {
     }
 
     private void publishMarkers() {
+        if (captureMode) {
+            publishCaptureMarkers();
+            return;
+        }
         Set<String> done = session.getCompletedLocationIds();
         Set<String> seen = session.getDiscoveredIds();
         List<MapMarker> markers = new ArrayList<>();
@@ -1011,7 +1074,7 @@ public class GameActivity extends BaseActivity {
         double lat = player.getLatitude();
         double lng = player.getLongitude();
 
-        if (difficulty.showsHeat()) {
+        if (difficulty.showsHeat() && !captureMode) {
             double distance = LocationScanner.distanceTo(round.getLocation(), lat, lng);
             HeatLevel heat = HeatLevel.forDistance(distance,
                     round.getLocation().getRadiusMeters());
@@ -1108,6 +1171,10 @@ public class GameActivity extends BaseActivity {
         if (inputLocked || mapOpen || round == null) {
             return;
         }
+        if (captureMode) {
+            onCaptureAction();
+            return;
+        }
         if (insideLocation == null) {
             showHint(getString(difficulty.showsHeat()
                     ? R.string.hint_no_place_easy : R.string.hint_no_place));
@@ -1130,6 +1197,279 @@ public class GameActivity extends BaseActivity {
         publishProgress(false);
         showHint(getString(R.string.hint_wrong_place, insideLocation.getName(),
                 GameSession.WRONG_PLACE_PENALTY));
+    }
+
+    private void startCapture(String uid) {
+        captureController = new CaptureController(matchCode, uid, myTeam, captureSession,
+                new CaptureRepository(), new CaptureController.Listener() {
+            @Override
+            public void onCapturesUpdated(
+                    java.util.Map<String, CaptureRepository.CaptureRecord> captures) {
+                afterCaptureChange();
+            }
+
+            @Override
+            public void onCaptureSuccess(CaptureRepository.CaptureRecord record) {
+                onMyCapture(record);
+            }
+
+            @Override
+            public void onLocationAlreadyCaptured(
+                    CaptureRepository.CaptureRecord record) {
+                onTeamCapturedTarget(record);
+            }
+
+            @Override
+            public void onEnemyCaptured(String locationId) {
+                onEnemyCapturedTarget(locationId);
+            }
+
+            @Override
+            public void onCooldown(long remainingMs) {
+                showHint(getString(R.string.capture_wrong_cooldown,
+                        (int) Math.max(1L, (remainingMs + 999L) / 1000L)));
+            }
+
+            @Override
+            public void onError(DatabaseError error) {
+                onCaptureError(error);
+            }
+        });
+        captureController.start();
+    }
+
+    private int countCaptured(boolean mine) {
+        int count = 0;
+        for (CaptureSession.CaptureInfo info : captureSession.getCapturedLocations().values()) {
+            if (myTeam.equals(info.getTeam()) == mine) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private int countTeam(String team) {
+        int count = 0;
+        for (CaptureSession.CaptureInfo info : captureSession.getCapturedLocations().values()) {
+            if (team.equals(info.getTeam())) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private void renderCapturePanel() {
+        binding.clueIndexText.setText(getString(R.string.capture_panel_title,
+                captureSession.getCapturedCount(), CaptureSession.LOCATION_COUNT));
+
+        List<Round> rounds = captureSession.getRounds();
+        StringBuilder free = new StringBuilder();
+        StringBuilder taken = new StringBuilder();
+        for (int i = 0; i < rounds.size(); i++) {
+            Round round = rounds.get(i);
+            CaptureSession.CaptureInfo info =
+                    captureSession.getCaptureInfo(round.getLocation().getId());
+            if (info == null) {
+                appendLine(free, getString(R.string.capture_clue_line, i + 1, round.getClue()));
+            } else {
+                appendLine(taken, getString(myTeam.equals(info.getTeam())
+                        ? R.string.capture_clue_mine : R.string.capture_clue_enemy, i + 1));
+            }
+        }
+        StringBuilder all = new StringBuilder(free);
+        if (taken.length() > 0) {
+            appendLine(all, taken.toString());
+        }
+        binding.clueText.setText(all.toString());
+    }
+
+    private void publishCaptureMarkers() {
+        Set<String> seen = session.getDiscoveredIds();
+        List<MapMarker> markers = new ArrayList<>();
+        for (CampusLocation location : arena.getLocations()) {
+            CaptureSession.CaptureInfo info = captureSession.getCaptureInfo(location.getId());
+            String team = info == null ? null
+                    : (myTeam.equals(info.getTeam())
+                    ? MapMarker.CAPTURE_MINE : MapMarker.CAPTURE_ENEMY);
+            markers.add(new MapMarker(location.getId(), location.getName(),
+                    location.getLatitude(), location.getLongitude(),
+                    location.getRadiusMeters(),
+                    info != null,
+                    seen.contains(location.getId()),
+                    team));
+        }
+        gameMap.setMarkers(markers);
+        binding.minimapView.setMarkers(markers);
+        binding.spectateMap.setMarkers(markers);
+        overviewMap.setMarkers(markers);
+    }
+
+    private void afterCaptureChange() {
+        if (captureSession == null || isFinishing() || isDestroyed()) {
+            return;
+        }
+        renderCapturePanel();
+        publishMarkers();
+        renderScoreText();
+        if (captureSession.isComplete()) {
+            endCapture(false);
+        }
+    }
+
+    private void unlockAfterCapture() {
+        if (runEnded) {
+            return;
+        }
+        inputLocked = false;
+        if (insideLocation != null) {
+            startPulse();
+        }
+    }
+
+    private void onCaptureAction() {
+        if (insideLocation == null) {
+            showHint(getString(R.string.hint_no_place));
+            return;
+        }
+        String id = insideLocation.getId();
+        Round round = captureSession.getRoundByLocationId(id);
+        if (round == null) {
+            showHint(getString(R.string.capture_not_target));
+            return;
+        }
+        if (captureSession.isCaptured(id)) {
+            showHint(getString(R.string.capture_already_taken));
+            return;
+        }
+        long remaining = captureController.getRemainingCooldown(id);
+        if (remaining > 0L) {
+            shakeActionButton();
+            showHint(getString(R.string.capture_cooldown,
+                    (int) Math.max(1L, (remaining + 999L) / 1000L)));
+            return;
+        }
+        startCaptureTask(round);
+    }
+
+    private void startCaptureTask(Round round) {
+        String id = round.getLocation().getId();
+        BaseTaskView view = TaskFactory.create(this, round.getTask(), false);
+        if (view == null) {
+            Log.e(TASK_TAG, "Task content missing for " + round.getTask().getType());
+            showHint(getString(R.string.error_generic));
+            return;
+        }
+        captureController.selectLocation(id);
+        captureTaskLocationId = id;
+        lockInput();
+        stopPulse();
+        taskOverlay.begin(round.getTask().getType(), difficulty, view,
+                (solved, mistakes, secondsLeft) ->
+                        onCaptureTaskFinished(round, solved, mistakes, secondsLeft));
+    }
+
+    private void onCaptureTaskFinished(Round round, boolean solved, int mistakes,
+                                       int secondsLeft) {
+        if (runEnded || captureController == null) {
+            return;
+        }
+        String id = round.getLocation().getId();
+        captureTaskLocationId = null;
+
+        if (!solved) {
+            captureController.releaseSelection();
+            captureController.submitWrongAnswer(id);
+            unlockAfterCapture();
+            return;
+        }
+
+        int limit = round.getTask().getType().timeLimitSeconds(difficulty);
+        RoundScore score = ScoreRules.score(difficulty, true, mistakes, secondsLeft, limit,
+                ScoreRules.findParSeconds(difficulty), 0);
+        captureController.submitCorrectAnswer(id, score.getTotal());
+    }
+
+    private void onMyCapture(CaptureRepository.CaptureRecord record) {
+        myCaptureCount++;
+        myCapturePoints += record.getTaskPoints();
+        binding.getRoot().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+        CampusLocation location = findLocation(record.getLocationId());
+        showHint(getString(R.string.capture_success,
+                location == null ? record.getLocationId() : location.getName()));
+        afterCaptureChange();
+        unlockAfterCapture();
+    }
+
+    private void onEnemyCapturedTarget(String locationId) {
+        closeCaptureTask();
+        showHint(getString(R.string.capture_enemy_took));
+        afterCaptureChange();
+        unlockAfterCapture();
+    }
+
+    private void onTeamCapturedTarget(CaptureRepository.CaptureRecord record) {
+        if (record.getLocationId().equals(captureTaskLocationId) && taskOverlay.isActive()) {
+            closeCaptureTask();
+            showHint(getString(R.string.capture_team_took));
+            afterCaptureChange();
+            unlockAfterCapture();
+        }
+    }
+
+    private void closeCaptureTask() {
+        captureTaskLocationId = null;
+        if (taskOverlay.isActive()) {
+            taskOverlay.cancel();
+        }
+        binding.getRoot().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+    }
+
+    private void onCaptureError(DatabaseError error) {
+        Log.e(TASK_TAG, "Capture error: " + (error == null ? "?" : error.getMessage()));
+        captureController.releaseSelection();
+        closeCaptureTask();
+        Toast.makeText(this, R.string.capture_sync_error, Toast.LENGTH_LONG).show();
+        unlockAfterCapture();
+    }
+
+    @Nullable
+    private CampusLocation findLocation(String id) {
+        for (CampusLocation location : arena.getLocations()) {
+            if (location.getId().equals(id)) {
+                return location;
+            }
+        }
+        return null;
+    }
+
+    private void endCapture(boolean timeUp) {
+        if (runEnded) {
+            return;
+        }
+        runEnded = true;
+        resultShown = true;
+        if (taskOverlay.isActive()) {
+            taskOverlay.cancel();
+        }
+        captureTaskLocationId = null;
+        lockInput();
+        stopPulse();
+        stopMusic();
+        clearRush();
+        gameMap.hideZone();
+
+        int teamA = countTeam("A");
+        int teamB = countTeam("B");
+        int mine = countCaptured(true);
+        int enemy = countCaptured(false);
+
+        int outcome = mine > enemy ? R.string.capture_result_win
+                : (mine < enemy ? R.string.capture_result_lose : R.string.capture_result_draw);
+        String body = getString(R.string.capture_result_score, teamA, teamB);
+        body += "\n" + getString(R.string.capture_result_mine, myCaptureCount, myCapturePoints);
+
+        showResult(getString(timeUp ? R.string.match_time_up : R.string.capture_all_done),
+                getString(outcome), body, R.string.action_back_home);
     }
 
     private void shakeActionButton() {

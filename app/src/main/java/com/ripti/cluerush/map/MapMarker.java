@@ -4,6 +4,10 @@ package com.ripti.cluerush.map;
 public class MapMarker {
 
     private final String id;
+
+    public static final String CAPTURE_MINE = "A";
+
+    public static final String CAPTURE_ENEMY = "B";
     private final String name;
     private final double latitude;
     private final double longitude;

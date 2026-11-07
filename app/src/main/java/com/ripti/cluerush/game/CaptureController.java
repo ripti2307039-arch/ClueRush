@@ -1,4 +1,3 @@
-
 package com.ripti.cluerush.game;
 
 import android.os.SystemClock;
@@ -120,6 +119,11 @@ public final class CaptureController {
         session.releaseSelection();
     }
 
+    public long getRemainingCooldown(String locationId) {
+        return rules.getRemainingCooldown(uid, locationId,
+                SystemClock.elapsedRealtime());
+    }
+
     public boolean canAttempt(String locationId) {
         return !stopped && rules.canAttempt(
                 uid,
@@ -165,7 +169,13 @@ public final class CaptureController {
                     public void onCaptured(
                             CaptureRepository.CaptureRecord record) {
 
-                        if (stopped || record == null) {
+                        if (stopped) {
+                            return;
+                        }
+
+                        if (record == null) {
+                            listener.onError(DatabaseError.fromException(
+                                    new IllegalStateException("Empty capture record")));
                             return;
                         }
 
@@ -184,7 +194,13 @@ public final class CaptureController {
                     public void onAlreadyCaptured(
                             CaptureRepository.CaptureRecord record) {
 
-                        if (stopped || record == null) {
+                        if (stopped) {
+                            return;
+                        }
+
+                        if (record == null) {
+                            listener.onError(DatabaseError.fromException(
+                                    new IllegalStateException("Empty capture record")));
                             return;
                         }
 

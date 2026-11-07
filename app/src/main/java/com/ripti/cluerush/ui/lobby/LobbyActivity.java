@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -168,8 +169,42 @@ public class LobbyActivity extends BaseActivity {
             return true;
         }
 
+        if (isSmallTeamTest(match)
+                && match.getPlayers().size() < match.getMaxPlayers()) {
+            return teamCount(match, LobbyPlayer.TEAM_A) >= 1
+                    && teamCount(match, LobbyPlayer.TEAM_B) >= 1;
+        }
+
         return teamCount(match, LobbyPlayer.TEAM_A) == TEAM_SLOTS
                 && teamCount(match, LobbyPlayer.TEAM_B) == TEAM_SLOTS;
+    }
+
+    private boolean isSmallTeamTest(Match match) {
+        boolean debuggable =
+                (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+
+        return debuggable
+                && match.isTeamCaptureMode()
+                && match.getPlayers().size() >= 2;
+    }
+
+    private boolean isEveryoneReady(Match match) {
+        if (!isSmallTeamTest(match)) {
+            return match.allPlayersReady();
+        }
+
+        for (LobbyPlayer player : match.getPlayers()) {
+            if (!player.isReady()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean isRoomFull(Match match) {
+        return isSmallTeamTest(match)
+                || match.getPlayers().size() >= match.getMaxPlayers();
     }
 
     private String myTeam(Match match) {
@@ -194,7 +229,7 @@ public class LobbyActivity extends BaseActivity {
             return;
         }
 
-        if (!match.allPlayersReady()) {
+        if (!isEveryoneReady(match)) {
             startClicked = false;
         }
 
@@ -206,11 +241,10 @@ public class LobbyActivity extends BaseActivity {
             return;
         }
 
-        if (!currentMatch.allPlayersReady()) {
+        if (!isEveryoneReady(currentMatch)) {
             shakeStartButton();
 
-            boolean missingOpponent =
-                    currentMatch.getPlayers().size() < currentMatch.getMaxPlayers();
+            boolean missingOpponent = !isRoomFull(currentMatch);
 
             Snackbar.make(
                     binding.getRoot(),
@@ -293,6 +327,16 @@ public class LobbyActivity extends BaseActivity {
                 (long) match.getDurationSeconds()
         );
 
+        if (match.isTeamCaptureMode()) {
+            intent.putExtra(GameActivity.EXTRA_GAME_MODE, match.getGameMode());
+
+            String team = myTeam(match);
+
+            if (team != null) {
+                intent.putExtra(GameActivity.EXTRA_TEAM, team);
+            }
+        }
+
         startActivity(intent);
         finish();
     }
@@ -341,9 +385,9 @@ public class LobbyActivity extends BaseActivity {
         );
 
         boolean host = match.isHost(uid);
-        boolean allReady = match.allPlayersReady();
+        boolean allReady = isEveryoneReady(match);
         boolean balanced = teamsBalanced(match);
-        boolean roomFull = match.getPlayers().size() >= match.getMaxPlayers();
+        boolean roomFull = isRoomFull(match);
 
         binding.readyButton.setText(
                 iAmReady

@@ -1,4 +1,3 @@
-
 package com.ripti.cluerush.data;
 
 import androidx.annotation.NonNull;
@@ -137,7 +136,7 @@ public class CaptureRepository {
                         callback.onAlreadyCaptured(record);
                     }
                 }
-            });
+            }, false);
 
         } catch (Exception e) {
             callback.onError(DatabaseError.fromException(e));
