@@ -99,6 +99,16 @@ class LabelOverlay extends Overlay {
         visionMeters = meters;
     }
 
+    private int markerColor(MapMarker marker) {
+        if ("A".equals(marker.getCaptureTeam())) {
+            return 0xFF36A3FF;
+        }
+        if ("B".equals(marker.getCaptureTeam())) {
+            return 0xFFFF4D6D;
+        }
+        return marker.isCompleted() ? completedColor : pendingColor;
+    }
+
     @Override
     public void draw(Canvas canvas, Projection projection) {
         int count = markers.size();
@@ -139,7 +149,7 @@ class LabelOverlay extends Overlay {
             if (!visible[i] || !onScreen(xs[i], ys[i], clip, margin)) {
                 continue;
             }
-            dotPaint.setColor(markers.get(i).isCompleted() ? completedColor : pendingColor);
+            dotPaint.setColor(markerColor(markers.get(i)));
             canvas.drawCircle(xs[i], ys[i], dotRadius, dotPaint);
             canvas.drawCircle(xs[i], ys[i], dotRadius, dotStrokePaint);
         }

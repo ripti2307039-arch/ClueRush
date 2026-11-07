@@ -420,6 +420,17 @@ public class ImageMapView extends View {
         }
     }
 
+    private int markerColor(MapMarker marker) {
+        if ("A".equals(marker.getCaptureTeam())) {
+            return 0xFF36A3FF;
+        }
+        if ("B".equals(marker.getCaptureTeam())) {
+            return 0xFFFF4D6D;
+        }
+        return marker.isCompleted() ? completedColor : pendingColor;
+    }
+
+
     private void drawMarkers(Canvas canvas) {
         boolean playerKnown = !Double.isNaN(playerX);
         for (MapMarker marker : markers) {
@@ -438,7 +449,7 @@ public class ImageMapView extends View {
                 stroke.setColor(white);
                 canvas.drawCircle(x, y, pin + 4f * density, stroke);
             }
-            fill.setColor(marker.isCompleted() ? completedColor : pendingColor);
+            fill.setColor(markerColor(marker));
             canvas.drawCircle(x, y, pin, fill);
             stroke.setStrokeWidth(2f * density);
             stroke.setColor(0xFF0B1B2B);

@@ -213,6 +213,17 @@ public class MinimapView extends View {
         }
     }
 
+    private int markerColor(MapMarker marker) {
+        if ("A".equals(marker.getCaptureTeam())) {
+            return 0xFF36A3FF;
+        }
+        if ("B".equals(marker.getCaptureTeam())) {
+            return 0xFFFF4D6D;
+        }
+        return marker.isCompleted() ? completedColor : pendingColor;
+    }
+
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -309,7 +320,7 @@ public class MinimapView extends View {
             if (marker.isDiscovered() || marker.isCompleted()) {
                 canvas.drawCircle(x, y, 6.5f * density, ringPaint);
             }
-            dotPaint.setColor(marker.isCompleted() ? completedColor : pendingColor);
+            dotPaint.setColor(markerColor(marker));
             canvas.drawCircle(x, y, 3.5f * density, dotPaint);
         }
         if (opponentVisible && !Double.isNaN(opponentLat) && !Double.isNaN(opponentLng)) {

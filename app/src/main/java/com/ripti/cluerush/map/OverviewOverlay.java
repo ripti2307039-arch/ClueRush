@@ -82,6 +82,17 @@ class OverviewOverlay extends Overlay {
         pickPaint.setColor(ContextCompat.getColor(context, R.color.heat_hot));
     }
 
+    private int markerColor(MapMarker marker) {
+        if ("A".equals(marker.getCaptureTeam())) {
+            return 0xFF36A3FF;
+        }
+        if ("B".equals(marker.getCaptureTeam())) {
+            return 0xFFFF4D6D;
+        }
+        return marker.isCompleted() ? completedColor : pendingColor;
+    }
+
+
     void setMarkers(List<MapMarker> newMarkers) {
         markers = new ArrayList<>(newMarkers);
         int count = markers.size();
@@ -124,7 +135,7 @@ class OverviewOverlay extends Overlay {
             projection.toPixels(geoPoints[i], point);
             xs[i] = point.x;
             ys[i] = point.y;
-            dotPaint.setColor(markers.get(i).isCompleted() ? completedColor : pendingColor);
+            dotPaint.setColor(markerColor(markers.get(i)));
             canvas.drawCircle(xs[i], ys[i], dotRadius, dotPaint);
             canvas.drawCircle(xs[i], ys[i], dotRadius, dotStrokePaint);
         }

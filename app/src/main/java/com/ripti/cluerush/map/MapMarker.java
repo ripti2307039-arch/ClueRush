@@ -1,3 +1,4 @@
+
 package com.ripti.cluerush.map;
 
 public class MapMarker {
@@ -9,9 +10,16 @@ public class MapMarker {
     private final double revealRadiusMeters;
     private final boolean completed;
     private final boolean discovered;
+    private final String captureTeam;
 
     public MapMarker(String id, String name, double latitude, double longitude,
                      double revealRadiusMeters, boolean completed, boolean discovered) {
+        this(id, name, latitude, longitude, revealRadiusMeters, completed, discovered, null);
+    }
+
+    public MapMarker(String id, String name, double latitude, double longitude,
+                     double revealRadiusMeters, boolean completed, boolean discovered,
+                     String captureTeam) {
         this.id = id;
         this.name = name;
         this.latitude = latitude;
@@ -19,6 +27,7 @@ public class MapMarker {
         this.revealRadiusMeters = revealRadiusMeters;
         this.completed = completed;
         this.discovered = discovered;
+        this.captureTeam = captureTeam;
     }
 
     public String getId() {
@@ -47,5 +56,13 @@ public class MapMarker {
 
     public boolean isDiscovered() {
         return discovered;
+    }
+
+    public String getCaptureTeam() {
+        return captureTeam;
+    }
+
+    public boolean isCaptured() {
+        return "A".equals(captureTeam) || "B".equals(captureTeam);
     }
 }
