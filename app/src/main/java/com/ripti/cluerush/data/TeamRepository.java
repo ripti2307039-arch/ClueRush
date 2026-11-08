@@ -42,6 +42,11 @@ public class TeamRepository {
             reference.removeEventListener(listener);
         }
     }
+    public interface PositionListener {
+        void onPositions(Map<String, double[]> positions);
+
+        void onCancelled(DatabaseError error);
+    }
 
     public static final String PING_OK = "ok";
     public static final String PING_HELP = "help";
@@ -207,6 +212,84 @@ public class TeamRepository {
         } catch (Exception ignored) {
             // Nothing to recover: the claim is cleared on disconnect as well.
         }
+    }
+    public ListenerHandle observePositions(String code, String team,
+                                           PositionListener listener) {
+
+        DatabaseReference reference = positionsReference(code, team);
+
+        ValueEventListener valueListener = new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Map<String, double[]> positions = new HashMap<>();
+
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    String uid = child.getKey();
+                    Object lat = child.child("lat").getValue();
+                    Object lng = child.child("lng").getValue();
+
+                    if (uid != null && lat instanceof Number && lng instanceof Number) {
+                        positions.put(uid, new double[] {
+                                ((Number) lat).doubleValue(),
+                                ((Number) lng).doubleValue()
+                        });
+                    }
+                }
+
+                listener.onPositions(positions);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                listener.onCancelled(error);
+            }
+        };
+
+        reference.addValueEventListener(valueListener);
+
+        return new ListenerHandle(reference, valueListener);
+    }
+
+    public void armPosition(String code, String team, String uid) {
+        if (isBlank(code) || isBlank(team) || isBlank(uid)) {
+            return;
+        }
+
+        try {
+            positionsReference(code, team).child(uid).onDisconnect().removeValue();
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void publishPosition(String code, String team, String uid,
+                                double latitude, double longitude) {
+        if (isBlank(code) || isBlank(team) || isBlank(uid)) {
+            return;
+        }
+
+        try {
+            Map<String, Object> data = new HashMap<>();
+            data.put("lat", latitude);
+            data.put("lng", longitude);
+            positionsReference(code, team).child(uid).setValue(data);
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void clearPosition(String code, String team, String uid) {
+        if (isBlank(code) || isBlank(team) || isBlank(uid)) {
+            return;
+        }
+
+        try {
+            positionsReference(code, team).child(uid).removeValue();
+        } catch (Exception ignored) {
+        }
+    }
+
+    private DatabaseReference positionsReference(String code, String team) {
+        return teamReference(code, team).child("pos");
     }
 
     private DatabaseReference claimsReference(String code, String team) {

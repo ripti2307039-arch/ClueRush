@@ -19,7 +19,7 @@ public interface GameMap {
     void setPlayerPosition(double latitude, double longitude);
 
     void setVisionRadius(double meters);
-
+    void setOpponentColor(int color);
     void setOpponent(double latitude, double longitude, boolean visible, String label);
 
     void showZone(double latitude, double longitude, double radiusMeters);

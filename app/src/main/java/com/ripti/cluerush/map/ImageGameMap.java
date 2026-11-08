@@ -56,7 +56,10 @@ public class ImageGameMap implements GameMap {
     public void setOpponent(double latitude, double longitude, boolean visible, String label) {
         view.setOpponent(latitude, longitude, visible, label);
     }
-
+    @Override
+    public void setOpponentColor(int color) {
+        view.setOpponentColor(color);
+    }
     @Override
     public void showZone(double latitude, double longitude, double radiusMeters) {
         view.showZone(latitude, longitude, radiusMeters);

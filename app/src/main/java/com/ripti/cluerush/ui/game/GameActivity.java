@@ -153,6 +153,8 @@ public class GameActivity extends BaseActivity {
     private static final int PING_FEED_MAX = 3;
     private static final long OFFLINE_LIMIT_MS = 30_000L;
     private static final long PRESENCE_TICK_MS = 3000L;
+    private static final long TEAM_POSITION_INTERVAL_MS = 1500L;
+    private static final double TEAM_POSITION_MIN_METERS = 3.0;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable hideHint = this::dismissHint;
@@ -238,6 +240,12 @@ public class GameActivity extends BaseActivity {
     private boolean shortHandedShown;
     private final Runnable presenceTick = this::onPresenceTick;
     private long lastPingAt;
+
+    private TeamRepository.ListenerHandle positionsHandle;
+    private final Map<String, double[]> teamPositions = new HashMap<>();
+    private long lastTeamPositionAt;
+    private double lastTeamLat = Double.NaN;
+    private double lastTeamLng = Double.NaN;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -1037,6 +1045,8 @@ public class GameActivity extends BaseActivity {
             if (coordinator != null) {
                 coordinator.publishPosition(player.getLatitude(), player.getLongitude());
                 updateOpponentMarkers();
+            } else if (captureMode) {
+                publishTeamPosition();
             }
         }
         binding.avatarView.setMoving(player.isMoving());
@@ -1316,6 +1326,30 @@ public class GameActivity extends BaseActivity {
                                 + (error == null ? "?" : error.getMessage()));
                     }
                 });
+
+        gameMap.setOpponentColor(MapMarker.COLOR_MINE);
+        binding.minimapView.setOpponentColor(MapMarker.COLOR_MINE);
+        teamRepository.armPosition(matchCode, myTeam, uid);
+        positionsHandle = teamRepository.observePositions(matchCode, myTeam,
+                new TeamRepository.PositionListener() {
+                    @Override
+                    public void onPositions(Map<String, double[]> positions) {
+                        if (isFinishing() || isDestroyed()) {
+                            return;
+                        }
+                        teamPositions.clear();
+                        teamPositions.putAll(positions);
+                        updateTeammateMarker();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        Log.e(TASK_TAG, "Teammate position unavailable: "
+                                + (error == null ? "?" : error.getMessage()));
+                    }
+                });
+        publishTeamPosition();
+
         setupQuickMessages();
         matchRepository = new MatchRepository();
         matchHandle = matchRepository.observeMatch(matchCode,
@@ -1497,6 +1531,13 @@ public class GameActivity extends BaseActivity {
             claimsHandle.remove();
             claimsHandle = null;
         }
+        if (positionsHandle != null) {
+            positionsHandle.remove();
+            positionsHandle = null;
+        }
+        if (teamRepository != null && myUid != null && myTeam != null) {
+            teamRepository.clearPosition(matchCode, myTeam, myUid);
+        }
         if (matchHandle != null) {
             matchHandle.remove();
             matchHandle = null;
@@ -1513,6 +1554,49 @@ public class GameActivity extends BaseActivity {
             presenceHandle.remove();
             presenceHandle = null;
         }
+    }
+
+    private void publishTeamPosition() {
+        if (teamRepository == null || runEnded || myUid == null || myTeam == null) {
+            return;
+        }
+        long now = SystemClock.uptimeMillis();
+        if (lastTeamPositionAt != 0L && now - lastTeamPositionAt < TEAM_POSITION_INTERVAL_MS) {
+            return;
+        }
+        double lat = player.getLatitude();
+        double lng = player.getLongitude();
+        if (!Double.isNaN(lastTeamLat) && GeoMath.distanceMeters(lastTeamLat, lastTeamLng,
+                lat, lng) < TEAM_POSITION_MIN_METERS) {
+            return;
+        }
+        lastTeamPositionAt = now;
+        lastTeamLat = lat;
+        lastTeamLng = lng;
+        teamRepository.publishPosition(matchCode, myTeam, myUid, lat, lng);
+    }
+
+    private void updateTeammateMarker() {
+        String mateUid = null;
+        double[] position = null;
+        for (Map.Entry<String, double[]> entry : teamPositions.entrySet()) {
+            if (!entry.getKey().equals(myUid)) {
+                mateUid = entry.getKey();
+                position = entry.getValue();
+                break;
+            }
+        }
+        if (position == null || runEnded) {
+            gameMap.setOpponent(0.0, 0.0, false, "");
+            binding.minimapView.setOpponent(0.0, 0.0, false);
+            return;
+        }
+        PlayerState state = livePlayers.get(mateUid);
+        String name = state == null ? null : state.getName();
+        String label = name == null || name.isEmpty()
+                ? "T" : name.substring(0, 1).toUpperCase(Locale.ROOT);
+        gameMap.setOpponent(position[0], position[1], true, label);
+        binding.minimapView.setOpponent(position[0], position[1], true);
     }
 
     private void setupQuickMessages() {

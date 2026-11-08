@@ -39,7 +39,9 @@ class OpponentOverlay extends Overlay {
         textPaint.setTextSize(13f * density);
         textPaint.setColor(ContextCompat.getColor(context, R.color.white));
     }
-
+    void setColor(int color) {
+        fillPaint.setColor(color);
+    }
     void set(double latitude, double longitude, boolean visible, String label) {
         point.setCoords(latitude, longitude);
         this.visible = visible;

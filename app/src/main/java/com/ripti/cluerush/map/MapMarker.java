@@ -1,4 +1,3 @@
-
 package com.ripti.cluerush.map;
 
 public class MapMarker {
@@ -8,6 +7,15 @@ public class MapMarker {
     public static final String CAPTURE_MINE = "A";
 
     public static final String CAPTURE_ENEMY = "B";
+
+    public static final String CAPTURE_FREE = "F";
+
+    public static final int COLOR_MINE = 0xFF36A3FF;
+
+    public static final int COLOR_ENEMY = 0xFFFF4D6D;
+
+    public static final int COLOR_FREE = 0xFF8E9AAB;
+
     private final String name;
     private final double latitude;
     private final double longitude;

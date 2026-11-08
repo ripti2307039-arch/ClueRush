@@ -73,6 +73,8 @@ public class ImageMapView extends View {
     private boolean oppVisible;
     private String oppLabel = "";
     private boolean zoneOn;
+    private int zoneColor;
+    private int oppColor;
     private double zoneX;
     private double zoneY;
     private double zoneR;
@@ -100,10 +102,12 @@ public class ImageMapView extends View {
         super(context, attrs);
         density = context.getResources().getDisplayMetrics().density;
         pendingColor = ContextCompat.getColor(context, R.color.treasure_gold);
+        zoneColor = pendingColor;
         completedColor = ContextCompat.getColor(context, R.color.mint);
         white = ContextCompat.getColor(context, R.color.white);
         blue = ContextCompat.getColor(context, R.color.rush_blue);
         hot = ContextCompat.getColor(context, R.color.heat_hot);
+        oppColor = hot;
 
         stroke.setStyle(Paint.Style.STROKE);
         fill.setStyle(Paint.Style.FILL);
@@ -260,6 +264,16 @@ public class ImageMapView extends View {
         invalidate();
     }
 
+    public void setOpponentColor(int color) {
+        oppColor = color;
+        invalidate();
+    }
+
+    public void setZoneColor(int color) {
+        zoneColor = color;
+        invalidate();
+    }
+
     public void hideZone() {
         zoneOn = false;
         invalidate();
@@ -406,12 +420,12 @@ public class ImageMapView extends View {
         float x = sx(zoneX);
         float y = sy(zoneY);
         float radius = (float) (zoneR * ppm);
-        fill.setColor(pendingColor);
+        fill.setColor(zoneColor);
         fill.setAlpha(45);
         canvas.drawCircle(x, y, radius, fill);
         fill.setAlpha(255);
         stroke.setStrokeWidth(2f * density);
-        stroke.setColor(pendingColor);
+        stroke.setColor(zoneColor);
         canvas.drawCircle(x, y, radius, stroke);
         if (rippleT >= 0f) {
             stroke.setAlpha((int) (200f * (1f - rippleT)));
@@ -426,6 +440,9 @@ public class ImageMapView extends View {
         }
         if ("B".equals(marker.getCaptureTeam())) {
             return 0xFFFF4D6D;
+        }
+        if (MapMarker.CAPTURE_FREE.equals(marker.getCaptureTeam())) {
+            return MapMarker.COLOR_FREE;
         }
         return marker.isCompleted() ? completedColor : pendingColor;
     }
@@ -467,7 +484,7 @@ public class ImageMapView extends View {
         }
         float x = sx(oppX);
         float y = sy(oppY);
-        fill.setColor(hot);
+        fill.setColor(oppColor);
         canvas.drawCircle(x, y, 9f * density, fill);
         stroke.setStrokeWidth(2f * density);
         stroke.setColor(white);

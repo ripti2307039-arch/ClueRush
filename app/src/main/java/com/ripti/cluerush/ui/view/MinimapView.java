@@ -48,16 +48,22 @@ public class MinimapView extends View {
     private double playerLat = Double.NaN;
     private double playerLng = Double.NaN;
     private double visionMeters;
+
     private final Paint opponentPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private double opponentLat = Double.NaN;
     private double opponentLng = Double.NaN;
     private boolean opponentVisible;
 
+    private boolean opponentColorSet;
+    private int opponentColor;
+
     private static final int TRAIL_MAX_POINTS = 70;
     private static final double TRAIL_MIN_STEP_DEGREES = 0.000006;
+
     private final Paint trailPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint opponentRingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final List<double[]> opponentTrail = new ArrayList<>();
+
     private boolean spectate;
     private float pulse;
     private ValueAnimator pulseAnimator;
@@ -68,6 +74,7 @@ public class MinimapView extends View {
 
     public MinimapView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+
         density = context.getResources().getDisplayMetrics().density;
         pendingColor = ContextCompat.getColor(context, R.color.treasure_gold);
         completedColor = ContextCompat.getColor(context, R.color.mint);
@@ -147,13 +154,21 @@ public class MinimapView extends View {
         invalidate();
     }
 
+    public void setOpponentColor(int color) {
+        opponentColor = color;
+        opponentColorSet = true;
+        invalidate();
+    }
+
     public void setOpponent(double latitude, double longitude, boolean visible) {
         opponentLat = latitude;
         opponentLng = longitude;
         opponentVisible = visible;
+
         if (spectate && visible && !Double.isNaN(latitude) && !Double.isNaN(longitude)) {
             addTrailPoint(latitude, longitude);
         }
+
         updatePulse();
         invalidate();
     }
@@ -164,9 +179,11 @@ public class MinimapView extends View {
      */
     public void setSpectate(boolean enabled) {
         spectate = enabled;
+
         if (!enabled) {
             opponentTrail.clear();
         }
+
         updatePulse();
         invalidate();
     }
@@ -179,13 +196,17 @@ public class MinimapView extends View {
     private void addTrailPoint(double latitude, double longitude) {
         if (!opponentTrail.isEmpty()) {
             double[] last = opponentTrail.get(opponentTrail.size() - 1);
+
             double dLat = Math.abs(last[0] - latitude);
             double dLng = Math.abs(last[1] - longitude);
+
             if (dLat < TRAIL_MIN_STEP_DEGREES && dLng < TRAIL_MIN_STEP_DEGREES) {
                 return;
             }
         }
-        opponentTrail.add(new double[] {latitude, longitude});
+
+        opponentTrail.add(new double[]{latitude, longitude});
+
         while (opponentTrail.size() > TRAIL_MAX_POINTS) {
             opponentTrail.remove(0);
         }
@@ -193,19 +214,23 @@ public class MinimapView extends View {
 
     private void updatePulse() {
         boolean needed = spectate && opponentVisible && isAttachedToWindow();
+
         if (needed) {
             if (pulseAnimator == null) {
                 pulseAnimator = ValueAnimator.ofFloat(0f, 1f);
                 pulseAnimator.setDuration(1100L);
                 pulseAnimator.setRepeatCount(ValueAnimator.INFINITE);
+
                 pulseAnimator.addUpdateListener(animation -> {
                     pulse = (float) animation.getAnimatedValue();
                     invalidate();
                 });
             }
+
             if (!pulseAnimator.isRunning()) {
                 pulseAnimator.start();
             }
+
         } else if (pulseAnimator != null) {
             pulseAnimator.cancel();
             pulseAnimator = null;
@@ -217,12 +242,13 @@ public class MinimapView extends View {
         if ("A".equals(marker.getCaptureTeam())) {
             return 0xFF36A3FF;
         }
+
         if ("B".equals(marker.getCaptureTeam())) {
             return 0xFFFF4D6D;
         }
+
         return marker.isCompleted() ? completedColor : pendingColor;
     }
-
 
     @Override
     protected void onAttachedToWindow() {
@@ -236,6 +262,7 @@ public class MinimapView extends View {
             pulseAnimator.cancel();
             pulseAnimator = null;
         }
+
         super.onDetachedFromWindow();
     }
 
@@ -259,22 +286,30 @@ public class MinimapView extends View {
 
     private void drawTrail(Canvas canvas, float left, float top, double west, double north,
                            double cosLat, float scale, float mapW, float mapH) {
+
         int count = opponentTrail.size();
+
         if (count < 2) {
             return;
         }
+
         float prevX = 0f;
         float prevY = 0f;
+
         for (int i = 0; i < count; i++) {
             double[] point = opponentTrail.get(i);
+
             float x = left + (float) ((point[1] - west) * cosLat * scale);
             float y = top + (float) ((north - point[0]) * scale);
+
             x = Math.max(left, Math.min(left + mapW, x));
             y = Math.max(top, Math.min(top + mapH, y));
+
             if (i > 0) {
                 trailPaint.setAlpha(30 + (int) (200f * i / count));
                 canvas.drawLine(prevX, prevY, x, y, trailPaint);
             }
+
             prevX = x;
             prevY = y;
         }
@@ -283,75 +318,139 @@ public class MinimapView extends View {
     private void drawArena(Canvas canvas, float w, float h) {
         double west = bounds.getWest();
         double north = bounds.getNorth();
-        double cosLat = Math.cos(Math.toRadians((north + bounds.getSouth()) / 2.0));
+
+        double cosLat = Math.cos(
+                Math.toRadians((north + bounds.getSouth()) / 2.0)
+        );
+
         double spanX = (bounds.getEast() - west) * cosLat;
         double spanY = north - bounds.getSouth();
+
         if (spanX <= 0.0 || spanY <= 0.0) {
             return;
         }
 
         float pad = 8f * density;
-        float scale = (float) Math.min((w - 2f * pad) / spanX, (h - 2f * pad) / spanY);
+
+        float scale = (float) Math.min(
+                (w - 2f * pad) / spanX,
+                (h - 2f * pad) / spanY
+        );
+
         float mapW = (float) (spanX * scale);
         float mapH = (float) (spanY * scale);
+
         float left = (w - mapW) / 2f;
         float top = (h - mapH) / 2f;
 
         areaRect.set(left, top, left + mapW, top + mapH);
         canvas.drawRoundRect(areaRect, 6f * density, 6f * density, areaPaint);
+
         if (backdrop != null) {
             clipPath.reset();
-            clipPath.addRoundRect(areaRect, 6f * density, 6f * density, Path.Direction.CW);
+            clipPath.addRoundRect(
+                    areaRect,
+                    6f * density,
+                    6f * density,
+                    Path.Direction.CW
+            );
+
             canvas.save();
             canvas.clipPath(clipPath);
             canvas.drawBitmap(backdrop, null, areaRect, null);
             canvas.restore();
         }
+
         for (int i = 1; i <= 2; i++) {
             float x = left + mapW * i / 3f;
             float y = top + mapH * i / 3f;
+
             canvas.drawLine(x, top, x, top + mapH, gridPaint);
             canvas.drawLine(left, y, left + mapW, y, gridPaint);
         }
 
         for (MapMarker marker : markers) {
-            float x = left + (float) ((marker.getLongitude() - west) * cosLat * scale);
-            float y = top + (float) ((north - marker.getLatitude()) * scale);
+            float x = left + (float) (
+                    (marker.getLongitude() - west) * cosLat * scale
+            );
+
+            float y = top + (float) (
+                    (north - marker.getLatitude()) * scale
+            );
+
             if (marker.isDiscovered() || marker.isCompleted()) {
                 canvas.drawCircle(x, y, 6.5f * density, ringPaint);
             }
+
             dotPaint.setColor(markerColor(marker));
             canvas.drawCircle(x, y, 3.5f * density, dotPaint);
         }
-        if (opponentVisible && !Double.isNaN(opponentLat) && !Double.isNaN(opponentLng)) {
-            float ox = left + (float) ((opponentLng - west) * cosLat * scale);
-            float oy = top + (float) ((north - opponentLat) * scale);
+
+        if (opponentVisible
+                && !Double.isNaN(opponentLat)
+                && !Double.isNaN(opponentLng)) {
+
+            float ox = left + (float) (
+                    (opponentLng - west) * cosLat * scale
+            );
+
+            float oy = top + (float) (
+                    (north - opponentLat) * scale
+            );
+
             ox = Math.max(left, Math.min(left + mapW, ox));
             oy = Math.max(top, Math.min(top + mapH, oy));
+
             if (spectate) {
-                drawTrail(canvas, left, top, west, north, cosLat, scale, mapW, mapH);
+                drawTrail(
+                        canvas, left, top, west, north,
+                        cosLat, scale, mapW, mapH
+                );
+
                 float ringRadius = (6f + 12f * pulse) * density;
+
                 opponentRingPaint.setAlpha((int) (200 * (1f - pulse)));
                 canvas.drawCircle(ox, oy, ringRadius, opponentRingPaint);
-                opponentPaint.setColor(ContextCompat.getColor(getContext(), R.color.alert_red));
+
+                opponentPaint.setColor(
+                        opponentColorSet ? opponentColor
+                                : ContextCompat.getColor(getContext(), R.color.alert_red)
+                );
+
                 canvas.drawCircle(ox, oy, 5.5f * density, opponentPaint);
                 canvas.drawCircle(ox, oy, 5.5f * density, ringPaint);
+
             } else {
-                opponentPaint.setColor(ContextCompat.getColor(getContext(), R.color.heat_hot));
+                opponentPaint.setColor(
+                        opponentColorSet ? opponentColor
+                                : ContextCompat.getColor(getContext(), R.color.heat_hot)
+                );
+
                 canvas.drawCircle(ox, oy, 4f * density, opponentPaint);
             }
         }
 
         if (!Double.isNaN(playerLat) && !Double.isNaN(playerLng)) {
-            float px = left + (float) ((playerLng - west) * cosLat * scale);
-            float py = top + (float) ((north - playerLat) * scale);
+            float px = left + (float) (
+                    (playerLng - west) * cosLat * scale
+            );
+
+            float py = top + (float) (
+                    (north - playerLat) * scale
+            );
+
             px = Math.max(left, Math.min(left + mapW, px));
             py = Math.max(top, Math.min(top + mapH, py));
+
             if (visionMeters > 0.0) {
-                float vision = (float) (visionMeters / GeoMath.METERS_PER_DEGREE_LATITUDE * scale);
+                float vision = (float) (
+                        visionMeters / GeoMath.METERS_PER_DEGREE_LATITUDE * scale
+                );
+
                 canvas.drawCircle(px, py, vision, visionFillPaint);
                 canvas.drawCircle(px, py, vision, visionStrokePaint);
             }
+
             canvas.drawCircle(px, py, 4.5f * density, playerPaint);
             canvas.drawCircle(px, py, 4.5f * density, playerStrokePaint);
         }

@@ -111,7 +111,11 @@ public class OsmGameMap implements GameMap {
         opponentOverlay.set(latitude, longitude, visible, label);
         mapView.invalidate();
     }
-
+    @Override
+    public void setOpponentColor(int color) {
+        opponentOverlay.setColor(color);
+        mapView.invalidate();
+    }
     @Override
     public void showZone(double latitude, double longitude, double radiusMeters) {
         zoneOverlay.show(latitude, longitude, radiusMeters);
