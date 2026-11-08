@@ -12,7 +12,6 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
@@ -78,9 +77,6 @@ public class LobbyActivity extends BaseActivity {
 
         adapter = new PlayerAdapter();
         adapter.setTeamSwitchListener(this::switchTeam);
-        binding.playerList.setLayoutManager(new LinearLayoutManager(this));
-        binding.playerList.setItemAnimator(null);
-        binding.playerList.setAdapter(adapter);
 
         binding.copyButton.setOnClickListener(v -> copyCode());
         binding.shareButton.setOnClickListener(v -> shareCode());
@@ -385,6 +381,7 @@ public class LobbyActivity extends BaseActivity {
                 iAmReady,
                 startClicked
         );
+        adapter.render(binding.playerList);
 
         boolean host = match.isHost(uid);
         boolean allReady = isEveryoneReady(match);

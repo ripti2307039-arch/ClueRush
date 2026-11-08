@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -93,6 +94,19 @@ public class PlayerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
         notifyDataSetChanged();
+    }
+
+    /**
+     * Draws every row into a plain vertical LinearLayout. A LinearLayout always
+     * measures all of its children, so no row can be cut off at the bottom.
+     */
+    public void render(LinearLayout container) {
+        container.removeAllViews();
+        for (int i = 0; i < rows.size(); i++) {
+            RecyclerView.ViewHolder holder = createViewHolder(container, getItemViewType(i));
+            onBindViewHolder(holder, i);
+            container.addView(holder.itemView);
+        }
     }
 
     private void addTeamRows(List<LobbyPlayer> all, String team) {

@@ -120,7 +120,10 @@ public class OsmGameMap implements GameMap {
     public void showZone(double latitude, double longitude, double radiusMeters) {
         zoneOverlay.show(latitude, longitude, radiusMeters);
     }
-
+    @Override
+    public void setZoneColor(int color) {
+        zoneOverlay.setColor(color);
+    }
     @Override
     public void hideZone() {
         zoneOverlay.hide();

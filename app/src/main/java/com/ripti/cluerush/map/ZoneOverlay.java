@@ -68,7 +68,12 @@ class ZoneOverlay extends Overlay {
         }
         mapView.invalidate();
     }
-
+    void setColor(int color) {
+        fillPaint.setColor(color);
+        glowPaint.setColor(color);
+        ringPaint.setColor(color);
+        mapView.invalidate();
+    }
     void hide() {
         visible = false;
         rippleStartedAt = NO_RIPPLE;

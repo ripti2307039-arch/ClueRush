@@ -1145,6 +1145,9 @@ public class GameActivity extends BaseActivity {
         if (!sameLocation(zoneNow, zoneLocation)) {
             zoneLocation = zoneNow;
             if (zoneNow != null) {
+                if (captureMode) {
+                    gameMap.setZoneColor(zoneColorFor(zoneNow.getId()));
+                }
                 gameMap.showZone(zoneNow.getLatitude(), zoneNow.getLongitude(),
                         zoneNow.getRadiusMeters());
             } else {
@@ -1749,6 +1752,37 @@ public class GameActivity extends BaseActivity {
             }
         }
         capClueListHeight(list);
+        updateTargetArrow();
+    }
+
+    private int zoneColorFor(String locationId) {
+        CaptureSession.CaptureInfo info = captureSession.getCaptureInfo(locationId);
+        if (info == null) {
+            return MapMarker.COLOR_FREE;
+        }
+        return myTeam.equals(info.getTeam()) ? MapMarker.COLOR_MINE : MapMarker.COLOR_ENEMY;
+    }
+
+    private void updateTargetArrow() {
+        String claimed = (myUid == null || runEnded) ? null : claims.get(myUid);
+        Round round = claimed == null ? null : captureSession.getRoundByLocationId(claimed);
+        boolean inside = insideLocation != null && insideLocation.getId().equals(claimed);
+        if (round == null || inside || captureSession.isCaptured(claimed)) {
+            binding.targetArrow.setVisibility(View.GONE);
+            return;
+        }
+        CampusLocation target = round.getLocation();
+        double dy = target.getLatitude() - player.getLatitude();
+        double dx = (target.getLongitude() - player.getLongitude())
+                * Math.cos(Math.toRadians(player.getLatitude()));
+        double angle = Math.toDegrees(Math.atan2(dx, dy));
+        int slot = (int) Math.round(((angle % 360.0) + 360.0) % 360.0 / 45.0) % 8;
+        double snapped = Math.toRadians(slot * 45.0);
+        float radius = dpPx(64);
+        binding.targetArrow.setTranslationX((float) (Math.sin(snapped) * radius));
+        binding.targetArrow.setTranslationY((float) (-Math.cos(snapped) * radius));
+        binding.targetArrow.setRotation(slot * 45f);
+        binding.targetArrow.setVisibility(View.VISIBLE);
     }
 
     private void capClueListHeight(LinearLayout list) {
@@ -1945,6 +1979,9 @@ public class GameActivity extends BaseActivity {
         renderCapturePanel();
         publishMarkers();
         renderScoreText();
+        if (captureMode && zoneLocation != null) {
+            gameMap.setZoneColor(zoneColorFor(zoneLocation.getId()));
+        }
         if (captureSession.isComplete()) {
             endCapture(false);
         }
@@ -2116,6 +2153,9 @@ public class GameActivity extends BaseActivity {
         clearRush();
         gameMap.hideZone();
         markPhase(PlayerState.PHASE_FINISHED);
+        binding.targetArrow.setVisibility(View.GONE);
+        gameMap.setOpponent(0.0, 0.0, false, "");
+        binding.minimapView.setOpponent(0.0, 0.0, false);
 
         String enemy = "A".equals(myTeam) ? "B" : "A";
         MatchResult.Outcome outcome = result.outcomeFor(myTeam);

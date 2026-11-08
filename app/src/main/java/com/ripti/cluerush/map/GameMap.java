@@ -25,6 +25,7 @@ public interface GameMap {
     void showZone(double latitude, double longitude, double radiusMeters);
 
     void hideZone();
+    void setZoneColor(int color);
 
     void playZoneRipple();
 

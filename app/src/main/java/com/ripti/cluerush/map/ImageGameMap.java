@@ -64,7 +64,10 @@ public class ImageGameMap implements GameMap {
     public void showZone(double latitude, double longitude, double radiusMeters) {
         view.showZone(latitude, longitude, radiusMeters);
     }
-
+    @Override
+    public void setZoneColor(int color) {
+        view.setZoneColor(color);
+    }
     @Override
     public void hideZone() {
         view.hideZone();
