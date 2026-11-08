@@ -60,6 +60,7 @@ import com.ripti.cluerush.game.HeatLevel;
 import com.ripti.cluerush.game.LocationScanner;
 import com.ripti.cluerush.game.MatchCoordinator;
 import com.ripti.cluerush.game.MatchResult;
+import com.ripti.cluerush.game.TeamMatchRules;
 import com.ripti.cluerush.game.MatchRules;
 import com.ripti.cluerush.game.PlayerController;
 import com.ripti.cluerush.game.Rank;
@@ -145,6 +146,13 @@ public class GameActivity extends BaseActivity {
     private static final int TEAM_RED = 0xFFFF4D6D;
     private static final long DIRECTION_REFRESH_MS = 2000L;
     private static final int LONG_CLUE_CHARS = 42;
+    private static final long PING_COOLDOWN_MS = 1500L;
+    private static final long PING_MAX_AGE_MS = 8000L;
+    private static final long PING_VISIBLE_MS = 4000L;
+    private static final long PING_REMOVE_MS = 12000L;
+    private static final int PING_FEED_MAX = 3;
+    private static final long OFFLINE_LIMIT_MS = 30_000L;
+    private static final long PRESENCE_TICK_MS = 3000L;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable hideHint = this::dismissHint;
@@ -220,6 +228,16 @@ public class GameActivity extends BaseActivity {
     private final Map<String, String> playerNames = new HashMap<>();
     private final HashSet<String> expandedClues = new HashSet<>();
     private final Runnable directionTick = this::onDirectionTick;
+    private TeamRepository.PingHandle pingHandle;
+    private MatchLiveRepository liveRepository;
+    private MatchLiveRepository.Handle liveHandle;
+    private MatchLiveRepository.Handle presenceHandle;
+    private final Map<String, PlayerState> livePlayers = new HashMap<>();
+    private final Map<String, String> playerTeams = new HashMap<>();
+    private final Map<String, Long> offlineSince = new HashMap<>();
+    private boolean shortHandedShown;
+    private final Runnable presenceTick = this::onPresenceTick;
+    private long lastPingAt;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -500,6 +518,9 @@ public class GameActivity extends BaseActivity {
         handler.removeCallbacksAndMessages(null);
         if (captureController != null) {
             captureController.stop();
+        }
+        if (captureMode && !runEnded) {
+            forfeitCapture();
         }
         stopTeamObservers();
         if (coordinator != null) {
@@ -1282,6 +1303,20 @@ public class GameActivity extends BaseActivity {
                                 + (error == null ? "?" : error.getMessage()));
                     }
                 });
+        pingHandle = teamRepository.observePings(matchCode, myTeam,
+                new TeamRepository.PingListener() {
+                    @Override
+                    public void onPing(String fromUid, String type, long at) {
+                        onPingReceived(fromUid, type, at);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        Log.e(TASK_TAG, "Quick messages unavailable: "
+                                + (error == null ? "?" : error.getMessage()));
+                    }
+                });
+        setupQuickMessages();
         matchRepository = new MatchRepository();
         matchHandle = matchRepository.observeMatch(matchCode,
                 new MatchRepository.MatchListener() {
@@ -1293,15 +1328,165 @@ public class GameActivity extends BaseActivity {
                         playerNames.clear();
                         for (com.ripti.cluerush.model.LobbyPlayer p : match.getPlayers()) {
                             playerNames.put(p.getUid(), p.getName());
+                            playerTeams.put(p.getUid(), p.getTeam());
                         }
                         renderCapturePanel();
                     }
 
                     @Override
                     public void onMatchRemoved() {
-                        // Match teardown is handled in a later phase.
+                        // Result is computed locally from captured data; nothing to do.
                     }
                 });
+        liveRepository = new MatchLiveRepository();
+        presenceHandle = liveRepository.armPresence(matchCode, uid, matchHost);
+        liveHandle = liveRepository.observe(matchCode, new MatchLiveRepository.Listener() {
+            @Override
+            public void onPlayers(List<PlayerState> players) {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                livePlayers.clear();
+                for (PlayerState state : players) {
+                    livePlayers.put(state.getUid(), state);
+                }
+                evaluatePresence();
+            }
+
+            @Override
+            public void onRemoved() {
+                // The match node may be removed after the result; nothing to do.
+            }
+        });
+        handler.postDelayed(presenceTick, PRESENCE_TICK_MS);
+    }
+
+    private void onPresenceTick() {
+        if (runEnded || isFinishing() || isDestroyed()) {
+            return;
+        }
+        evaluatePresence();
+        handler.postDelayed(presenceTick, PRESENCE_TICK_MS);
+    }
+
+    private boolean isPlayerGone(String uid, long now) {
+        PlayerState state = livePlayers.get(uid);
+        if (state == null) {
+            return false;
+        }
+        if (PlayerState.PHASE_FORFEIT.equals(state.getPhase())) {
+            return true;
+        }
+        Long since = offlineSince.get(uid);
+        return !state.isConnected() && since != null && now - since >= OFFLINE_LIMIT_MS;
+    }
+
+    private void evaluatePresence() {
+        if (!captureMode || runEnded || myTeam == null || myUid == null) {
+            return;
+        }
+        long now = SystemClock.elapsedRealtime();
+        for (PlayerState state : livePlayers.values()) {
+            if (state.isConnected()) {
+                offlineSince.remove(state.getUid());
+            } else if (!offlineSince.containsKey(state.getUid())) {
+                offlineSince.put(state.getUid(), now);
+            }
+        }
+        String enemy = "A".equals(myTeam) ? "B" : "A";
+        boolean enemySeen = false;
+        boolean enemyAllGone = true;
+        boolean mateGone = false;
+        for (Map.Entry<String, String> entry : playerTeams.entrySet()) {
+            String uid = entry.getKey();
+            if (uid.equals(myUid)) {
+                continue;
+            }
+            boolean gone = isPlayerGone(uid, now);
+            if (enemy.equals(entry.getValue())) {
+                enemySeen = true;
+                if (!gone) {
+                    enemyAllGone = false;
+                }
+            } else if (myTeam.equals(entry.getValue()) && gone) {
+                mateGone = true;
+            }
+        }
+        if (mateGone && !shortHandedShown) {
+            shortHandedShown = true;
+            showHint(getString(R.string.capture_teammate_left));
+        }
+        if (enemySeen && enemyAllGone) {
+            endCaptureTeamLeft(myTeam);
+        }
+    }
+
+    private void markPhase(String phase) {
+        if (liveRepository == null || myUid == null || matchCode == null) {
+            return;
+        }
+        Map<String, Object> values = new HashMap<>();
+        values.put("phase", phase);
+        liveRepository.update(matchCode, myUid, values);
+    }
+
+    private void forfeitCapture() {
+        if (runEnded) {
+            return;
+        }
+        runEnded = true;
+        markPhase(PlayerState.PHASE_FORFEIT);
+        String enemy = "A".equals(myTeam) ? "B" : "A";
+        saveHistory(MatchResult.Outcome.LOSS, countCaptured(true), countCaptured(false),
+                getString(R.string.capture_opponent_team, enemy), "FORFEIT_ME");
+        saveTeamStats(MatchResult.Outcome.LOSS, 0);
+    }
+
+    private void leaveCaptureMatch() {
+        if (liveRepository == null || matchCode == null) {
+            return;
+        }
+        boolean othersActive = false;
+        for (PlayerState state : livePlayers.values()) {
+            if (!state.getUid().equals(myUid) && state.isConnected()
+                    && !PlayerState.PHASE_FINISHED.equals(state.getPhase())
+                    && !PlayerState.PHASE_FORFEIT.equals(state.getPhase())) {
+                othersActive = true;
+                break;
+            }
+        }
+        if (othersActive) {
+            liveRepository.removePlayer(matchCode, myUid);
+        } else {
+            liveRepository.deleteMatch(matchCode);
+        }
+    }
+
+    private String saveTeamStats(MatchResult.Outcome outcome, int points) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (statsSaved || user == null || user.isAnonymous()) {
+            return "";
+        }
+        statsSaved = true;
+        new StatsRepository().recordTeamMatch(user.getUid(),
+                UserDisplay.displayName(this, user), points, outcome);
+        return getString(R.string.stats_gain_match,
+                StatsRules.matchXp(points, outcome), StatsRules.ratingDelta(outcome));
+    }
+
+    private String teamDeciderLine(TeamMatchRules.Result result) {
+        switch (result.getDecider()) {
+            case CAPTURES:
+                return getString(R.string.capture_decided_captures);
+            case TASK_POINTS:
+                return getString(R.string.capture_decided_points);
+            case LAST_CAPTURE:
+                return getString(R.string.capture_decided_last);
+            case TEAM_LEFT:
+                return getString(R.string.capture_decided_left);
+            default:
+                return getString(R.string.capture_decided_draw);
+        }
     }
 
     private void stopTeamObservers() {
@@ -1316,6 +1501,121 @@ public class GameActivity extends BaseActivity {
             matchHandle.remove();
             matchHandle = null;
         }
+        if (pingHandle != null) {
+            pingHandle.remove();
+            pingHandle = null;
+        }
+        if (liveHandle != null) {
+            liveHandle.remove();
+            liveHandle = null;
+        }
+        if (presenceHandle != null) {
+            presenceHandle.remove();
+            presenceHandle = null;
+        }
+    }
+
+    private void setupQuickMessages() {
+        binding.quickMessageToggle.setVisibility(View.VISIBLE);
+        binding.quickMessageToggle.setOnClickListener(v -> {
+            boolean open = binding.quickMessageBar.getVisibility() == View.VISIBLE;
+            binding.quickMessageBar.setVisibility(open ? View.GONE : View.VISIBLE);
+        });
+
+        LinearLayout row = binding.quickMessageRow;
+        row.removeAllViews();
+        String[] types = {
+                TeamRepository.PING_OK,
+                TeamRepository.PING_HELP,
+                TeamRepository.PING_ENEMY,
+                TeamRepository.PING_CAPTURED,
+                TeamRepository.PING_COME
+        };
+        for (String type : types) {
+            TextView chip = new TextView(this);
+            chip.setText(pingLabel(type));
+            chip.setBackgroundResource(R.drawable.bg_hud_pill);
+            chip.setTextColor(0xFFFFFFFF);
+            chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+            chip.setTypeface(Typeface.DEFAULT_BOLD);
+            chip.setPadding(dpPx(14), dpPx(8), dpPx(14), dpPx(8));
+            chip.setOnClickListener(v -> sendQuickMessage(type));
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.setMarginEnd(dpPx(8));
+            row.addView(chip, params);
+        }
+    }
+
+    private String pingLabel(String type) {
+        if (TeamRepository.PING_HELP.equals(type)) {
+            return getString(R.string.capture_msg_help);
+        }
+        if (TeamRepository.PING_ENEMY.equals(type)) {
+            return getString(R.string.capture_msg_enemy);
+        }
+        if (TeamRepository.PING_CAPTURED.equals(type)) {
+            return getString(R.string.capture_msg_captured);
+        }
+        if (TeamRepository.PING_COME.equals(type)) {
+            return getString(R.string.capture_msg_come);
+        }
+        return getString(R.string.capture_msg_ok);
+    }
+
+    private void sendQuickMessage(String type) {
+        binding.quickMessageBar.setVisibility(View.GONE);
+        if (runEnded || teamRepository == null || myUid == null) {
+            return;
+        }
+        long now = SystemClock.uptimeMillis();
+        if (now - lastPingAt < PING_COOLDOWN_MS) {
+            return;
+        }
+        lastPingAt = now;
+        final String key = teamRepository.sendPing(matchCode, myTeam, myUid, type);
+        if (key == null) {
+            return;
+        }
+        handler.postDelayed(() -> teamRepository.removePing(matchCode, myTeam, key),
+                PING_REMOVE_MS);
+        showPing(getString(R.string.capture_ping_you), pingLabel(type));
+    }
+
+    private void onPingReceived(String fromUid, String type, long at) {
+        if (isFinishing() || isDestroyed() || runEnded
+                || fromUid.equals(myUid) || !TeamRepository.isValidPing(type)) {
+            return;
+        }
+        if (at > 0L && ServerClock.now() - at > PING_MAX_AGE_MS) {
+            return;
+        }
+        showPing(nameOf(fromUid), pingLabel(type));
+        buzz(120L);
+    }
+
+    private void showPing(String who, String label) {
+        TextView view = new TextView(this);
+        view.setText(getString(R.string.capture_ping_line, who, label));
+        view.setBackgroundResource(R.drawable.bg_hud_pill);
+        view.setTextColor(0xFFFFFFFF);
+        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+        view.setTypeface(Typeface.DEFAULT_BOLD);
+        view.setPadding(dpPx(12), dpPx(6), dpPx(12), dpPx(6));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.bottomMargin = dpPx(4);
+        binding.pingFeed.addView(view, 0, params);
+        while (binding.pingFeed.getChildCount() > PING_FEED_MAX) {
+            binding.pingFeed.removeViewAt(binding.pingFeed.getChildCount() - 1);
+        }
+        view.animate()
+                .alpha(0f)
+                .setStartDelay(PING_VISIBLE_MS)
+                .setDuration(800L)
+                .withEndAction(() -> binding.pingFeed.removeView(view))
+                .start();
     }
 
     private int countCaptured(boolean mine) {
@@ -1703,6 +2003,15 @@ public class GameActivity extends BaseActivity {
     }
 
     private void endCapture(boolean timeUp) {
+        finishCapture(TeamMatchRules.decide(captureSession.getCapturedLocations()));
+    }
+
+    private void endCaptureTeamLeft(String winnerTeam) {
+        finishCapture(TeamMatchRules.teamLeft(winnerTeam,
+                captureSession.getCapturedLocations()));
+    }
+
+    private void finishCapture(TeamMatchRules.Result result) {
         if (runEnded) {
             return;
         }
@@ -1714,24 +2023,36 @@ public class GameActivity extends BaseActivity {
         captureTaskLocationId = null;
         releaseMyClaim();
         handler.removeCallbacks(directionTick);
+        handler.removeCallbacks(presenceTick);
+        binding.quickMessageToggle.setVisibility(View.GONE);
+        binding.quickMessageBar.setVisibility(View.GONE);
         lockInput();
         stopPulse();
         stopMusic();
         clearRush();
         gameMap.hideZone();
+        markPhase(PlayerState.PHASE_FINISHED);
 
-        int teamA = countTeam("A");
-        int teamB = countTeam("B");
-        int mine = countCaptured(true);
-        int enemy = countCaptured(false);
+        String enemy = "A".equals(myTeam) ? "B" : "A";
+        MatchResult.Outcome outcome = result.outcomeFor(myTeam);
+        int titleRes = outcome == MatchResult.Outcome.WIN ? R.string.capture_result_win
+                : (outcome == MatchResult.Outcome.LOSS
+                ? R.string.capture_result_lose : R.string.capture_result_draw);
+        String title = getString(titleRes);
+        String subtitle = getString(R.string.capture_result_score,
+                result.getCapturesA(), result.getCapturesB());
+        String body = teamDeciderLine(result) + "\n"
+                + getString(R.string.capture_result_mine, myCaptureCount, myCapturePoints);
 
-        int outcome = mine > enemy ? R.string.capture_result_win
-                : (mine < enemy ? R.string.capture_result_lose : R.string.capture_result_draw);
-        String body = getString(R.string.capture_result_score, teamA, teamB);
-        body += "\n" + getString(R.string.capture_result_mine, myCaptureCount, myCapturePoints);
-
-        showResult(getString(timeUp ? R.string.match_time_up : R.string.capture_all_done),
-                getString(outcome), body, R.string.action_back_home);
+        saveHistory(outcome, result.getCaptures(myTeam), result.getCaptures(enemy),
+                getString(R.string.capture_opponent_team, enemy),
+                result.getDecider().name());
+        String gain = saveTeamStats(outcome, myCapturePoints);
+        if (!gain.isEmpty()) {
+            body = body + "\n" + gain;
+        }
+        MatchService.finish(this, title, subtitle);
+        showResult(title, subtitle, body, R.string.action_back_home);
     }
 
     private void shakeActionButton() {
@@ -2060,6 +2381,9 @@ public class GameActivity extends BaseActivity {
     }
 
     private void leaveAfterResult() {
+        if (captureMode) {
+            leaveCaptureMatch();
+        }
         if (coordinator != null) {
             coordinator.deleteMatch();
         }
@@ -2245,7 +2569,9 @@ public class GameActivity extends BaseActivity {
                 .setMessage(match ? R.string.forfeit_message : R.string.exit_match_message)
                 .setNegativeButton(R.string.action_cancel, null)
                 .setPositiveButton(R.string.action_leave_match, (dialog, which) -> {
-                    if (coordinator != null) {
+                    if (captureMode) {
+                        forfeitCapture();
+                    } else if (coordinator != null) {
                         coordinator.forfeitMine();
                     }
                     finish();

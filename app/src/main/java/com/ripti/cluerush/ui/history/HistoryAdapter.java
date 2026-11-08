@@ -138,6 +138,12 @@ public class HistoryAdapter extends ListAdapter<MatchHistoryItem, HistoryAdapter
                     return R.string.history_note_opp_disconnect;
                 case "DISCONNECT_ME":
                     return R.string.history_note_me_disconnect;
+                case "TEAM_LEFT":
+                    return R.string.history_note_team_left;
+                case "TASK_POINTS":
+                    return R.string.history_note_points;
+                case "LAST_CAPTURE":
+                    return R.string.history_note_last_capture;
                 default:
                     return 0;
             }

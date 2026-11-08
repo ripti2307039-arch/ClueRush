@@ -55,6 +55,21 @@ public class StatsRepository {
         submitBest(uid, name, arenaId, difficultyKey, score);
     }
 
+    /**
+     * Team match: same XP, rating and win counters as a 1v1 match, but the
+     * per-arena best-score board is left alone (it only holds solo/1v1 scores).
+     */
+    public void recordTeamMatch(String uid, String name, int score,
+                                MatchResult.Outcome outcome) {
+        Change change = new Change();
+        change.xp = StatsRules.matchXp(score, outcome);
+        change.rating = StatsRules.ratingDelta(outcome);
+        change.matches = 1;
+        change.wins = outcome == MatchResult.Outcome.WIN ? 1 : 0;
+        change.draws = outcome == MatchResult.Outcome.DRAW ? 1 : 0;
+        apply(uid, name, change);
+    }
+
     private void apply(String uid, String name, Change change) {
         try {
             DatabaseReference reference = FirebaseDatabase.getInstance()

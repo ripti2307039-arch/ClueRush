@@ -103,6 +103,13 @@ public class MatchLiveRepository {
         }
     }
 
+    public void removePlayer(String code, String uid) {
+        try {
+            matches().child(code).child("players").child(uid).removeValue();
+        } catch (Exception ignored) {
+        }
+    }
+
     public void deleteMatch(String code) {
         try {
             matches().child(code).removeValue();

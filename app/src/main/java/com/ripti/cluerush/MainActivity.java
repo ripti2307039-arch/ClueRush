@@ -80,7 +80,7 @@ public class MainActivity extends BaseActivity {
         applyInsets(binding.getRoot());
 
         String name = UserDisplay.displayName(this, user);
-        binding.greetingText.setText(getString(R.string.greeting_user, name));
+        binding .greetingText.setText(getString(R.string.greeting_user, name));
         binding.avatarButton.setText(UserDisplay.initial(name));
 
         binding.avatarButton.setOnClickListener(v ->
