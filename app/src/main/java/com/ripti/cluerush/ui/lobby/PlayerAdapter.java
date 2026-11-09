@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ripti.cluerush.R;
+import com.ripti.cluerush.data.ProfilePhotoRepository;
 import com.ripti.cluerush.databinding.ItemLobbyPlayerBinding;
 import com.ripti.cluerush.databinding.ItemTeamHeaderBinding;
 import com.ripti.cluerush.model.LobbyPlayer;
@@ -227,6 +228,16 @@ public class PlayerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             binding.playerAvatar.setAlpha(1f);
 
+            final String playerUid = player.getUid();
+            binding.playerAvatar.setTag(playerUid);
+            ProfilePhotoRepository.loadPublic(context, playerUid, bitmap -> {
+                if (bitmap != null && playerUid.equals(binding.playerAvatar.getTag())) {
+                    binding.playerAvatar.setBackground(
+                            ProfilePhotoRepository.circle(context, bitmap));
+                    binding.playerAvatar.setText("");
+                }
+            });
+
             binding.playerRole.setVisibility(View.VISIBLE);
             binding.playerRole.setText(
                     player.isHost() ? R.string.role_host : R.string.role_player);
@@ -274,6 +285,7 @@ public class PlayerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
             binding.playerName.setText(teamMode
                     ? R.string.lobby_open_slot : R.string.waiting_for_opponent);
+            binding.playerAvatar.setTag(null);
             binding.playerAvatar.setText("?");
             binding.playerAvatar.setBackgroundResource(R.drawable.bg_avatar_opponent);
             binding.playerAvatar.setTextColor(

@@ -10,11 +10,14 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Base64;
+import android.util.LruCache;
 
 import androidx.annotation.NonNull;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -52,6 +55,9 @@ public final class ProfilePhotoRepository {
     private static final ExecutorService IO = Executors.newSingleThreadExecutor();
     private static final Handler MAIN = new Handler(Looper.getMainLooper());
 
+    /** In-memory photos of other players (leaderboard / lobby). Cleared when the app closes. */
+    private static final LruCache<String, Bitmap> CACHE = new LruCache<>(40);
+
     private ProfilePhotoRepository() {
     }
 
@@ -77,6 +83,65 @@ public final class ProfilePhotoRepository {
         });
     }
 
+    /**
+     * Photo of ANY player (leaderboard, lobby). The signed-in player's own photo comes
+     * from the local file; everyone else's is read from Realtime Database and kept in
+     * memory so scrolling the list does not download it again.
+     */
+    public static void loadPublic(Context context, String uid, Callback callback) {
+        if (uid == null || uid.isEmpty()) {
+            callback.onResult(null);
+            return;
+        }
+        FirebaseUser me = FirebaseAuth.getInstance().getCurrentUser();
+        if (me != null && uid.equals(me.getUid())) {
+            load(context, uid, callback);
+            return;
+        }
+        Bitmap cached = CACHE.get(uid);
+        if (cached != null) {
+            callback.onResult(cached);
+            return;
+        }
+        try {
+            FirebaseDatabase.getInstance()
+                    .getReference("users")
+                    .child(uid)
+                    .child("photo")
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            Object value = snapshot.getValue();
+                            if (!(value instanceof String)) {
+                                callback.onResult(null);
+                                return;
+                            }
+                            IO.execute(() -> {
+                                Bitmap bitmap = null;
+                                try {
+                                    byte[] bytes = Base64.decode((String) value, Base64.DEFAULT);
+                                    bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                } catch (Exception ignored) {
+                                    // Corrupt cloud copy: behave as if there is no photo.
+                                }
+                                if (bitmap != null) {
+                                    CACHE.put(uid, bitmap);
+                                }
+                                Bitmap result = bitmap;
+                                MAIN.post(() -> callback.onResult(result));
+                            });
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            callback.onResult(null);
+                        }
+                    });
+        } catch (Exception e) {
+            callback.onResult(null);
+        }
+    }
+
     /** Picks a Uri from the photo picker, crops it square and shrinks it. */
     public static void decode(Context context, Uri uri, Callback callback) {
         Context app = context.getApplicationContext();
@@ -95,6 +160,7 @@ public final class ProfilePhotoRepository {
     /** Stores the already-cropped photo locally and uploads it. */
     public static void save(Context context, String uid, Bitmap bitmap) {
         Context app = context.getApplicationContext();
+        CACHE.put(uid, bitmap);
         IO.execute(() -> {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, out);

@@ -213,7 +213,7 @@ public class LeaderboardActivity extends BaseActivity {
             } else if (activeTab == TAB_LEVEL) {
                 detail = getString(R.string.lb_xp_value, entry.value);
             }
-            rows.add(new LeaderboardAdapter.Row(rank, entry.name,
+            rows.add(new LeaderboardAdapter.Row(rank, entry.uid, entry.name,
                     valueText(activeTab, entry.value), detail, entry.uid.equals(uid)));
         }
         adapter.submit(rows);
