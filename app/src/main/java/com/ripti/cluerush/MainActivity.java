@@ -1,4 +1,3 @@
-
 package com.ripti.cluerush;
 
 import android.Manifest;
@@ -23,6 +22,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.ripti.cluerush.data.ArenaCatalog;
 import com.ripti.cluerush.data.DailyChallenge;
 import com.ripti.cluerush.data.DailyRepository;
+import com.ripti.cluerush.data.ProfilePhotoRepository;
 import com.ripti.cluerush.data.MatchRepository;
 import com.ripti.cluerush.databinding.ActivityMainBinding;
 import com.ripti.cluerush.databinding.DialogJoinCodeBinding;
@@ -79,9 +79,7 @@ public class MainActivity extends BaseActivity {
         setContentView(binding.getRoot());
         applyInsets(binding.getRoot());
 
-        String name = UserDisplay.displayName(this, user);
-        binding .greetingText.setText(getString(R.string.greeting_user, name));
-        binding.avatarButton.setText(UserDisplay.initial(name));
+        renderHeader(user);
 
         binding.avatarButton.setOnClickListener(v ->
                 startActivity(new Intent(this, ProfileActivity.class)));
@@ -148,6 +146,24 @@ public class MainActivity extends BaseActivity {
         askNotificationPermission();
     }
 
+    /** Greeting and avatar: re-run after the player edits their profile. */
+    private void renderHeader(FirebaseUser user) {
+        String name = UserDisplay.displayName(this, user);
+        binding.greetingText.setText(getString(R.string.greeting_user, name));
+        binding.avatarButton.setText(UserDisplay.initial(name));
+        binding.avatarButton.setBackgroundResource(R.drawable.bg_avatar);
+
+        if (!user.isAnonymous()) {
+            ProfilePhotoRepository.load(this, user.getUid(), bitmap -> {
+                if (!isFinishing() && !isDestroyed() && bitmap != null) {
+                    binding.avatarButton.setBackground(
+                            ProfilePhotoRepository.circle(this, bitmap));
+                    binding.avatarButton.setText("");
+                }
+            });
+        }
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -156,6 +172,10 @@ public class MainActivity extends BaseActivity {
                 && binding != null) {
             openLogin();
             return;
+        }
+
+        if (binding != null) {
+            renderHeader(FirebaseAuth.getInstance().getCurrentUser());
         }
 
         if (binding == null || allArenas.isEmpty()) {
@@ -208,17 +228,12 @@ public class MainActivity extends BaseActivity {
                 )
         );
 
-        String source = getString(
-                dailyChallenge.fromServer
-                        ? R.string.daily_source_online
-                        : R.string.daily_source_offline
-        );
-
-        binding.dailyMeta.setText(
-                dailyChallenge.title.isEmpty()
-                        ? source
-                        : dailyChallenge.title + " · " + source
-        );
+        if (dailyChallenge.title.isEmpty()) {
+            binding.dailyMeta.setVisibility(View.GONE);
+        } else {
+            binding.dailyMeta.setText(dailyChallenge.title);
+            binding.dailyMeta.setVisibility(View.VISIBLE);
+        }
 
         renderDailyScore();
         binding.dailyPlayButton.setEnabled(arena != null);

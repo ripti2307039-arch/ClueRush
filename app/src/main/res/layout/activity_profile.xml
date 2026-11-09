@@ -235,11 +235,19 @@
                 </LinearLayout>
             </LinearLayout>
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/historyButton"
+                android:id="@+id/editProfileButton"
                 style="@style/Widget.ClueRush.Button.Outlined"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_lg"
+                android:text="@string/edit_profile" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/historyButton"
+                style="@style/Widget.ClueRush.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_sm"
                 android:text="@string/history_open" />
 
             <!-- Logout (subtle) -->

@@ -52,6 +52,14 @@
     <string name="arena_buet_subtitle">Bangladesh University of Engineering and Technology</string>
 
     <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="edit_profile_title">Edit profile</string>
+    <string name="change_photo">Change photo</string>
+    <string name="cd_change_photo">Profile photo</string>
+    <string name="profile_saved">Profile updated</string>
+    <string name="profile_save_failed">Could not save. Check your connection and try again.</string>
+    <string name="photo_load_failed">Could not open that photo</string>
     <string name="action_join">Join</string>
     <string name="join_dialog_hint">Match code</string>
     <string name="join_error">Enter the 6-character match code</string>
@@ -355,8 +363,6 @@
     <string name="daily_label">DAILY CHALLENGE</string>
     <string name="daily_loading">Loading today\'s challenge…</string>
     <string name="daily_title_format">%1$s · %2$s</string>
-    <string name="daily_source_online">Synced online · same for every player</string>
-    <string name="daily_source_offline">Offline · built from today\'s date</string>
     <string name="daily_score_none">Not played yet today</string>
     <string name="daily_score_value">Your best today: %1$d</string>
     <string name="daily_play">Play today\'s challenge</string>

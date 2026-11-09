@@ -98,7 +98,7 @@ public class DailyRepository {
         String title = doc.getString("title");
         if (arenaId == null || difficultyName == null || seed == null) {
             return null;
-        }git
+        }
         Difficulty difficulty = Difficulty.fromName(difficultyName);
 
         boolean known = false;

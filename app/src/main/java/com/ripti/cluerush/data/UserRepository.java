@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.ripti.cluerush.model.UserProfile;
@@ -38,6 +39,31 @@ public class UserRepository {
                     .addOnCompleteListener(task -> onDone.run());
         } catch (Exception e) {
             onDone.run();
+        }
+    }
+
+    /** Keeps the saved name and the leaderboard name in step with the new display name. */
+    public void updateName(String uid, String name) {
+        try {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            database.getReference("users").child(uid).child("name").setValue(name);
+
+            DatabaseReference entry = database.getReference("leaderboard").child(uid);
+            entry.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    // Only rename players who are already on the leaderboard.
+                    if (snapshot.exists()) {
+                        entry.child("name").setValue(name);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
+        } catch (Exception ignored) {
+            // The Auth display name is already updated; this only mirrors it.
         }
     }
 
