@@ -146,6 +146,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:maxLines="1"
+            android:minWidth="0dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:textSize="13sp"
             android:text="@string/history_filter_all" />
 
         <com.google.android.material.button.MaterialButton
@@ -154,6 +159,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:maxLines="1"
+            android:minWidth="0dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:textSize="13sp"
             android:text="@string/history_filter_wins" />
 
         <com.google.android.material.button.MaterialButton
@@ -162,6 +172,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:maxLines="1"
+            android:minWidth="0dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:textSize="13sp"
             android:text="@string/history_filter_losses" />
 
         <com.google.android.material.button.MaterialButton
@@ -170,6 +185,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:maxLines="1"
+            android:minWidth="0dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:textSize="13sp"
             android:text="@string/history_filter_draws" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 

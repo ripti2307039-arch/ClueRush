@@ -238,6 +238,10 @@ public class GameActivity extends BaseActivity {
     private final Map<String, String> playerTeams = new HashMap<>();
     private final Map<String, Long> offlineSince = new HashMap<>();
     private boolean shortHandedShown;
+    private static final long FINALIZE_GRACE_MS = 3000L;
+    private boolean finalizing;
+    private TextView finalizingView;
+    private final Runnable finalizeRunnable = this::onFinalizeElapsed;
     private final Runnable presenceTick = this::onPresenceTick;
     private long lastPingAt;
 
@@ -620,8 +624,8 @@ public class GameActivity extends BaseActivity {
             lastShownSeconds = seconds;
             renderScoreText();
         }
-        if (captureMode && seconds <= 0 && !runEnded) {
-            endCapture(true);
+        if (captureMode && seconds <= 0 && !runEnded && !finalizing) {
+            beginFinalizing();
         }
     }
 
@@ -1988,7 +1992,7 @@ public class GameActivity extends BaseActivity {
     }
 
     private void unlockAfterCapture() {
-        if (runEnded) {
+        if (runEnded || finalizing) {
             return;
         }
         inputLocked = false;
@@ -2054,6 +2058,11 @@ public class GameActivity extends BaseActivity {
         }
         String id = round.getLocation().getId();
         captureTaskLocationId = null;
+
+        if (finalizing && !solved) {
+            captureController.releaseSelection();
+            return;
+        }
 
         if (!solved) {
             captureController.releaseSelection();
@@ -2123,6 +2132,44 @@ public class GameActivity extends BaseActivity {
         return null;
     }
 
+    /**
+     * Time is up, but a capture sent in the last second may still be on its way
+     * to the server. Wait a short grace period so every phone reads the same
+     * captured data before the result is computed. The database rules close
+     * captures 2 s after the end, so the data is final when this runs.
+     */
+    private void beginFinalizing() {
+        if (finalizing || runEnded) {
+            return;
+        }
+        finalizing = true;
+        lockInput();
+        stopPulse();
+        captureTaskLocationId = null;
+        if (taskOverlay.isActive()) {
+            taskOverlay.cancel();
+        }
+        finalizingView = new TextView(this);
+        finalizingView.setText(R.string.capture_finalizing);
+        finalizingView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 26f);
+        finalizingView.setTextColor(ContextCompat.getColor(this, R.color.treasure_gold));
+        finalizingView.setTypeface(Typeface.DEFAULT_BOLD);
+        finalizingView.setGravity(Gravity.CENTER);
+        finalizingView.setBackgroundColor(ContextCompat.getColor(this, R.color.overlay_scrim));
+        finalizingView.setClickable(true);
+        ((ViewGroup) binding.getRoot()).addView(finalizingView,
+                new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT));
+        handler.postDelayed(finalizeRunnable, FINALIZE_GRACE_MS);
+    }
+
+    private void onFinalizeElapsed() {
+        if (runEnded || isFinishing() || isDestroyed()) {
+            return;
+        }
+        endCapture(true);
+    }
+
     private void endCapture(boolean timeUp) {
         finishCapture(TeamMatchRules.decide(captureSession.getCapturedLocations()));
     }
@@ -2138,10 +2185,19 @@ public class GameActivity extends BaseActivity {
         }
         runEnded = true;
         resultShown = true;
+        finalizing = false;
+        handler.removeCallbacks(finalizeRunnable);
+        if (finalizingView != null) {
+            ((ViewGroup) binding.getRoot()).removeView(finalizingView);
+            finalizingView = null;
+        }
         if (taskOverlay.isActive()) {
             taskOverlay.cancel();
         }
         captureTaskLocationId = null;
+        if (captureController != null) {
+            captureController.stop();
+        }
         releaseMyClaim();
         handler.removeCallbacks(directionTick);
         handler.removeCallbacks(presenceTick);
@@ -2679,6 +2735,9 @@ public class GameActivity extends BaseActivity {
     }
 
     private void confirmExit() {
+        if (finalizing && !runEnded) {
+            return;
+        }
         if (isMatch() && resultShown) {
             leaveAfterResult();
             return;

@@ -30,6 +30,10 @@ import com.ripti.cluerush.util.EntranceAnimator;
 import com.ripti.cluerush.util.LobbyMusic;
 import com.ripti.cluerush.util.ServerClock;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class LobbyActivity extends BaseActivity {
 
     public static final String EXTRA_CODE = "extra_code";
@@ -51,6 +55,7 @@ public class LobbyActivity extends BaseActivity {
     private boolean launched;
     private boolean startClicked;
     private boolean startWasActive;
+    private boolean autoMoving;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -229,7 +234,76 @@ public class LobbyActivity extends BaseActivity {
             startClicked = false;
         }
 
+        resolveTeamOverflow(match);
         render(match);
+    }
+
+    /**
+     * Two players can switch into the same team at the same moment, because the
+     * database cannot count players per team. Every phone sees the same data, so
+     * they all agree who came last: that player moves back to the other team.
+     */
+    private void resolveTeamOverflow(Match match) {
+        if (!match.isTeamCaptureMode() || autoMoving || startClicked) {
+            return;
+        }
+
+        String mine = myTeam(match);
+
+        if (mine == null) {
+            return;
+        }
+
+        List<LobbyPlayer> members = new ArrayList<>();
+
+        for (LobbyPlayer player : match.getPlayers()) {
+            if (mine.equals(player.getTeam())) {
+                members.add(player);
+            }
+        }
+
+        if (members.size() <= TEAM_SLOTS) {
+            return;
+        }
+
+        Collections.sort(members, (a, b) -> {
+            int bySince = Long.compare(a.getTeamSince(), b.getTeamSince());
+            return bySince != 0 ? bySince : a.getUid().compareTo(b.getUid());
+        });
+
+        int myIndex = -1;
+
+        for (int i = 0; i < members.size(); i++) {
+            if (members.get(i).getUid().equals(uid)) {
+                myIndex = i;
+                break;
+            }
+        }
+
+        if (myIndex < TEAM_SLOTS) {
+            return;
+        }
+
+        final String other = LobbyPlayer.TEAM_A.equals(mine)
+                ? LobbyPlayer.TEAM_B : LobbyPlayer.TEAM_A;
+
+        if (teamCount(match, other) >= TEAM_SLOTS) {
+            return;
+        }
+
+        autoMoving = true;
+
+        repository.switchTeam(code, uid, other, success -> {
+            autoMoving = false;
+
+            if (success && !isFinishing() && !isDestroyed()) {
+                Snackbar.make(
+                        binding.getRoot(),
+                        getString(R.string.lobby_team_overflow_moved, other),
+                        Snackbar.LENGTH_LONG
+                ).show();
+            }
+        });
     }
 
     private void startMatch() {

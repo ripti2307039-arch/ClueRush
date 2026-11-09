@@ -1,4 +1,3 @@
-
 package com.ripti.cluerush.model;
 
 public class LobbyPlayer {
@@ -11,12 +10,20 @@ public class LobbyPlayer {
     private final boolean ready;
     private final boolean host;
     private final String team;
+    private final long teamSince;
 
     public LobbyPlayer(String uid, String name, boolean ready, boolean host) {
         this(uid, name, ready, host, null);
     }
 
     public LobbyPlayer(String uid, String name, boolean ready, boolean host, String team) {
+        this(uid, name, ready, host, team, 0L);
+    }
+
+    /** teamSince: server time the player joined, or last switched to, this team. */
+    public LobbyPlayer(String uid, String name, boolean ready, boolean host,
+                       String team, long teamSince) {
+        this.teamSince = teamSince;
         this.uid = uid;
         this.name = name;
         this.ready = ready;
@@ -42,6 +49,10 @@ public class LobbyPlayer {
 
     public String getTeam() {
         return team;
+    }
+
+    public long getTeamSince() {
+        return teamSince;
     }
 
     public boolean isTeamA() {

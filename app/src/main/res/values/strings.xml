@@ -427,6 +427,8 @@
     <string name="capture_success">Captured %1$s!</string>
     <string name="capture_enemy_took">The enemy team captured this location.</string>
     <string name="capture_team_took">Your teammate captured this location.</string>
+    <string name="capture_finalizing">Finalizing result…</string>
+    <string name="lobby_team_overflow_moved">That team was already full, so you were moved to Team %1$s.</string>
     <string name="capture_sync_error">Could not sync the capture. Check your connection.</string>
     <string name="capture_all_done">All locations captured!</string>
     <string name="capture_result_win">Your team wins!</string>

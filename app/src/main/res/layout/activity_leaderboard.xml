@@ -45,6 +45,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:maxLines="1"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:textSize="14sp"
             android:text="@string/lb_tab_rating" />
 
         <com.google.android.material.button.MaterialButton
@@ -53,6 +57,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:maxLines="1"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:textSize="14sp"
             android:text="@string/lb_tab_level" />
 
         <com.google.android.material.button.MaterialButton
@@ -60,7 +68,11 @@
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="1.5"
+            android:maxLines="1"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:textSize="14sp"
             android:text="@string/lb_tab_score" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 

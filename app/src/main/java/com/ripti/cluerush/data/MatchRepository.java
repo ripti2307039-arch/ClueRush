@@ -70,9 +70,11 @@ public class MatchRepository {
         final boolean host;
         final long joinedAt;
         final String team;
+        final long teamSince;
 
         PlayerRow(String uid, String name, boolean ready, boolean host,
-                  long joinedAt, String team) {
+                  long joinedAt, String team, long teamSince) {
+            this.teamSince = teamSince;
             this.uid = uid;
             this.name = name;
             this.ready = ready;
@@ -376,6 +378,7 @@ public class MatchRepository {
         try {
             Map<String, Object> updates = new HashMap<>();
             updates.put("team", team);
+            updates.put("teamAt", ServerValue.TIMESTAMP);
             updates.put("ready", false);
 
             matches()
@@ -530,7 +533,8 @@ public class MatchRepository {
                     ready,
                     uid.equals(hostUid),
                     readLong(child, "joinedAt", Long.MAX_VALUE),
-                    readString(child, "team", null)
+                    readString(child, "team", null),
+                    readLong(child, "teamAt", readLong(child, "joinedAt", Long.MAX_VALUE))
             ));
         }
 
@@ -576,7 +580,7 @@ public class MatchRepository {
                         : (i < TEAM_SLOTS ? LobbyPlayer.TEAM_A : LobbyPlayer.TEAM_B);
 
                 players.add(new LobbyPlayer(
-                        row.uid, row.name, row.ready, row.host, team));
+                        row.uid, row.name, row.ready, row.host, team, row.teamSince));
             }
 
         } else {
