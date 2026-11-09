@@ -25,17 +25,6 @@
         android:layout_height="@dimen/avatar_game_size"
         android:layout_gravity="center"
         android:contentDescription="@string/cd_player_avatar" />
-    <TextView
-        android:id="@+id/targetArrow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:shadowColor="#CC000000"
-        android:shadowRadius="6"
-        android:text="@string/capture_target_arrow"
-        android:textColor="@color/treasure_gold"
-        android:textSize="24sp"
-        android:visibility="gone" />
     <FrameLayout
         android:id="@+id/hudLayer"
         android:layout_width="match_parent"
@@ -240,52 +229,6 @@
             android:layout_marginBottom="@dimen/hud_margin_small"
             android:minWidth="@dimen/action_button_min_width"
             android:text="@string/action_is_this_the_place" />
-        <LinearLayout
-            android:id="@+id/pingFeed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="104dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical" />
-
-        <HorizontalScrollView
-            android:id="@+id/quickMessageBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginStart="@dimen/hud_margin"
-            android:layout_marginEnd="@dimen/hud_margin"
-            android:layout_marginBottom="92dp"
-            android:fillViewport="true"
-            android:scrollbars="none"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:id="@+id/quickMessageRow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal" />
-        </HorizontalScrollView>
-
-        <TextView
-            android:id="@+id/quickMessageToggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginBottom="44dp"
-            android:background="@drawable/bg_hud_pill"
-            android:paddingStart="@dimen/space_md"
-            android:paddingTop="@dimen/space_sm"
-            android:paddingEnd="@dimen/space_md"
-            android:paddingBottom="@dimen/space_sm"
-            android:text="@string/capture_quick_title"
-            android:textColor="@color/white"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:visibility="gone" />
-
         <TextView
             android:id="@+id/attributionText"
             android:layout_width="wrap_content"

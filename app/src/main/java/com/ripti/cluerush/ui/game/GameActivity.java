@@ -146,11 +146,6 @@ public class GameActivity extends BaseActivity {
     private static final int TEAM_RED = 0xFFFF4D6D;
     private static final long DIRECTION_REFRESH_MS = 2000L;
     private static final int LONG_CLUE_CHARS = 42;
-    private static final long PING_COOLDOWN_MS = 1500L;
-    private static final long PING_MAX_AGE_MS = 8000L;
-    private static final long PING_VISIBLE_MS = 4000L;
-    private static final long PING_REMOVE_MS = 12000L;
-    private static final int PING_FEED_MAX = 3;
     private static final long OFFLINE_LIMIT_MS = 30_000L;
     private static final long PRESENCE_TICK_MS = 3000L;
     private static final long TEAM_POSITION_INTERVAL_MS = 1500L;
@@ -216,6 +211,7 @@ public class GameActivity extends BaseActivity {
     private boolean captureMode;
     private String myTeam;
     private CaptureSession captureSession;
+    private int shownWave;
     private CaptureController captureController;
     private String captureTaskLocationId;
     private int myCaptureCount;
@@ -230,7 +226,6 @@ public class GameActivity extends BaseActivity {
     private final Map<String, String> playerNames = new HashMap<>();
     private final HashSet<String> expandedClues = new HashSet<>();
     private final Runnable directionTick = this::onDirectionTick;
-    private TeamRepository.PingHandle pingHandle;
     private MatchLiveRepository liveRepository;
     private MatchLiveRepository.Handle liveHandle;
     private MatchLiveRepository.Handle presenceHandle;
@@ -243,7 +238,6 @@ public class GameActivity extends BaseActivity {
     private TextView finalizingView;
     private final Runnable finalizeRunnable = this::onFinalizeElapsed;
     private final Runnable presenceTick = this::onPresenceTick;
-    private long lastPingAt;
 
     private TeamRepository.ListenerHandle positionsHandle;
     private final Map<String, double[]> teamPositions = new HashMap<>();
@@ -1320,19 +1314,6 @@ public class GameActivity extends BaseActivity {
                                 + (error == null ? "?" : error.getMessage()));
                     }
                 });
-        pingHandle = teamRepository.observePings(matchCode, myTeam,
-                new TeamRepository.PingListener() {
-                    @Override
-                    public void onPing(String fromUid, String type, long at) {
-                        onPingReceived(fromUid, type, at);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError error) {
-                        Log.e(TASK_TAG, "Quick messages unavailable: "
-                                + (error == null ? "?" : error.getMessage()));
-                    }
-                });
 
         gameMap.setOpponentColor(MapMarker.COLOR_MINE);
         binding.minimapView.setOpponentColor(MapMarker.COLOR_MINE);
@@ -1357,7 +1338,6 @@ public class GameActivity extends BaseActivity {
                 });
         publishTeamPosition();
 
-        setupQuickMessages();
         matchRepository = new MatchRepository();
         matchHandle = matchRepository.observeMatch(matchCode,
                 new MatchRepository.MatchListener() {
@@ -1549,10 +1529,6 @@ public class GameActivity extends BaseActivity {
             matchHandle.remove();
             matchHandle = null;
         }
-        if (pingHandle != null) {
-            pingHandle.remove();
-            pingHandle = null;
-        }
         if (liveHandle != null) {
             liveHandle.remove();
             liveHandle = null;
@@ -1606,109 +1582,6 @@ public class GameActivity extends BaseActivity {
         binding.minimapView.setOpponent(position[0], position[1], true);
     }
 
-    private void setupQuickMessages() {
-        binding.quickMessageToggle.setVisibility(View.VISIBLE);
-        binding.quickMessageToggle.setOnClickListener(v -> {
-            boolean open = binding.quickMessageBar.getVisibility() == View.VISIBLE;
-            binding.quickMessageBar.setVisibility(open ? View.GONE : View.VISIBLE);
-        });
-
-        LinearLayout row = binding.quickMessageRow;
-        row.removeAllViews();
-        String[] types = {
-                TeamRepository.PING_OK,
-                TeamRepository.PING_HELP,
-                TeamRepository.PING_ENEMY,
-                TeamRepository.PING_CAPTURED,
-                TeamRepository.PING_COME
-        };
-        for (String type : types) {
-            TextView chip = new TextView(this);
-            chip.setText(pingLabel(type));
-            chip.setBackgroundResource(R.drawable.bg_hud_pill);
-            chip.setTextColor(0xFFFFFFFF);
-            chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
-            chip.setTypeface(Typeface.DEFAULT_BOLD);
-            chip.setPadding(dpPx(14), dpPx(8), dpPx(14), dpPx(8));
-            chip.setOnClickListener(v -> sendQuickMessage(type));
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.setMarginEnd(dpPx(8));
-            row.addView(chip, params);
-        }
-    }
-
-    private String pingLabel(String type) {
-        if (TeamRepository.PING_HELP.equals(type)) {
-            return getString(R.string.capture_msg_help);
-        }
-        if (TeamRepository.PING_ENEMY.equals(type)) {
-            return getString(R.string.capture_msg_enemy);
-        }
-        if (TeamRepository.PING_CAPTURED.equals(type)) {
-            return getString(R.string.capture_msg_captured);
-        }
-        if (TeamRepository.PING_COME.equals(type)) {
-            return getString(R.string.capture_msg_come);
-        }
-        return getString(R.string.capture_msg_ok);
-    }
-
-    private void sendQuickMessage(String type) {
-        binding.quickMessageBar.setVisibility(View.GONE);
-        if (runEnded || teamRepository == null || myUid == null) {
-            return;
-        }
-        long now = SystemClock.uptimeMillis();
-        if (now - lastPingAt < PING_COOLDOWN_MS) {
-            return;
-        }
-        lastPingAt = now;
-        final String key = teamRepository.sendPing(matchCode, myTeam, myUid, type);
-        if (key == null) {
-            return;
-        }
-        handler.postDelayed(() -> teamRepository.removePing(matchCode, myTeam, key),
-                PING_REMOVE_MS);
-        showPing(getString(R.string.capture_ping_you), pingLabel(type));
-    }
-
-    private void onPingReceived(String fromUid, String type, long at) {
-        if (isFinishing() || isDestroyed() || runEnded
-                || fromUid.equals(myUid) || !TeamRepository.isValidPing(type)) {
-            return;
-        }
-        if (at > 0L && ServerClock.now() - at > PING_MAX_AGE_MS) {
-            return;
-        }
-        showPing(nameOf(fromUid), pingLabel(type));
-        buzz(120L);
-    }
-
-    private void showPing(String who, String label) {
-        TextView view = new TextView(this);
-        view.setText(getString(R.string.capture_ping_line, who, label));
-        view.setBackgroundResource(R.drawable.bg_hud_pill);
-        view.setTextColor(0xFFFFFFFF);
-        view.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
-        view.setTypeface(Typeface.DEFAULT_BOLD);
-        view.setPadding(dpPx(12), dpPx(6), dpPx(12), dpPx(6));
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.bottomMargin = dpPx(4);
-        binding.pingFeed.addView(view, 0, params);
-        while (binding.pingFeed.getChildCount() > PING_FEED_MAX) {
-            binding.pingFeed.removeViewAt(binding.pingFeed.getChildCount() - 1);
-        }
-        view.animate()
-                .alpha(0f)
-                .setStartDelay(PING_VISIBLE_MS)
-                .setDuration(800L)
-                .withEndAction(() -> binding.pingFeed.removeView(view))
-                .start();
-    }
-
     private int countCaptured(boolean mine) {
         int count = 0;
         for (CaptureSession.CaptureInfo info : captureSession.getCapturedLocations().values()) {
@@ -1734,8 +1607,9 @@ public class GameActivity extends BaseActivity {
             return;
         }
         int captured = captureSession.getCapturedCount();
+        int wave = Math.min(captureSession.getCurrentWave() + 1, CaptureSession.WAVE_COUNT);
         binding.clueIndexText.setText(getString(R.string.capture_panel_title,
-                captured, CaptureSession.LOCATION_COUNT));
+                captured, CaptureSession.LOCATION_COUNT, wave, CaptureSession.WAVE_COUNT));
         binding.captureCounter.setText(getString(R.string.capture_counter,
                 captured, CaptureSession.LOCATION_COUNT));
         binding.captureCounter.setVisibility(View.VISIBLE);
@@ -1745,8 +1619,9 @@ public class GameActivity extends BaseActivity {
         LinearLayout list = binding.captureClueList;
         list.removeAllViews();
         List<Round> rounds = captureSession.getRounds();
+        int start = captureSession.getWaveStartIndex();
         for (int pass = 0; pass < 2; pass++) {
-            for (int i = 0; i < rounds.size(); i++) {
+            for (int i = start; i < start + CaptureSession.WAVE_SIZE; i++) {
                 Round round = rounds.get(i);
                 CaptureSession.CaptureInfo info =
                         captureSession.getCaptureInfo(round.getLocation().getId());
@@ -1756,7 +1631,6 @@ public class GameActivity extends BaseActivity {
             }
         }
         capClueListHeight(list);
-        updateTargetArrow();
     }
 
     private int zoneColorFor(String locationId) {
@@ -1765,28 +1639,6 @@ public class GameActivity extends BaseActivity {
             return MapMarker.COLOR_FREE;
         }
         return myTeam.equals(info.getTeam()) ? MapMarker.COLOR_MINE : MapMarker.COLOR_ENEMY;
-    }
-
-    private void updateTargetArrow() {
-        String claimed = (myUid == null || runEnded) ? null : claims.get(myUid);
-        Round round = claimed == null ? null : captureSession.getRoundByLocationId(claimed);
-        boolean inside = insideLocation != null && insideLocation.getId().equals(claimed);
-        if (round == null || inside || captureSession.isCaptured(claimed)) {
-            binding.targetArrow.setVisibility(View.GONE);
-            return;
-        }
-        CampusLocation target = round.getLocation();
-        double dy = target.getLatitude() - player.getLatitude();
-        double dx = (target.getLongitude() - player.getLongitude())
-                * Math.cos(Math.toRadians(player.getLatitude()));
-        double angle = Math.toDegrees(Math.atan2(dx, dy));
-        int slot = (int) Math.round(((angle % 360.0) + 360.0) % 360.0 / 45.0) % 8;
-        double snapped = Math.toRadians(slot * 45.0);
-        float radius = dpPx(64);
-        binding.targetArrow.setTranslationX((float) (Math.sin(snapped) * radius));
-        binding.targetArrow.setTranslationY((float) (-Math.cos(snapped) * radius));
-        binding.targetArrow.setRotation(slot * 45f);
-        binding.targetArrow.setVisibility(View.VISIBLE);
     }
 
     private void capClueListHeight(LinearLayout list) {
@@ -1914,7 +1766,7 @@ public class GameActivity extends BaseActivity {
 
     private void onClueTapped(String id) {
         if (runEnded || myUid == null || teamRepository == null
-                || captureSession.isCaptured(id)) {
+                || captureSession.isCaptured(id) || !captureSession.isActive(id)) {
             return;
         }
         if (id.equals(claims.get(myUid))) {
@@ -1983,6 +1835,15 @@ public class GameActivity extends BaseActivity {
         renderCapturePanel();
         publishMarkers();
         renderScoreText();
+        int wave = captureSession.getCurrentWave();
+        if (wave > shownWave) {
+            shownWave = wave;
+            if (!captureSession.isComplete()) {
+                showHint(getString(R.string.capture_new_wave, wave + 1,
+                        CaptureSession.WAVE_COUNT));
+                buzz(200L);
+            }
+        }
         if (captureMode && zoneLocation != null) {
             gameMap.setZoneColor(zoneColorFor(zoneLocation.getId()));
         }
@@ -2008,7 +1869,7 @@ public class GameActivity extends BaseActivity {
         }
         String id = insideLocation.getId();
         Round round = captureSession.getRoundByLocationId(id);
-        if (round == null) {
+        if (round == null || (!captureSession.isCaptured(id) && !captureSession.isActive(id))) {
             long now = SystemClock.uptimeMillis();
             if (now - lastWrongAt < WRONG_COOLDOWN_MS) {
                 return;
@@ -2201,15 +2062,12 @@ public class GameActivity extends BaseActivity {
         releaseMyClaim();
         handler.removeCallbacks(directionTick);
         handler.removeCallbacks(presenceTick);
-        binding.quickMessageToggle.setVisibility(View.GONE);
-        binding.quickMessageBar.setVisibility(View.GONE);
         lockInput();
         stopPulse();
         stopMusic();
         clearRush();
         gameMap.hideZone();
         markPhase(PlayerState.PHASE_FINISHED);
-        binding.targetArrow.setVisibility(View.GONE);
         gameMap.setOpponent(0.0, 0.0, false, "");
         binding.minimapView.setOpponent(0.0, 0.0, false);
 

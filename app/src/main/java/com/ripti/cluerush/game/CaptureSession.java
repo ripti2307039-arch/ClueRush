@@ -1,4 +1,3 @@
-
 package com.ripti.cluerush.game;
 
 import android.content.Context;
@@ -18,6 +17,10 @@ import java.util.Random;
 public final class CaptureSession {
 
     public static final int LOCATION_COUNT = 8;
+
+    /** 2v2: clues are released in waves of 2. 4 waves = 8 clues in total. */
+    public static final int WAVE_SIZE = 2;
+    public static final int WAVE_COUNT = LOCATION_COUNT / WAVE_SIZE;
 
     private final List<Round> rounds;
     private final Map<String, CaptureInfo> captured;
@@ -72,10 +75,47 @@ public final class CaptureSession {
         return null;
     }
 
+    /**
+     * Index (0-based) of the wave that is live right now: the first wave that
+     * still has an uncaptured location. Anyone (either team) capturing counts,
+     * so the next 2 clues unlock once both locations of the wave are taken.
+     * Returns WAVE_COUNT when everything is captured.
+     */
+    public int getCurrentWave() {
+        for (int wave = 0; wave < WAVE_COUNT; wave++) {
+            for (int i = wave * WAVE_SIZE; i < (wave + 1) * WAVE_SIZE; i++) {
+                if (!isCaptured(rounds.get(i).getLocation().getId())) {
+                    return wave;
+                }
+            }
+        }
+        return WAVE_COUNT;
+    }
+
+    /** Index in getRounds() of the first clue of the live wave. */
+    public int getWaveStartIndex() {
+        return Math.min(getCurrentWave(), WAVE_COUNT - 1) * WAVE_SIZE;
+    }
+
+    /** The 2 rounds players can see and capture right now. */
+    public List<Round> getActiveRounds() {
+        int start = getWaveStartIndex();
+        return rounds.subList(start, start + WAVE_SIZE);
+    }
+
+    public boolean isActive(String locationId) {
+        for (Round round : getActiveRounds()) {
+            if (round.getLocation().getId().equals(locationId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean selectLocation(String locationId) {
         Round round = getRoundByLocationId(locationId);
 
-        if (round == null || isCaptured(locationId)) {
+        if (round == null || isCaptured(locationId) || !isActive(locationId)) {
             return false;
         }
 
