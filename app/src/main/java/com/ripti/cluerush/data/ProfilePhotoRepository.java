@@ -58,6 +58,10 @@ public final class ProfilePhotoRepository {
     /** In-memory photos of other players (leaderboard / lobby). Cleared when the app closes. */
     private static final LruCache<String, Bitmap> CACHE = new LruCache<>(40);
 
+    /** When each cached photo was downloaded. Old entries are fetched again so a changed photo shows up. */
+    private static final LruCache<String, Long> CACHE_TIME = new LruCache<>(40);
+    private static final long CACHE_TTL_MS = 20_000L;
+
     private ProfilePhotoRepository() {
     }
 
@@ -99,7 +103,9 @@ public final class ProfilePhotoRepository {
             return;
         }
         Bitmap cached = CACHE.get(uid);
-        if (cached != null) {
+        Long cachedAt = CACHE_TIME.get(uid);
+        if (cached != null && cachedAt != null
+                && System.currentTimeMillis() - cachedAt < CACHE_TTL_MS) {
             callback.onResult(cached);
             return;
         }
@@ -113,6 +119,8 @@ public final class ProfilePhotoRepository {
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             Object value = snapshot.getValue();
                             if (!(value instanceof String)) {
+                                CACHE.remove(uid);
+                                CACHE_TIME.remove(uid);
                                 callback.onResult(null);
                                 return;
                             }
@@ -126,6 +134,7 @@ public final class ProfilePhotoRepository {
                                 }
                                 if (bitmap != null) {
                                     CACHE.put(uid, bitmap);
+                                    CACHE_TIME.put(uid, System.currentTimeMillis());
                                 }
                                 Bitmap result = bitmap;
                                 MAIN.post(() -> callback.onResult(result));
@@ -159,6 +168,12 @@ public final class ProfilePhotoRepository {
 
     /** Stores the already-cropped photo locally and uploads it. */
     public static void save(Context context, String uid, Bitmap bitmap) {
+        save(context, uid, bitmap, null);
+    }
+
+    /** Same as save, but onFail gets the Firebase error text on the main thread. */
+    public static void save(Context context, String uid, Bitmap bitmap,
+                            java.util.function.Consumer<String> onFail) {
         Context app = context.getApplicationContext();
         CACHE.put(uid, bitmap);
         IO.execute(() -> {
@@ -177,8 +192,23 @@ public final class ProfilePhotoRepository {
                         .getReference("users")
                         .child(uid)
                         .child("photo")
-                        .setValue(Base64.encodeToString(bytes, Base64.NO_WRAP));
-            } catch (Exception ignored) {
+                        .setValue(Base64.encodeToString(bytes, Base64.NO_WRAP))
+                        .addOnSuccessListener(v -> {
+                            if (onFail != null) {
+                                MAIN.post(() -> onFail.accept("Server saved your photo"));
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            android.util.Log.w("ProfilePhoto", "photo upload failed: " + e);
+                            if (onFail != null) {
+                                MAIN.post(() -> onFail.accept(
+                                        "Not synced to server: photo: " + e.getMessage()));
+                            }
+                        });
+            } catch (Exception e) {
+                if (onFail != null) {
+                    MAIN.post(() -> onFail.accept("Not synced to server: photo: " + e));
+                }
                 // Offline writes are queued by Firebase; anything else keeps the local copy.
             }
         });

@@ -1,4 +1,3 @@
-
 package com.ripti.cluerush.ui.profile;
 
 import android.content.Intent;
@@ -224,6 +223,12 @@ public class ProfileActivity extends BaseActivity {
     // SAVE PROFILE
     // -----------------------------------------
 
+    /** Tells whether the server confirmed the write or rejected it. */
+    private void showSyncError(String message) {
+        Toast.makeText(getApplicationContext(),
+                message, Toast.LENGTH_LONG).show();
+    }
+
     private void saveProfile(AlertDialog dialog) {
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -265,7 +270,8 @@ public class ProfileActivity extends BaseActivity {
             ProfilePhotoRepository.save(
                     this,
                     user.getUid(),
-                    newPhoto
+                    newPhoto,
+                    this::showSyncError
             );
 
             photoBitmap = newPhoto;
@@ -306,8 +312,10 @@ public class ProfileActivity extends BaseActivity {
             if (task.isSuccessful()) {
 
                 userRepository.updateName(
+                        this,
                         user.getUid(),
-                        name
+                        name,
+                        this::showSyncError
                 );
 
                 binding.profileName.setText(name);

@@ -138,7 +138,7 @@ public class LeaderboardRepository {
                             readLong(child, field), readLong(child, FIELD_XP)));
                 }
                 Collections.sort(entries, (a, b) -> Long.compare(b.value, a.value));
-                callback.onLoaded(entries);
+                withCurrentNames(entries, callback);
             }
 
             @Override
@@ -155,5 +155,53 @@ public class LeaderboardRepository {
 
     private static FirebaseDatabase database() {
         return FirebaseDatabase.getInstance();
+    }
+
+    /**
+     * The name copied into leaderboard / scores can be out of date after a rename, so the
+     * list shows the live name from users/{uid}/name and only falls back to the copy.
+     */
+    private void withCurrentNames(List<Entry> entries, Callback callback) {
+        if (entries.isEmpty()) {
+            callback.onLoaded(entries);
+            return;
+        }
+        final List<Entry> result = new ArrayList<>(entries);
+        final int[] pending = {entries.size()};
+        for (int i = 0; i < entries.size(); i++) {
+            final int index = i;
+            final Entry old = entries.get(i);
+            try {
+                database().getReference("users").child(old.uid).child("name")
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                Object live = snapshot.getValue();
+                                if (live instanceof String && !((String) live).trim().isEmpty()) {
+                                    result.set(index, new Entry(old.uid, ((String) live).trim(),
+                                            old.value, old.xp));
+                                }
+                                done();
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                done();
+                            }
+
+                            private void done() {
+                                pending[0]--;
+                                if (pending[0] == 0) {
+                                    callback.onLoaded(result);
+                                }
+                            }
+                        });
+            } catch (Exception e) {
+                pending[0]--;
+                if (pending[0] == 0) {
+                    callback.onLoaded(result);
+                }
+            }
+        }
     }
 }
